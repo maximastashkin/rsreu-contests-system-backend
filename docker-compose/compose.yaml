@@ -5,7 +5,7 @@ services:
     container_name: rest-service
     image: service:0.1
     ports:
-      - 8091:8080
+      - "8091:8080"
     restart: always
     depends_on:
       - mongo
@@ -18,7 +18,7 @@ services:
     image: mongo
     restart: always
     ports:
-      - 8891:27017
+      - "8891:27017"
     environment:
       MONGO_INITDB_DATABASE: rcs-db
       MONGO_INITDB_ROOT_USERNAME: root
