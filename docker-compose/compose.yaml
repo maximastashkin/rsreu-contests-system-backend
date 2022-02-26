@@ -1,20 +1,21 @@
 version: '3.1'
 
 services:
-  service:
+  rest-service:
     container_name: rest-service
-    image: rest-service:0.1
+    build: ./../
     ports:
       - "8080:8091"
     restart: always
     depends_on:
       - mongo
+      - code-executor-service
     environment:
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_HOST=${MONGO_HOST}
   mongo:
     container_name: rcs-db
-    image: mongo
+    image: mongo:latest
     restart: always
     ports:
       - "8891:27017"
