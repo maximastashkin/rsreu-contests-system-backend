@@ -14,7 +14,7 @@ import java.util.Set;
 @Builder
 public class TaskSolution {
     @MongoId
-    private ObjectId id;
+    @Builder.Default private ObjectId id = new ObjectId();
 
     @DBRef
     private Task task;

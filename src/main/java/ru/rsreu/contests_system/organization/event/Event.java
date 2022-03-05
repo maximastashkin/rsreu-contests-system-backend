@@ -3,6 +3,7 @@ package ru.rsreu.contests_system.organization.event;
 import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import ru.rsreu.contests_system.organization.event.participant_info.ParticipantInfo;
@@ -17,7 +18,10 @@ import java.util.Set;
 @Builder
 public class Event {
     @MongoId
-    private ObjectId id;
+    @Builder.Default private ObjectId id = new ObjectId();
+
+    @Indexed(unique = true)
+    private String name;
 
     private EventType eventType;
 
@@ -26,6 +30,7 @@ public class Event {
     private LocalDateTime endDateTime;
 
     @DBRef
+    @Indexed(unique = true)
     private User eventLeader;
 
     @DBRef

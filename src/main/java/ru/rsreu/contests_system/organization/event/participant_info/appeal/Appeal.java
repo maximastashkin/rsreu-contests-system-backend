@@ -11,7 +11,7 @@ import ru.rsreu.contests_system.user.User;
 @Builder
 public class Appeal {
     @MongoId
-    private ObjectId objectId;
+    @Builder.Default private ObjectId objectId = new ObjectId();
 
     private String text;
 

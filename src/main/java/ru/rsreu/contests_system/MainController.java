@@ -43,15 +43,15 @@ public class MainController {
         task.addTaskTest(taskTest);
         taskRepository.insert(task);
 
-        User user = new User("maxik", "maxik", Role.MASTER_ORGANIZER, "test", "rsreu");
+        User user = userRepository.insert(new User("maxik", "maxik", Role.MASTER_ORGANIZER, "test", "rsreu"));
         Organization organization = Organization.builder().name("testOrg").organizationLeader(user).build();
-        user = new User("pavel", "pavel", Role.ORGANIZER, "test", "rsreu");
+        user = userRepository.insert(new User("pavel", "pavel", Role.ORGANIZER, "test", "rsreu"));
         organization.addOrganizer(user);
         Event event = Event.builder().eventType(EventType.OLYMPIAD).startDateTime(LocalDateTime.now()).endDateTime(LocalDateTime.now())
                 .eventLeader(user).build();
         event.addEventOrganizer(user);
         event.addTask(task);
-        user = new User("alesha", "alesha", Role.PARTICIPANT, "test", "rsreu");
+        user = userRepository.insert(new User("alesha", "alesha", Role.PARTICIPANT, "test", "rsreu"));
         ParticipantInfo participantInfo = ParticipantInfo.builder().participant(user).appeal(Appeal.builder().appealStatus(AppealStatus.PENDING).text("ololo").build()).build();
         TestInfo testInfo = TestInfo.builder().memory(500).time(500).score(228).build();
         TaskSolution taskSolution = TaskSolution.builder().solution("solution").solutionStatus(SolutionStatus.COMPILE_ERROR).task(task).build();
