@@ -18,5 +18,7 @@ public class Appeal {
     @DBRef
     private User organizer;
 
+    private String organizerText;
+
     private AppealStatus appealStatus;
 }

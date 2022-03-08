@@ -21,8 +21,6 @@ public class TaskSolution {
 
     private String solution;
 
-    private SolutionStatus solutionStatus;
-
     @Builder.Default private Set<TestInfo> testsInfos = new HashSet<>();
 
     public void addTestInfo(TestInfo testInfo) {

@@ -1,6 +1,6 @@
 package ru.rsreu.contests_system.organization.event.participant_info.task_solution;
 
-public enum SolutionStatus {
+public enum TestStatus {
     OK,
     COMPILE_ERROR
     //TODO Add more statuses.

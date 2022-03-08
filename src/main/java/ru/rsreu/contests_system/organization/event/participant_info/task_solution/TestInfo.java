@@ -11,4 +11,6 @@ public class TestInfo {
     private long memory;
 
     private int score;
+
+    private TestStatus testStatus;
 }
