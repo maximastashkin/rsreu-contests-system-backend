@@ -5,29 +5,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.rsreu.contests_system.user.resource.models.signup.UserSignUpMapper;
-import ru.rsreu.contests_system.user.resource.models.signup.UserSignUpRequest;
-import ru.rsreu.contests_system.user.resource.models.signup.UserSignUpResponse;
+import ru.rsreu.contests_system.user.resource.dto.check_mail.CheckMailMapper;
+import ru.rsreu.contests_system.user.resource.dto.check_mail.CheckMailResponse;
+import ru.rsreu.contests_system.user.resource.dto.signup.UserSignUpMapper;
+import ru.rsreu.contests_system.user.resource.dto.signup.UserSignUpRequest;
+import ru.rsreu.contests_system.user.resource.dto.signup.UserSignUpResponse;
 import ru.rsreu.contests_system.user.service.UserService;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserResource {
     private final UserService userService;
     private final UserSignUpMapper userSignUpMapper;
+    private final CheckMailMapper checkMailMapper;
 
     @Autowired
-    public UserResource(UserService userService, UserSignUpMapper userSignUpMapper) {
+    public UserResource(UserService userService, UserSignUpMapper userSignUpMapper, CheckMailMapper checkMailMapper) {
         this.userService = userService;
         this.userSignUpMapper = userSignUpMapper;
+        this.checkMailMapper = checkMailMapper;
     }
 
     @Operation(summary = "Create new user by sign upping")
-    @PostMapping(path = "/signup", produces = "application/json", consumes = "application/json")
+    @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")
     public ResponseEntity<UserSignUpResponse> signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
         return new ResponseEntity<>(
                 userSignUpMapper.toResponse(
                         userService.save(userSignUpMapper.toUser(userSignUpRequest))),
                 HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Perform email unique checking")
+    @GetMapping(path = "/check-mail", produces = "application/json")
+    public ResponseEntity<CheckMailResponse> checkEmailUnique(@RequestParam String email) {
+        return new ResponseEntity<>(checkMailMapper.toResponse(userService.isEmailUnique(email)), HttpStatus.OK);
     }
 }

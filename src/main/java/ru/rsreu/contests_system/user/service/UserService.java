@@ -9,4 +9,8 @@ public record UserService(UserRepository userRepository) {
     public User save(User user) {
         return userRepository.save(user);
     }
+
+    public boolean isEmailUnique(String email) {
+        return userRepository.findUsersByEmail(email).isEmpty();
+    }
 }

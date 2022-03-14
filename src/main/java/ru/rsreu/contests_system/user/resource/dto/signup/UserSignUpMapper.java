@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.user.resource.models.signup;
+package ru.rsreu.contests_system.user.resource.dto.signup;
 
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.user.Role;
