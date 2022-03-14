@@ -1,6 +1,7 @@
 package ru.rsreu.contests_system.user.resource;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,10 +50,14 @@ public class UserResource {
     }
 
     @Operation(summary = "Get all users")
-    @GetMapping(path = "/", produces = "application/json")
-    public ResponseEntity<List<UsersInfoResponse>> getAllUsers() {
+    @GetMapping(path = "/{pageSize}/{pageNumber}", produces = "application/json")
+    public ResponseEntity<List<UsersInfoResponse>> getAllUsers(@PathVariable int pageSize,
+                                                               @Parameter(description = "Numbering stats from 0!")
+                                                               @PathVariable int pageNumber) {
         return new ResponseEntity<>(
-                userService.getAll().stream().map(usersInfoMapper::toResponse).collect(Collectors.toList()),
+                userService
+                        .getAll(pageSize, pageNumber)
+                        .stream().map(usersInfoMapper::toResponse).collect(Collectors.toList()),
                 HttpStatus.OK
         );
     }

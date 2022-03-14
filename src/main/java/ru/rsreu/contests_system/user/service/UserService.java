@@ -1,5 +1,6 @@
 package ru.rsreu.contests_system.user.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.user.User;
 import ru.rsreu.contests_system.user.repository.UserRepository;
@@ -13,10 +14,10 @@ public record UserService(UserRepository userRepository) {
     }
 
     public boolean isEmailUnique(String email) {
-        return userRepository.findUsersByEmail(email).isEmpty();
+        return userRepository.findByEmail(email).isEmpty();
     }
 
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public List<User> getAll(int pageSize, int pageNumber) {
+        return userRepository.findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
     }
 }
