@@ -2,6 +2,7 @@ package ru.rsreu.contests_system.user.resource.dto.signup;
 
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.user.Role;
+import ru.rsreu.contests_system.user.Status;
 import ru.rsreu.contests_system.user.User;
 
 @Component
@@ -21,6 +22,7 @@ public record UserSignUpMapper() {
                 .password(userSignUpRequest.password())
                 .email(userSignUpRequest.email())
                 .role(Role.PARTICIPANT)
+                .status(Status.UN_ACTIVE)
                 .build();
     }
 }

@@ -10,7 +10,12 @@ import ru.rsreu.contests_system.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.user.resource.dto.signup.UserSignUpMapper;
 import ru.rsreu.contests_system.user.resource.dto.signup.UserSignUpRequest;
 import ru.rsreu.contests_system.user.resource.dto.signup.UserSignUpResponse;
+import ru.rsreu.contests_system.user.resource.dto.users_info.UsersInfoMapper;
+import ru.rsreu.contests_system.user.resource.dto.users_info.UsersInfoResponse;
 import ru.rsreu.contests_system.user.service.UserService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -18,12 +23,14 @@ public class UserResource {
     private final UserService userService;
     private final UserSignUpMapper userSignUpMapper;
     private final CheckMailMapper checkMailMapper;
+    private final UsersInfoMapper usersInfoMapper;
 
     @Autowired
-    public UserResource(UserService userService, UserSignUpMapper userSignUpMapper, CheckMailMapper checkMailMapper) {
+    public UserResource(UserService userService, UserSignUpMapper userSignUpMapper, CheckMailMapper checkMailMapper, UsersInfoMapper usersInfoMapper) {
         this.userService = userService;
         this.userSignUpMapper = userSignUpMapper;
         this.checkMailMapper = checkMailMapper;
+        this.usersInfoMapper = usersInfoMapper;
     }
 
     @Operation(summary = "Create new user by sign upping")
@@ -39,5 +46,14 @@ public class UserResource {
     @GetMapping(path = "/check-mail", produces = "application/json")
     public ResponseEntity<CheckMailResponse> checkEmailUnique(@RequestParam String email) {
         return new ResponseEntity<>(checkMailMapper.toResponse(userService.isEmailUnique(email)), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get all users")
+    @GetMapping(path = "/", produces = "application/json")
+    public ResponseEntity<List<UsersInfoResponse>> getAllUsers() {
+        return new ResponseEntity<>(
+                userService.getAll().stream().map(usersInfoMapper::toResponse).collect(Collectors.toList()),
+                HttpStatus.OK
+        );
     }
 }

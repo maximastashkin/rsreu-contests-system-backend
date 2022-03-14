@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.user.User;
 import ru.rsreu.contests_system.user.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 public record UserService(UserRepository userRepository) {
     public User save(User user) {
@@ -12,5 +14,9 @@ public record UserService(UserRepository userRepository) {
 
     public boolean isEmailUnique(String email) {
         return userRepository.findUsersByEmail(email).isEmpty();
+    }
+
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 }
