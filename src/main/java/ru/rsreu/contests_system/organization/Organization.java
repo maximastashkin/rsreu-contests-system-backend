@@ -24,6 +24,16 @@ public class Organization {
     @Indexed(unique = true)
     private String name;
 
+    private String description;
+
+    private String pictureUrl;
+
+    @Indexed(unique = true)
+    private String organizationEmail;
+
+    @Indexed(unique = true)
+    private String organizationPhone;
+
     @DBRef
     private User organizationLeader;
 

@@ -23,6 +23,8 @@ public class Event {
     @Indexed(unique = true)
     private String name;
 
+    private String description;
+
     private EventType eventType;
 
     private LocalDateTime startDateTime;
