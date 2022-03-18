@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.util.List;
+
 @Data
 @Builder
 @Document(collection = "users")
@@ -29,4 +31,6 @@ public class User {
     private String password;
 
     private String educationPlace;
+
+    private List<String> refreshTokens;
 }

@@ -18,6 +18,16 @@ import ru.rsreu.contests_system.security.jwt.JwtConfigurer;
 
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+    private static final String[] AUTH_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html/**",
+            "/**/signup",
+            "/**/auth",
+            "/**/check-mail",
+            "/**/refresh"
+    };
+
     private final JwtConfigurer jwtConfigurer;
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -30,15 +40,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
         http
                 .httpBasic().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(authorize ->
-                    authorize.antMatchers("/**/signup", "/**/auth", "/**/check-mail").permitAll()
-                            .antMatchers("/api/users/**").hasAuthority("ADMIN")
-                            .anyRequest().denyAll()
+                        authorize.antMatchers(AUTH_WHITELIST).permitAll()
+                                .antMatchers("/api/users/**").hasAuthority("ADMIN")
+                                .anyRequest().denyAll()
                 )
                 .apply(jwtConfigurer)
                 .and()
@@ -65,7 +76,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private void matchPasswords(PasswordEncoder passwordEncoder, String password, UserDetails userDetails) {
-        if(!passwordEncoder.matches(password, userDetails.getPassword())) {
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Bad credentials");
         }
     }

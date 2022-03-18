@@ -1,7 +1,6 @@
 package ru.rsreu.contests_system.user.service;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.user.User;
 import ru.rsreu.contests_system.user.repository.UserRepository;
@@ -25,5 +24,17 @@ public record UserService(UserRepository userRepository) {
 
     public User getUserByEmail(String email) throws NoSuchElementException {
         return userRepository.findByEmail(email).orElseThrow();
+    }
+
+    public void addRefreshToken(String email, String refreshToken) {
+        userRepository.addUserRefreshToken(email, refreshToken);
+    }
+
+    public long deleteRefreshToken(String email, String refreshToken) {
+        return userRepository.deleteUserRefreshToken(email, refreshToken);
+    }
+
+    public List<String> getRefreshTokens(String email) {
+        return userRepository.findRefreshTokensForUser(email);
     }
 }
