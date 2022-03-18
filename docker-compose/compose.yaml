@@ -9,7 +9,6 @@ services:
     restart: always
     depends_on:
       - mongo
-      - code-executor-service
     environment:
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_HOST=${MONGO_HOST}

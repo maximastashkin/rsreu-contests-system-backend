@@ -20,4 +20,8 @@ public record UserService(UserRepository userRepository) {
     public List<User> getAll(int pageSize, int pageNumber) {
         return userRepository.findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
     }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).get();
+    }
 }

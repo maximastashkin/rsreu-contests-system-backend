@@ -7,10 +7,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import ru.rsreu.contests_system.user.User;
 
 import java.util.List;
+import java.util.Optional;
 
 //Here write default methods signatures. It will work without impl.
 public interface UserRepository extends MongoRepository<User, ObjectId>, UserCustomRepository {
-    List<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     Page<User> findAll(Pageable pageable);
 }
