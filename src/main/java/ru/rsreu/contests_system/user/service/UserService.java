@@ -1,11 +1,13 @@
 package ru.rsreu.contests_system.user.service;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.user.User;
 import ru.rsreu.contests_system.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public record UserService(UserRepository userRepository) {
@@ -21,7 +23,7 @@ public record UserService(UserRepository userRepository) {
         return userRepository.findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).get();
+    public User getUserByEmail(String email) throws NoSuchElementException {
+        return userRepository.findByEmail(email).orElseThrow();
     }
 }

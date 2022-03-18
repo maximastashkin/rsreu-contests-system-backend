@@ -29,14 +29,10 @@ public class JwtTokenFilter extends GenericFilterBean {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(
+            ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         String jwtToken = resolveToken((HttpServletRequest) request);
-        if (jwtToken != null && jwtTokenProvider.validateToken(jwtToken)) {
-            Authentication authentication = jwtTokenProvider.getAuthenticationFromJwtToken(jwtToken);
-            if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }
+        setAuthentication(jwtToken);
         chain.doFilter(request, response);
     }
 
@@ -46,5 +42,18 @@ public class JwtTokenFilter extends GenericFilterBean {
             return bearerToken.substring(START_TOKEN_INDEX);
         }
         return null;
+    }
+
+    private void setAuthentication(String jwtToken) {
+        if (jwtToken != null && jwtTokenProvider.validateToken(jwtToken)) {
+            Authentication authentication = jwtTokenProvider.getAuthenticationFromJwtToken(jwtToken);
+            addAuthenticationToSecurityContext(authentication);
+        }
+    }
+
+    private void addAuthenticationToSecurityContext(Authentication authentication) {
+        if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
     }
 }

@@ -13,7 +13,6 @@ import ru.rsreu.contests_system.security.user.UserDetailsImpl;
 import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -22,18 +21,17 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
     private static final String AUTHORITIES_KEY = "roles";
 
-    //@Value("${security.jwt.token.secret-key:secret}")
-    private String secretKeyStringRepresentation = "my-32-character-ultra-secure-and-ultra-long-secret";
+    @Value("${security.jwt.token.secret-key}")
+    private String secretKeyStringRepresentation;
 
     @Value("${security.jwt.token.expire-length:3600000}")
-    private long tokenExpiringMilliSeconds = 60 * 60 * 1000;
+    private long tokenExpiringMilliSeconds;
 
     private SecretKey secretKey;
 
     @PostConstruct
     public void init() {
-        String secret = Base64.getEncoder().encodeToString(secretKeyStringRepresentation.getBytes());
-        secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        secretKey = Keys.hmacShaKeyFor(secretKeyStringRepresentation.getBytes(StandardCharsets.UTF_8));
     }
 
     public String createTokenFromAuthentication(Authentication authentication) {
@@ -42,7 +40,8 @@ public class JwtTokenProvider {
                 .setClaims(getClaims(authentication))
                 .setIssuedAt(now)
                 .setExpiration(getValidityDate(now))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(secretKey)
+                .setHeaderParam("typ", "JWT")
                 .compact();
     }
 
@@ -53,6 +52,10 @@ public class JwtTokenProvider {
     private Claims getClaims(Authentication authentication) {
         String username = authentication.getName();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        return formClaims(username, authorities);
+    }
+
+    private Claims formClaims(String username, Collection<? extends GrantedAuthority> authorities) {
         Claims claims = Jwts.claims().setSubject(username);
 
         if (!authorities.isEmpty()) {
@@ -88,7 +91,11 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String jwtToken) throws JwtException {
-        getClaimsJws(jwtToken);
+        try {
+            getClaimsJws(jwtToken);
+        } catch (JwtException exception) {
+            return false;
+        }
         return true;
     }
 }

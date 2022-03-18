@@ -1,12 +1,13 @@
 package ru.rsreu.contests_system.user.resource.dto.signup;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.user.Role;
 import ru.rsreu.contests_system.user.Status;
 import ru.rsreu.contests_system.user.User;
 
 @Component
-public record UserSignUpMapper() {
+public record UserSignUpMapper(PasswordEncoder passwordEncoder) {
 
     public UserSignUpResponse toResponse(User user) {
         //TODO Tokens!!!
@@ -19,7 +20,7 @@ public record UserSignUpMapper() {
                 .lastName(userSignUpRequest.lastName())
                 .middleName(userSignUpRequest.middleName())
                 .educationPlace(userSignUpRequest.educationPlace())
-                .password(userSignUpRequest.password())
+                .password(passwordEncoder.encode(userSignUpRequest.password()))
                 .email(userSignUpRequest.email())
                 .role(Role.PARTICIPANT)
                 .status(Status.UN_ACTIVE)

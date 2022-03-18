@@ -11,17 +11,21 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.rsreu.contests_system.security.jwt.JwtAuthenticationEntryPoint;
 import ru.rsreu.contests_system.security.jwt.JwtConfigurer;
 
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final JwtConfigurer jwtConfigurer;
 
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Autowired
-    public SecurityConfiguration(JwtConfigurer jwtConfigurer) {
+    public SecurityConfiguration(JwtConfigurer jwtConfigurer, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtConfigurer = jwtConfigurer;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
     @Override
@@ -31,13 +35,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                //TODO Routes
-                .apply(jwtConfigurer);
+                .authorizeHttpRequests(authorize ->
+                    authorize.antMatchers("/**/signup", "/**/auth", "/**/check-mail").permitAll()
+                            .antMatchers("/api/users/**").hasAuthority("ADMIN")
+                            .anyRequest().denyAll()
+                )
+                .apply(jwtConfigurer)
+                .and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -45,14 +55,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             @Autowired UserDetailsService userDetailsService, @Autowired PasswordEncoder passwordEncoder) {
         return authentication -> {
             String username = authentication.getPrincipal().toString();
-            String password =authentication.getCredentials().toString();
+            String password = authentication.getCredentials().toString();
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if(!passwordEncoder.matches(password, userDetails.getPassword())) {
-                throw new BadCredentialsException("Bad credentials");
-            }
+            matchPasswords(passwordEncoder, password, userDetails);
 
-            return new UsernamePasswordAuthenticationToken(username, "", userDetails.getAuthorities());
+            return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
         };
+    }
+
+    private void matchPasswords(PasswordEncoder passwordEncoder, String password, UserDetails userDetails) {
+        if(!passwordEncoder.matches(password, userDetails.getPassword())) {
+            throw new BadCredentialsException("Bad credentials");
+        }
     }
 }
