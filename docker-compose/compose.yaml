@@ -1,17 +1,6 @@
 version: '3.1'
 
 services:
-  rest-service:
-    container_name: rest-service
-    build: ./../
-    ports:
-      - "8080:8091"
-    restart: always
-    depends_on:
-      - mongo
-    environment:
-      - MONGO_PORT=${MONGO_PORT}
-      - MONGO_HOST=${MONGO_HOST}
   mongo:
     container_name: rcs-db
     image: mongo:latest
@@ -24,3 +13,14 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root
     volumes:
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+  rest-service:
+    container_name: rest-service
+    build: ./../
+    ports:
+      - "8080:8091"
+    restart: always
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_HOST=${MONGO_HOST}
