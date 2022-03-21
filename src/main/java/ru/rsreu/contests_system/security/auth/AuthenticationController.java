@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +35,7 @@ public class AuthenticationController {
 
     @Autowired
     public AuthenticationController(
-            AuthenticationManager authenticationManager,
+            @Qualifier("jwtAuthenticationManager") AuthenticationManager authenticationManager,
             JwtTokenProvider jwtTokenProvider, RefreshTokenProvider refreshTokenProvider, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
