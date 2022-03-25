@@ -7,13 +7,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableWebSecurity
 public class WebMvcConfig implements WebMvcConfigurer {
-    @Value("security.frontend_app.url_pattern")
+    @Value("${security.frontend_app.url_pattern}")
     private String frontendAppUrlPattern;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping(frontendAppUrlPattern)
-                    .allowCredentials(true)
-                    .allowedMethods("GET", "POST");
+        registry.addMapping("/**").allowedOrigins(frontendAppUrlPattern)
+                .allowCredentials(true)
+                .allowedMethods("GET", "POST", "OPTIONS");
     }
 }
