@@ -1,35 +1,35 @@
 package ru.rsreu.contests_system.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import ru.rsreu.contests_system.security.api_key.ApiKeyConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.rsreu.contests_system.security.jwt.JwtConfigurer;
 
 @EnableWebSecurity
-@Order(2)
-public class ApiKeySecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_WHITELIST = {
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/swagger-ui.html/**"
+            "/swagger-ui.html/**",
+            "/**/signup",
+            "/**/auth",
+            "/**/check-mail",
+            "/**/refresh"
     };
-
-    private final ApiKeyConfigurer apiKeyConfigurer;
+    private final JwtConfigurer jwtConfigurer;
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    public ApiKeySecurityConfiguration(
-            ApiKeyConfigurer apiKeyConfigurer,
+    public SecurityConfiguration(
+            JwtConfigurer jwtConfigurer,
             AuthenticationEntryPoint authenticationEntryPoint) {
-        this.apiKeyConfigurer = apiKeyConfigurer;
+        this.jwtConfigurer = jwtConfigurer;
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
@@ -38,15 +38,21 @@ public class ApiKeySecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().disable()
                 .csrf().disable()
-                .cors()
-                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(authorize ->
-                        authorize.antMatchers(AUTH_WHITELIST).permitAll()
-                                .antMatchers("/api/**").authenticated())
-                .apply(apiKeyConfigurer)
+                        authorize
+                                .antMatchers(AUTH_WHITELIST).permitAll()
+                                .antMatchers("/api/users/**").hasAuthority("ADMIN")
+                                .anyRequest().denyAll()
+                )
+                .apply(jwtConfigurer)
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
