@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.rsreu.contests_system.security.api_key.ApiKeyConfigurer;
 import ru.rsreu.contests_system.security.jwt.JwtConfigurer;
 
 @EnableWebSecurity
@@ -21,34 +22,36 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/check-mail",
             "/**/refresh"
     };
+
     private final JwtConfigurer jwtConfigurer;
+
+    private final ApiKeyConfigurer apiKeyConfigurer;
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    public SecurityConfiguration(
-            JwtConfigurer jwtConfigurer,
-            AuthenticationEntryPoint authenticationEntryPoint) {
+    public SecurityConfiguration(JwtConfigurer jwtConfigurer, ApiKeyConfigurer apiKeyConfigurer, AuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtConfigurer = jwtConfigurer;
+        this.apiKeyConfigurer = apiKeyConfigurer;
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
         http
                 .httpBasic().disable()
                 .csrf().disable()
-                .cors()
-                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(authorize ->
-                        authorize
-                                .antMatchers(AUTH_WHITELIST).permitAll()
+                        authorize.antMatchers(AUTH_WHITELIST).permitAll()
                                 .antMatchers("/api/users/**").hasAuthority("ADMIN")
                                 .anyRequest().denyAll()
                 )
                 .apply(jwtConfigurer)
+                .and()
+                .apply(apiKeyConfigurer)
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
     }
