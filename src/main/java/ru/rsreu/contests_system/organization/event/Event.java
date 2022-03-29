@@ -31,6 +31,8 @@ public class Event {
 
     private LocalDateTime endDateTime;
 
+    private long timeLimit;
+
     @DBRef
     @Indexed(unique = true)
     private User eventLeader;

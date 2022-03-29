@@ -10,6 +10,7 @@ import ru.rsreu.contests_system.organization.event.participant_info.appeal.Appea
 import ru.rsreu.contests_system.organization.event.participant_info.task_solution.TaskSolution;
 import ru.rsreu.contests_system.user.User;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +25,12 @@ public class ParticipantInfo {
     private User participant;
 
     private Appeal appeal;
+
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
+
+    private boolean completed;
 
     @Builder.Default private Set<TaskSolution> tasksSolutions = new HashSet<>();
 
