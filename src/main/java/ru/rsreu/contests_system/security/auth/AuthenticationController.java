@@ -18,7 +18,7 @@ import ru.rsreu.contests_system.security.auth.dto.AuthenticationRequest;
 import ru.rsreu.contests_system.security.auth.dto.AuthenticationResponse;
 import ru.rsreu.contests_system.security.jwt.JwtTokenProvider;
 import ru.rsreu.contests_system.security.refresh.RefreshTokenProvider;
-import ru.rsreu.contests_system.user.service.UserService;
+import ru.rsreu.contests_system.api.user.service.UserService;
 
 import javax.validation.Valid;
 

@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.security.jwt.JwtTokenProvider;
 import ru.rsreu.contests_system.security.refresh.black_list.RefreshTokenBlackListService;
-import ru.rsreu.contests_system.user.service.UserService;
+import ru.rsreu.contests_system.api.user.service.UserService;
 
 @Service
 public record RefreshService(UserService userService,

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.rsreu.contests_system.user.User;
+import ru.rsreu.contests_system.api.user.User;
 
 import java.util.Collection;
 import java.util.List;

@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.rsreu.contests_system.user.exception.NotUniqueEmailException;
+import ru.rsreu.contests_system.api.user.exception.NotUniqueEmailException;
 
 import javax.validation.ConstraintViolationException;
 
