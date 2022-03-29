@@ -3,6 +3,7 @@ package ru.rsreu.contests_system.security.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,13 +15,16 @@ import ru.rsreu.contests_system.security.jwt.JwtConfigurer;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_WHITELIST = {
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html/**",
             "/**/signup",
             "/**/auth",
             "/**/check-mail",
             "/**/refresh"
+    };
+
+    private static final String[] API_KEY_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html/**",
     };
 
     private final JwtConfigurer jwtConfigurer;
@@ -54,6 +58,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .apply(apiKeyConfigurer)
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers(API_KEY_WHITELIST);
     }
 
     @Bean
