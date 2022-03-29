@@ -9,12 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.security.auth.dto.AuthenticationResponse;
-import ru.rsreu.contests_system.security.refresh.dto.RefreshTokenErrorRequest;
+import ru.rsreu.contests_system.security.refresh.dto.RefreshTokenErrorResponse;
 import ru.rsreu.contests_system.security.refresh.dto.RefreshTokenRequest;
 import ru.rsreu.contests_system.security.refresh.exception.BlackListTokenException;
 import ru.rsreu.contests_system.security.refresh.exception.CompromisedTokenException;
 import ru.rsreu.contests_system.security.refresh.exception.InvalidTokenException;
-import ru.rsreu.contests_system.security.refresh.exception.RefreshTokenErrorStatus;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/refresh")
@@ -33,11 +34,11 @@ public class RefreshController {
             content = {
                    @Content(
                            mediaType = "application/json",
-                           schema = @Schema(implementation = RefreshTokenErrorRequest.class)
+                           schema = @Schema(implementation = RefreshTokenErrorResponse.class)
                    )
             })
     })
-    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.refreshToken();
         String accessToken = refreshTokenRequest.accessToken();
         String username = refreshTokenRequest.username();
@@ -57,26 +58,5 @@ public class RefreshController {
         } else {
             throw new BlackListTokenException();
         }
-    }
-
-    @ExceptionHandler(value = {InvalidTokenException.class})
-    public ResponseEntity<RefreshTokenErrorRequest> handleInvalidTokenException() {
-        return formRefreshTokenErrorRequestResponseEntity(RefreshTokenErrorStatus.INVALID_TOKEN);
-    }
-
-    private ResponseEntity<RefreshTokenErrorRequest> formRefreshTokenErrorRequestResponseEntity(
-            RefreshTokenErrorStatus status) {
-        return new ResponseEntity<>(
-                new RefreshTokenErrorRequest(status), HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(value = {CompromisedTokenException.class})
-    public ResponseEntity<RefreshTokenErrorRequest> handleCompromisedTokenException() {
-        return formRefreshTokenErrorRequestResponseEntity(RefreshTokenErrorStatus.COMPROMISED);
-    }
-
-    @ExceptionHandler(value = {BlackListTokenException.class})
-    public ResponseEntity<RefreshTokenErrorRequest> handleBlackListTokenException() {
-        return formRefreshTokenErrorRequestResponseEntity(RefreshTokenErrorStatus.BLACK_LIST);
     }
 }

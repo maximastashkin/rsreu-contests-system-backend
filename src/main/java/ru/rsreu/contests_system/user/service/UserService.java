@@ -3,6 +3,7 @@ package ru.rsreu.contests_system.user.service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.user.User;
+import ru.rsreu.contests_system.user.exception.NotUniqueEmailException;
 import ru.rsreu.contests_system.user.repository.UserRepository;
 
 import java.util.List;
@@ -11,7 +12,11 @@ import java.util.NoSuchElementException;
 @Service
 public record UserService(UserRepository userRepository) {
     public User save(User user) {
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (RuntimeException exception) {
+            throw new NotUniqueEmailException(String.format("Email:%s not unique!", user.getEmail()));
+        }
     }
 
     public boolean isEmailUnique(String email) {

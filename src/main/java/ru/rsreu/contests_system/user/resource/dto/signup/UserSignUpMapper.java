@@ -8,20 +8,14 @@ import ru.rsreu.contests_system.user.User;
 
 @Component
 public record UserSignUpMapper(PasswordEncoder passwordEncoder) {
-
-    public UserSignUpResponse toResponse(User user) {
-        //TODO Tokens!!!
-        return new UserSignUpResponse(null, null, user.getRole());
-    }
-
     public User toUser(UserSignUpRequest userSignUpRequest) {
         return User.builder()
-                .firstName(userSignUpRequest.firstName())
-                .lastName(userSignUpRequest.lastName())
-                .middleName(userSignUpRequest.middleName())
-                .educationPlace(userSignUpRequest.educationPlace())
+                .firstName(userSignUpRequest.firstName().trim())
+                .lastName(userSignUpRequest.lastName().trim())
+                .middleName(userSignUpRequest.middleName().trim())
+                .educationPlace(userSignUpRequest.educationPlace().trim())
                 .password(passwordEncoder.encode(userSignUpRequest.password()))
-                .email(userSignUpRequest.email())
+                .email(userSignUpRequest.email().trim())
                 .role(Role.PARTICIPANT)
                 .status(Status.UN_ACTIVE)
                 .build();
