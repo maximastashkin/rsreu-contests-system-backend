@@ -10,7 +10,7 @@ public interface OrganizationCreatingApplicationRepository
         extends MongoRepository<OrganizationCreatingApplication, ObjectId> {
     Optional<OrganizationCreatingApplication> findByOrganizationEmail(String organizationEmail);
 
-    Optional<OrganizationCreatingApplication> findByPhone(String phone);
+    Optional<OrganizationCreatingApplication> findByOrganizationPhone(String phone);
 
     Optional<OrganizationCreatingApplication> findByLeaderEmail(String leaderEmail);
 }

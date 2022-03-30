@@ -15,7 +15,7 @@ public record OrganizationCreatingApplicationService(
     }
 
     public boolean isUniquePhone(String phone) {
-        return organizationCreatingApplicationRepository.findByPhone(phone).isEmpty();
+        return organizationCreatingApplicationRepository.findByOrganizationPhone(phone).isEmpty();
     }
 
     public boolean isUniqueLeaderEmail(String leaderEmail) {
