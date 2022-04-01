@@ -15,8 +15,8 @@ import ru.rsreu.contests_system.api.organization_creating_application.resource.d
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.check_org_email.CheckOrganizationEmailUniqueResponse;
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.check_phone.CheckOrganizationPhoneUniqueMapper;
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.check_phone.CheckOrganizationPhoneUniqueResponse;
-import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.creating.OrganizationCreatingApplicationMapper;
-import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.creating.OrganizationCreatingApplicationRequest;
+import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_creating.OrganizationCreatingApplicationMapper;
+import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_creating.OrganizationCreatingApplicationRequest;
 import ru.rsreu.contests_system.api.organization_creating_application.service.OrganizationCreatingApplicationService;
 import ru.rsreu.contests_system.validation.phone.Phone;
 
@@ -39,10 +39,10 @@ public class OrganizationCreatingApplicationResource {
     private final OrganizationCreatingApplicationService organizationCreatingApplicationService;
 
     @Operation(summary = "${api.applications.all.operation}")
-    @GetMapping(path = "/{pageSize}/{pageNumber}")
+    @GetMapping(path = "/{pageSize}/{pageNumber}", produces = "application/json")
     public ResponseEntity<List<OrganizationCreatingApplicationsInfoResponse>> getAllOrganizationCreatingApplication(
             @PathVariable @Min(1) int pageSize,
-            @Parameter(description = "Numbering stats from 0!")
+            @Parameter(description = "${api.pageable_numbering.message}")
             @PathVariable @Min(0) int pageNumber) {
         return new ResponseEntity<>(
                 organizationCreatingApplicationService
@@ -53,7 +53,7 @@ public class OrganizationCreatingApplicationResource {
     }
 
     @Operation(summary = "${api.applications.creating.operation}")
-    @PostMapping
+    @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> createOrganizationCreatingApplication(
             @RequestBody @Valid OrganizationCreatingApplicationRequest request) {
         organizationCreatingApplicationService
@@ -62,7 +62,7 @@ public class OrganizationCreatingApplicationResource {
     }
 
     @Operation(summary = "${api.applications.check-organization-email.operation}")
-    @GetMapping("/check-organization-email")
+    @GetMapping(path = "/check-organization-email", produces = "application/json")
     public ResponseEntity<CheckOrganizationEmailUniqueResponse> checkOrganizationEmailUnique(
             @RequestParam @NotBlank @Email String email) {
         return new ResponseEntity<>(
@@ -72,7 +72,7 @@ public class OrganizationCreatingApplicationResource {
     }
 
     @Operation(summary = "${api.applications.check-organization-phone.operation}")
-    @GetMapping("/check-organization-phone")
+    @GetMapping(path = "/check-organization-phone", produces = "application/json")
     public ResponseEntity<CheckOrganizationPhoneUniqueResponse> checkOrganizationPhoneUnique(
             @RequestParam @NotBlank @Phone String phone) {
         return new ResponseEntity<>(
@@ -83,7 +83,7 @@ public class OrganizationCreatingApplicationResource {
     }
 
     @Operation(summary = "${api.applications.check-leader-email.operation}")
-    @GetMapping("/check-leader-email")
+    @GetMapping(path = "/check-leader-email", produces = "application/json")
     public ResponseEntity<CheckLeaderEmailUniqueResponse> checkLeaderEmailUnique(
             @RequestParam @NotBlank @Email String email) {
         return new ResponseEntity<>(

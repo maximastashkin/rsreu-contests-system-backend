@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.api.organization_creating_application.resource.dto.creating;
+package ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_creating;
 
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.organization_creating_application.OrganizationCreatingApplication;
@@ -12,7 +12,7 @@ public record OrganizationCreatingApplicationMapper() {
                 .organizationEmail(organizationCreatingApplicationRequest.organizationEmail())
                 .organizationPhone(organizationCreatingApplicationRequest.organizationPhone())
                 .leaderFirstName(organizationCreatingApplicationRequest.leaderFirstName())
-                .leaderEmail(organizationCreatingApplicationRequest.leaderLastName())
+                .leaderLastName(organizationCreatingApplicationRequest.leaderLastName())
                 .leaderMiddleName(organizationCreatingApplicationRequest.leaderMiddleName())
                 .leaderEmail(organizationCreatingApplicationRequest.leaderEmail())
                 .build();

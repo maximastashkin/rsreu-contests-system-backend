@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.user.User;
 
 @Component
-public class UsersInfoMapper {
-    public UsersInfoResponse toResponse(User user) {
-        return new UsersInfoResponse(
+public class UserInfoMapper {
+    public UserInfoResponse toResponse(User user) {
+        return new UserInfoResponse(
                 user.getId().toString(),
                 user.getFirstName(),
                 user.getLastName(),

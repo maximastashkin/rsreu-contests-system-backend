@@ -34,6 +34,7 @@ public class RefreshController {
                    )
             })
     })
+
     public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.refreshToken();
         String accessToken = refreshTokenRequest.accessToken();
