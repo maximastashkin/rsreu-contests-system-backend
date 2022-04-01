@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RestController
 @Validated
 @AllArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping(value = "/api/users")
 public class UserResource {
     private final UserService userService;
     private final UserSignUpMapper userSignUpMapper;
@@ -71,8 +71,17 @@ public class UserResource {
             @ApiResponse(responseCode = "403", description = "${api.users.block.response-codes.forbidden}")
     })
     public ResponseEntity<?> blockUser(@PathVariable String id) {
-        System.out.println();
         userService.updateBlockedStatus(id, BlockedStatus.BLOCKED);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.users.unblock.operation}")
+    @PostMapping(path = "/unblock/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404", description = "${api.users.unblock.response-codes.not-found}")
+    })
+    public ResponseEntity<?> unblockUser(@PathVariable String id) {
+        userService.updateBlockedStatus(id, BlockedStatus.UNBLOCKED);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

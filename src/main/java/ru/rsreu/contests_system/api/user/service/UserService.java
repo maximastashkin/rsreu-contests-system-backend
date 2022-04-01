@@ -50,7 +50,7 @@ public record UserService(UserRepository userRepository) {
 
     public void updateBlockedStatus(String id, BlockedStatus blockedStatus) {
         User user = getUserById(id);
-        if (user.getRole() != Role.ADMIN) {
+        if (user.getRole() != Role.ADMIN || blockedStatus == BlockedStatus.UNBLOCKED) {
             user.setBlockedStatus(blockedStatus);
             userRepository.save(user);
         } else {
