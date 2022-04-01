@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.rsreu.contests_system.api.user.BlockedStatus;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpMapper;
@@ -61,5 +62,17 @@ public class UserResource {
                         .stream().map(userInfoMapper::toResponse).collect(Collectors.toList()),
                 HttpStatus.OK
         );
+    }
+
+    @Operation(summary = "${api.users.block.operation}")
+    @PostMapping(path = "/block/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404", description = "${api.users.block.response-codes.not-found}"),
+            @ApiResponse(responseCode = "403", description = "${api.users.block.response-codes.forbidden}")
+    })
+    public ResponseEntity<?> blockUser(@PathVariable String id) {
+        System.out.println();
+        userService.updateBlockedStatus(id, BlockedStatus.BLOCKED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

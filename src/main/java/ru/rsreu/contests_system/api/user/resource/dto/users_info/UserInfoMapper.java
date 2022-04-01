@@ -13,7 +13,7 @@ public class UserInfoMapper {
                 user.getMiddleName(),
                 user.getEmail(),
                 user.getRole(),
-                user.getStatus()
+                user.getActivationStatus()
         );
     }
 }
