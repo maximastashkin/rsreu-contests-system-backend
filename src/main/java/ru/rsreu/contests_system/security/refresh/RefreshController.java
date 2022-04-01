@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +19,9 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/refresh")
+@AllArgsConstructor
 public class RefreshController {
     private final RefreshService refreshService;
-
-    @Autowired
-    public RefreshController(RefreshService refreshService) {
-        this.refreshService = refreshService;
-    }
 
     @PostMapping(consumes = "application/json", produces = "application/json")
     @ApiResponses(value = {

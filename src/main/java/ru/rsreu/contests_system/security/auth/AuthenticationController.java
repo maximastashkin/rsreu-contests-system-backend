@@ -3,8 +3,7 @@ package ru.rsreu.contests_system.security.auth;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,25 +22,13 @@ import ru.rsreu.contests_system.api.user.service.UserService;
 import javax.validation.Valid;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
-
     private final JwtTokenProvider jwtTokenProvider;
-
     private final RefreshTokenProvider refreshTokenProvider;
-
     private final UserService userService;
-
-    @Autowired
-    public AuthenticationController(
-            @Qualifier("jwtAuthenticationManager") AuthenticationManager authenticationManager,
-            JwtTokenProvider jwtTokenProvider, RefreshTokenProvider refreshTokenProvider, UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.refreshTokenProvider = refreshTokenProvider;
-        this.userService = userService;
-    }
 
     @PostMapping(consumes = "application/json", produces = "application/json")
     @ApiResponses(value = {

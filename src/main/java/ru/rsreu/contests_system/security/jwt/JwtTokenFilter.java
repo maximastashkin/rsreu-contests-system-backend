@@ -1,6 +1,6 @@
 package ru.rsreu.contests_system.security.jwt;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,16 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Component
+@AllArgsConstructor
 public class JwtTokenFilter extends GenericFilterBean {
     private static final String HEADER_PREFIX = "Bearer ";
     private static final int START_TOKEN_INDEX = 7;
 
     private final JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
     @Override
     public void doFilter(

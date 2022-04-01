@@ -9,14 +9,19 @@ import javax.validation.constraints.Pattern;
 public record UserSignUpRequest(
         @NotBlank @Email(message = "Email isn't valid")
         String email,
+
         @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")
         String password,
+
         @NotBlank
         String firstName,
+
         @NotBlank
         String lastName,
+
         @NullOrNotBlank
         String middleName,
+
         @NotBlank
         String educationPlace) {
 }

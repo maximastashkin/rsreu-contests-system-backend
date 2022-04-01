@@ -18,7 +18,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/signup",
             "/**/auth",
             "/**/check-mail",
-            "/**/refresh"
+            "/**/refresh",
+            "/**/check-organization-phone",
+            "/**/check-organization-email",
+            "/**/check-leader-email",
+            "/**/applications/"
     };
 
     private static final String[] API_KEY_WHITELIST = {

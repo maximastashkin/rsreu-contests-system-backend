@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,24 +26,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @Validated
+@AllArgsConstructor
 @RequestMapping("/api/users")
 public class UserResource {
     private final UserService userService;
     private final UserSignUpMapper userSignUpMapper;
     private final CheckMailMapper checkMailMapper;
     private final UsersInfoMapper usersInfoMapper;
-
-    @Autowired
-    public UserResource(
-            UserService userService,
-            UserSignUpMapper userSignUpMapper,
-            CheckMailMapper checkMailMapper,
-            UsersInfoMapper usersInfoMapper) {
-        this.userService = userService;
-        this.userSignUpMapper = userSignUpMapper;
-        this.checkMailMapper = checkMailMapper;
-        this.usersInfoMapper = usersInfoMapper;
-    }
 
     @Operation(summary = "${api.users.signup.operation}")
     @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")

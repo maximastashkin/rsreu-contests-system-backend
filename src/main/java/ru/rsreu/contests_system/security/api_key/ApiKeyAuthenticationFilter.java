@@ -1,5 +1,6 @@
 package ru.rsreu.contests_system.security.api_key;
 
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -10,15 +11,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+@AllArgsConstructor
 public class ApiKeyAuthenticationFilter extends GenericFilterBean {
     private final String apiKeyHeaderName;
 
     private final ApiKeyProvider apiKeyProvider;
-
-    public ApiKeyAuthenticationFilter(String apiKeyHeaderName, ApiKeyProvider apiKeyProvider) {
-        this.apiKeyHeaderName = apiKeyHeaderName;
-        this.apiKeyProvider = apiKeyProvider;
-    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
