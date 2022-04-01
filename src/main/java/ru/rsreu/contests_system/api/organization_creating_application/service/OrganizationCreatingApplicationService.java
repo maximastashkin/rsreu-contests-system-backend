@@ -1,11 +1,15 @@
 package ru.rsreu.contests_system.api.organization_creating_application.service;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 import ru.rsreu.contests_system.api.organization_creating_application.OrganizationCreatingApplication;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfo;
 import ru.rsreu.contests_system.api.organization_creating_application.repository.OrganizationCreatingApplicationRepository;
 import ru.rsreu.contests_system.api.user.service.UserService;
+
+import java.util.List;
 
 @Service
 public record OrganizationCreatingApplicationService(
@@ -51,5 +55,10 @@ public record OrganizationCreatingApplicationService(
                     .append(organizationCreatingApplication.getLeaderEmail());
         }
         return message;
+    }
+
+    public List<OrganizationCreatingApplication> getAll(int pageSize, int pageNumber) {
+        return organizationCreatingApplicationRepository
+                .findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
     }
 }

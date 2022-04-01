@@ -2,6 +2,7 @@ package ru.rsreu.contests_system.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -56,6 +57,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeHttpRequests(authorize ->
                         authorize.antMatchers(AUTH_WHITELIST).permitAll()
+                                .antMatchers(HttpMethod.GET, "/api/applications/**").hasAuthority("ADMIN")
                                 .antMatchers("/api/users/**").hasAuthority("ADMIN")
                                 .anyRequest().denyAll()
                 )
