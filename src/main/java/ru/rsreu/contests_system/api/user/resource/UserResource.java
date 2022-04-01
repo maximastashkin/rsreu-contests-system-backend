@@ -67,8 +67,9 @@ public class UserResource {
     @Operation(summary = "${api.users.block.operation}")
     @PostMapping(path = "/block/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "404", description = "${api.users.block.response-codes.not-found}"),
-            @ApiResponse(responseCode = "403", description = "${api.users.block.response-codes.forbidden}")
+            @ApiResponse(responseCode = "200", description = "${api.users.block.response-codes.ok}"),
+            @ApiResponse(responseCode = "403", description = "${api.users.block.response-codes.forbidden}"),
+            @ApiResponse(responseCode = "404", description = "${api.users.block.response-codes.not-found}")
     })
     public ResponseEntity<?> blockUser(@PathVariable String id) {
         userService.updateBlockedStatus(id, BlockedStatus.BLOCKED);
@@ -78,6 +79,7 @@ public class UserResource {
     @Operation(summary = "${api.users.unblock.operation}")
     @PostMapping(path = "/unblock/{id}")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.users.unblock.response-cords.ok}"),
             @ApiResponse(responseCode = "404", description = "${api.users.unblock.response-codes.not-found}")
     })
     public ResponseEntity<?> unblockUser(@PathVariable String id) {
