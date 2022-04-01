@@ -1,7 +1,6 @@
 package ru.rsreu.contests_system.api.user;
 
-public enum Status {
+public enum ActivationStatus {
     ACTIVE,
-    UN_ACTIVE,
-    BLOCKED
+    INACTIVE
 }

@@ -1,6 +1,6 @@
 package ru.rsreu.contests_system.api.user.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,15 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 //Here write custom methods impl.
+@AllArgsConstructor
 public class UserRepositoryImpl implements UserCustomRepository {
     private static final String REFRESH_TOKENS_FIELD_NAME = "refreshTokens";
 
     private final MongoTemplate mongoTemplate;
-
-    @Autowired
-    public UserRepositoryImpl(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
 
     @Override
     public void addUserRefreshToken(String email, String refreshToken) {

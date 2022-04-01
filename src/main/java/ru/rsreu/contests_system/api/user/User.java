@@ -26,7 +26,9 @@ public class User {
 
     private Role role;
 
-    private Status status;
+    private ActivationStatus activationStatus;
+
+    private BlockedStatus blockedStatus;
 
     private String password;
 

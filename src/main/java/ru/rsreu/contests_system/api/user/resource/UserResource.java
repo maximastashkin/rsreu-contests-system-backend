@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.rsreu.contests_system.api.user.BlockedStatus;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpMapper;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 @RestController
 @Validated
 @AllArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping(value = "/api/users")
 public class UserResource {
     private final UserService userService;
     private final UserSignUpMapper userSignUpMapper;
@@ -61,5 +62,26 @@ public class UserResource {
                         .stream().map(userInfoMapper::toResponse).collect(Collectors.toList()),
                 HttpStatus.OK
         );
+    }
+
+    @Operation(summary = "${api.users.block.operation}")
+    @PostMapping(path = "/block/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404", description = "${api.users.block.response-codes.not-found}"),
+            @ApiResponse(responseCode = "403", description = "${api.users.block.response-codes.forbidden}")
+    })
+    public ResponseEntity<?> blockUser(@PathVariable String id) {
+        userService.updateBlockedStatus(id, BlockedStatus.BLOCKED);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.users.unblock.operation}")
+    @PostMapping(path = "/unblock/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404", description = "${api.users.unblock.response-codes.not-found}")
+    })
+    public ResponseEntity<?> unblockUser(@PathVariable String id) {
+        userService.updateBlockedStatus(id, BlockedStatus.UNBLOCKED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
