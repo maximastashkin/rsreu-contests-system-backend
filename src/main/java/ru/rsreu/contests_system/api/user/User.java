@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.util.EnumSet;
 import java.util.List;
 
 @Data
@@ -24,15 +25,13 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
-    private Role role;
-
-    private ActivationStatus activationStatus;
-
-    private BlockedStatus blockedStatus;
+    private EnumSet<Authority> authorities;
 
     private String password;
 
     private String educationPlace;
 
     private List<String> refreshTokens;
+
+    private String confirmationToken;
 }

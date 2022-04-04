@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.rsreu.contests_system.api.user.BlockedStatus;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpMapper;
@@ -22,6 +21,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,26 +64,37 @@ public class UserResource {
         );
     }
 
+    @Operation(summary = "${api.users.confirm.operation}")
+    @PostMapping(path = "/confirm/{confirmationToken}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.users.confirm.response-codes.ok}"),
+            @ApiResponse(responseCode = "404", description = "${api.users.confirm.response-codes.not-found}")
+    })
+    public ResponseEntity<?> confirmAccount(@PathVariable @NotNull @NotBlank String confirmationToken) {
+        userService.confirmUserByToken(confirmationToken);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @Operation(summary = "${api.users.block.operation}")
-    @PostMapping(path = "/block/{id}")
+    @PostMapping(path = "/block")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.block.response-codes.ok}"),
             @ApiResponse(responseCode = "403", description = "${api.users.block.response-codes.forbidden}"),
             @ApiResponse(responseCode = "404", description = "${api.users.block.response-codes.not-found}")
     })
-    public ResponseEntity<?> blockUser(@PathVariable String id) {
-        userService.updateBlockedStatus(id, BlockedStatus.BLOCKED);
+    public ResponseEntity<?> blockUser(@RequestParam @NotBlank @Email String email) {
+        userService.blockUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "${api.users.unblock.operation}")
-    @PostMapping(path = "/unblock/{id}")
+    @PostMapping(path = "/unblock")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.unblock.response-cords.ok}"),
             @ApiResponse(responseCode = "404", description = "${api.users.unblock.response-codes.not-found}")
     })
-    public ResponseEntity<?> unblockUser(@PathVariable String id) {
-        userService.updateBlockedStatus(id, BlockedStatus.UNBLOCKED);
+    public ResponseEntity<?> unblockUser(@RequestParam @NotBlank @Email String email) {
+        userService.unblockUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

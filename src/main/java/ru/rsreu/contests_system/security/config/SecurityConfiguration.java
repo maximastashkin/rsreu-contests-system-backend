@@ -1,8 +1,7 @@
 package ru.rsreu.contests_system.security.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,10 +9,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.rsreu.contests_system.api.user.Authority;
 import ru.rsreu.contests_system.security.api_key.ApiKeyConfigurer;
 import ru.rsreu.contests_system.security.jwt.JwtConfigurer;
 
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_WHITELIST = {
             "/**/signup",
@@ -23,7 +24,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/check-organization-phone",
             "/**/check-organization-email",
             "/**/check-leader-email",
-            "/**/applications/"
+            "/**/applications/",
+            "/**/confirm/**"
     };
 
     private static final String[] API_KEY_WHITELIST = {
@@ -32,18 +34,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/swagger-ui.html/**",
     };
 
+    private static final String[] ADMIN_LIST = {
+            "/**/users/**",
+            "/**/applications/**"
+    };
+
     private final JwtConfigurer jwtConfigurer;
 
     private final ApiKeyConfigurer apiKeyConfigurer;
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    @Autowired
-    public SecurityConfiguration(JwtConfigurer jwtConfigurer, ApiKeyConfigurer apiKeyConfigurer, AuthenticationEntryPoint authenticationEntryPoint) {
-        this.jwtConfigurer = jwtConfigurer;
-        this.apiKeyConfigurer = apiKeyConfigurer;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-    }
+    private final AuthorityAccessAttributeProvider authorityAccessAttributeProvider;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -54,10 +57,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeHttpRequests(authorize ->
-                        authorize.antMatchers(AUTH_WHITELIST).permitAll()
-                                .antMatchers(HttpMethod.GET, "/api/applications/**").hasAuthority("ADMIN")
-                                .antMatchers("/api/users/**").hasAuthority("ADMIN")
+                .authorizeRequests(authorize ->
+                        authorize
+                                .antMatchers(AUTH_WHITELIST).permitAll()
+                                .antMatchers(ADMIN_LIST).access(
+                                        authorityAccessAttributeProvider.formActiveUnblockedAttribute(Authority.ADMIN))
                                 .anyRequest().denyAll()
                 )
                 .apply(jwtConfigurer)

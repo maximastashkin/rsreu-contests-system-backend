@@ -12,8 +12,6 @@ public class UserInfoMapper {
                 user.getLastName(),
                 user.getMiddleName(),
                 user.getEmail(),
-                user.getRole(),
-                user.getActivationStatus()
-        );
+                user.getAuthorities());
     }
 }

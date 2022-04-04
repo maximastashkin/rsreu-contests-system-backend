@@ -43,6 +43,14 @@ public class UserRepositoryImpl implements UserCustomRepository {
         return getUserRefreshTokens(user);
     }
 
+    @Override
+    public void unsetConfirmationToken(String confirmationToken) {
+        Query query = Query.query(Criteria.where("confirmationToken").is(confirmationToken));
+        Update update = new Update();
+        update.unset("confirmationToken");
+        mongoTemplate.updateFirst(query, update, User.class);
+    }
+
     private List<String> getUserRefreshTokens(User user) {
         List<String> refreshTokens = new ArrayList<>();
         if (user != null && user.getRefreshTokens() != null) {

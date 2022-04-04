@@ -1,10 +1,8 @@
 package ru.rsreu.contests_system.api.user.service;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.rsreu.contests_system.api.user.BlockedStatus;
-import ru.rsreu.contests_system.api.user.Role;
+import ru.rsreu.contests_system.api.user.Authority;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.exception.AdminBlockingAttemptException;
 import ru.rsreu.contests_system.api.user.exception.NotUniqueEmailException;
@@ -16,9 +14,10 @@ import java.util.NoSuchElementException;
 
 @Service
 public record UserService(UserRepository userRepository) {
-    public User save(User user) {
+
+    public void save(User user) {
         try {
-            return userRepository.save(user);
+            userRepository.save(user);
         } catch (RuntimeException exception) {
             throw new NotUniqueEmailException(String.format("Email:%s not unique!", user.getEmail()));
         }
@@ -33,7 +32,8 @@ public record UserService(UserRepository userRepository) {
     }
 
     public User getUserByEmail(String email) throws NoSuchElementException {
-        return userRepository.findByEmail(email).orElseThrow();
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException(String.format("User with email:%s didn't found", email)));
     }
 
     public void addRefreshToken(String email, String refreshToken) {
@@ -48,23 +48,30 @@ public record UserService(UserRepository userRepository) {
         return userRepository.findRefreshTokensForUser(email);
     }
 
-    public void updateBlockedStatus(String id, BlockedStatus blockedStatus) {
-        User user = getUserById(id);
-        if (user.getRole() != Role.ADMIN || blockedStatus == BlockedStatus.UNBLOCKED) {
-            user.setBlockedStatus(blockedStatus);
-            userRepository.save(user);
+    public void blockUserByEmail(String email) {
+        User user = getUserByEmail(email);
+        if (!user.getAuthorities().contains(Authority.ADMIN)) {
+            replaceUserAuthority(user, Authority.UNBLOCKED, Authority.BLOCKED);
         } else {
             throw new AdminBlockingAttemptException("Admin blocking is impossible");
         }
     }
 
-    private User getUserById(String id) {
-        User user;
-        try {
-            user = userRepository.findById(new ObjectId(id)).orElseThrow(IllegalArgumentException::new);
-        } catch (IllegalArgumentException exception) {
-            throw new UserNotFoundException(String.format("User with id: %s not found", id));
-        }
-        return user;
+    public void unblockUserByEmail(String email) {
+        replaceUserAuthority(getUserByEmail(email), Authority.BLOCKED, Authority.UNBLOCKED);
+    }
+
+    private void replaceUserAuthority(User user, Authority oldAuthority, Authority newAuthority) {
+        user.getAuthorities().remove(oldAuthority);
+        user.getAuthorities().add(newAuthority);
+        save(user);
+    }
+
+    public void confirmUserByToken(String confirmationToken) {
+        User user = userRepository.findByConfirmationToken(confirmationToken).orElseThrow(
+                () -> new UserNotFoundException(String.format("User for confirmation token:%s not found", confirmationToken))
+        );
+        replaceUserAuthority(user, Authority.INACTIVE, Authority.ACTIVE);
+        userRepository.unsetConfirmationToken(confirmationToken);
     }
 }
