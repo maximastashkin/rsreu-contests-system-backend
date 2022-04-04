@@ -15,9 +15,9 @@ import java.util.NoSuchElementException;
 @Service
 public record UserService(UserRepository userRepository) {
 
-    public User save(User user) {
+    public void save(User user) {
         try {
-            return userRepository.save(user);
+            userRepository.save(user);
         } catch (RuntimeException exception) {
             throw new NotUniqueEmailException(String.format("Email:%s not unique!", user.getEmail()));
         }
@@ -51,19 +51,27 @@ public record UserService(UserRepository userRepository) {
     public void blockUserByEmail(String email) {
         User user = getUserByEmail(email);
         if (!user.getAuthorities().contains(Authority.ADMIN)) {
-            replaceUserAuthorityByEmail(user, Authority.UNBLOCKED, Authority.BLOCKED);
+            replaceUserAuthority(user, Authority.UNBLOCKED, Authority.BLOCKED);
         } else {
             throw new AdminBlockingAttemptException("Admin blocking is impossible");
         }
     }
 
     public void unblockUserByEmail(String email) {
-        replaceUserAuthorityByEmail(getUserByEmail(email), Authority.BLOCKED, Authority.UNBLOCKED);
+        replaceUserAuthority(getUserByEmail(email), Authority.BLOCKED, Authority.UNBLOCKED);
     }
 
-    private void replaceUserAuthorityByEmail(User user, Authority oldAuthority, Authority newAuthority) {
+    private void replaceUserAuthority(User user, Authority oldAuthority, Authority newAuthority) {
         user.getAuthorities().remove(oldAuthority);
         user.getAuthorities().add(newAuthority);
         save(user);
+    }
+
+    public void confirmUserByToken(String confirmationToken) {
+        User user = userRepository.findByConfirmationToken(confirmationToken).orElseThrow(
+                () -> new UserNotFoundException(String.format("User for confirmation token:%s not found", confirmationToken))
+        );
+        replaceUserAuthority(user, Authority.INACTIVE, Authority.ACTIVE);
+        userRepository.unsetConfirmationToken(confirmationToken);
     }
 }

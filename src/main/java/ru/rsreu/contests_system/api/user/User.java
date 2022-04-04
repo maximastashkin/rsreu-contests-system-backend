@@ -32,4 +32,6 @@ public class User {
     private String educationPlace;
 
     private List<String> refreshTokens;
+
+    private String confirmationToken;
 }

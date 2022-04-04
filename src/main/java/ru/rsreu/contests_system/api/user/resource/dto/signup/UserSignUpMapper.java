@@ -6,6 +6,7 @@ import ru.rsreu.contests_system.api.user.Authority;
 import ru.rsreu.contests_system.api.user.User;
 
 import java.util.EnumSet;
+import java.util.UUID;
 
 @Component
 public record UserSignUpMapper(PasswordEncoder passwordEncoder) {
@@ -18,6 +19,7 @@ public record UserSignUpMapper(PasswordEncoder passwordEncoder) {
                 .password(passwordEncoder.encode(userSignUpRequest.password()))
                 .email(userSignUpRequest.email().trim())
                 .authorities(EnumSet.of(Authority.PARTICIPANT, Authority.UNBLOCKED, Authority.INACTIVE))
+                .confirmationToken(UUID.randomUUID().toString())
                 .build();
     }
 }

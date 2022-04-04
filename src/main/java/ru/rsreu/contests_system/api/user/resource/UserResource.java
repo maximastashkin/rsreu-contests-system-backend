@@ -13,14 +13,15 @@ import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailMapper
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpRequest;
-import ru.rsreu.contests_system.security.users_info.UserInfoMapper;
-import ru.rsreu.contests_system.security.users_info.UserInfoResponse;
+import ru.rsreu.contests_system.api.user.resource.dto.users_info.UserInfoMapper;
+import ru.rsreu.contests_system.api.user.resource.dto.users_info.UserInfoResponse;
 import ru.rsreu.contests_system.api.user.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,17 @@ public class UserResource {
                         .stream().map(userInfoMapper::toResponse).collect(Collectors.toList()),
                 HttpStatus.OK
         );
+    }
+
+    @Operation(summary = "${api.users.confirm.operation}")
+    @PostMapping(path = "/confirm/{confirmationToken}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.users.confirm.response-codes.ok}"),
+            @ApiResponse(responseCode = "404", description = "${api.users.confirm.response-codes.not-found}")
+    })
+    public ResponseEntity<?> confirmAccount(@PathVariable @NotNull @NotBlank String confirmationToken) {
+        userService.confirmUserByToken(confirmationToken);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "${api.users.block.operation}")

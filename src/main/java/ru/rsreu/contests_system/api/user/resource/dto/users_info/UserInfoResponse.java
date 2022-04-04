@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.security.users_info;
+package ru.rsreu.contests_system.api.user.resource.dto.users_info;
 
 import ru.rsreu.contests_system.api.user.Authority;
 
