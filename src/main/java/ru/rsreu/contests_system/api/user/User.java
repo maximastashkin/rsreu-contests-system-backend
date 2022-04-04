@@ -25,7 +25,7 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
-    private EnumSet<Authority> authority;
+    private EnumSet<Authority> authorities;
 
     private String password;
 

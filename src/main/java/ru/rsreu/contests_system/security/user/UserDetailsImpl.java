@@ -19,7 +19,7 @@ public class UserDetailsImpl implements UserDetails {
     public UserDetailsImpl(User user) {
         username = user.getEmail();
         password = user.getPassword();
-        authorities = user.getAuthority().stream().map(authority ->
+        authorities = user.getAuthorities().stream().map(authority ->
                     new SimpleGrantedAuthority(authority.toString())).toList();
     }
 

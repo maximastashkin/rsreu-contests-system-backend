@@ -17,7 +17,7 @@ public record UserSignUpMapper(PasswordEncoder passwordEncoder) {
                 .educationPlace(userSignUpRequest.educationPlace().trim())
                 .password(passwordEncoder.encode(userSignUpRequest.password()))
                 .email(userSignUpRequest.email().trim())
-                .authority(EnumSet.of(Authority.PARTICIPANT, Authority.INACTIVE))
+                .authorities(EnumSet.of(Authority.PARTICIPANT, Authority.UNBLOCKED, Authority.INACTIVE))
                 .build();
     }
 }

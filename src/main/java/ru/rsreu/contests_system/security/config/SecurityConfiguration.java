@@ -2,7 +2,6 @@ package ru.rsreu.contests_system.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.rsreu.contests_system.api.user.Authority;
 import ru.rsreu.contests_system.security.api_key.ApiKeyConfigurer;
 import ru.rsreu.contests_system.security.jwt.JwtConfigurer;
 
@@ -30,6 +30,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html/**",
+    };
+
+    private static final String[] ADMIN_LIST = {
+            "/**/users/**",
+            "/**/applications/**"
     };
 
     private final JwtConfigurer jwtConfigurer;
@@ -54,10 +59,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeHttpRequests(authorize ->
-                        authorize.antMatchers(AUTH_WHITELIST).permitAll()
-                                .antMatchers(HttpMethod.GET, "/api/applications/**").hasAuthority("ADMIN")
-                                .antMatchers("/api/users/**").hasAuthority("ADMIN")
+                .authorizeRequests(authorize ->
+                        authorize
+                                .antMatchers(AUTH_WHITELIST).permitAll()
+                                .antMatchers(ADMIN_LIST).access(formActiveUnblockedAttribute(Authority.ADMIN))
                                 .anyRequest().denyAll()
                 )
                 .apply(jwtConfigurer)
@@ -65,6 +70,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .apply(apiKeyConfigurer)
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
+    }
+
+    private String formActiveUnblockedAttribute(Authority authority) {
+        String roleAuthority = authority != Authority.NONE ? String.format("hasAuthority('%s') AND", authority) : "";
+        return String.format("%s hasAuthority('UNBLOCKED') AND hasAuthority('ACTIVE')", roleAuthority);
     }
 
     @Override

@@ -1,9 +1,10 @@
 package ru.rsreu.contests_system.api.user.service;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.rsreu.contests_system.api.user.Authority;
 import ru.rsreu.contests_system.api.user.User;
+import ru.rsreu.contests_system.api.user.exception.AdminBlockingAttemptException;
 import ru.rsreu.contests_system.api.user.exception.NotUniqueEmailException;
 import ru.rsreu.contests_system.api.user.exception.UserNotFoundException;
 import ru.rsreu.contests_system.api.user.repository.UserRepository;
@@ -13,6 +14,7 @@ import java.util.NoSuchElementException;
 
 @Service
 public record UserService(UserRepository userRepository) {
+
     public User save(User user) {
         try {
             return userRepository.save(user);
@@ -30,7 +32,8 @@ public record UserService(UserRepository userRepository) {
     }
 
     public User getUserByEmail(String email) throws NoSuchElementException {
-        return userRepository.findByEmail(email).orElseThrow();
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException(String.format("User with email:%s didn't found", email)));
     }
 
     public void addRefreshToken(String email, String refreshToken) {
@@ -45,13 +48,22 @@ public record UserService(UserRepository userRepository) {
         return userRepository.findRefreshTokensForUser(email);
     }
 
-    private User getUserById(String id) {
-        User user;
-        try {
-            user = userRepository.findById(new ObjectId(id)).orElseThrow(IllegalArgumentException::new);
-        } catch (IllegalArgumentException exception) {
-            throw new UserNotFoundException(String.format("User with id: %s not found", id));
+    public void blockUserByEmail(String email) {
+        User user = getUserByEmail(email);
+        if (!user.getAuthorities().contains(Authority.ADMIN)) {
+            replaceUserAuthorityByEmail(user, Authority.UNBLOCKED, Authority.BLOCKED);
+        } else {
+            throw new AdminBlockingAttemptException("Admin blocking is impossible");
         }
-        return user;
+    }
+
+    public void unblockUserByEmail(String email) {
+        replaceUserAuthorityByEmail(getUserByEmail(email), Authority.BLOCKED, Authority.UNBLOCKED);
+    }
+
+    private void replaceUserAuthorityByEmail(User user, Authority oldAuthority, Authority newAuthority) {
+        user.getAuthorities().remove(oldAuthority);
+        user.getAuthorities().add(newAuthority);
+        save(user);
     }
 }

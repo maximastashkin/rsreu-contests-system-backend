@@ -13,8 +13,8 @@ import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailMapper
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpRequest;
-import ru.rsreu.contests_system.api.user.resource.dto.users_info.UserInfoMapper;
-import ru.rsreu.contests_system.api.user.resource.dto.users_info.UserInfoResponse;
+import ru.rsreu.contests_system.security.users_info.UserInfoMapper;
+import ru.rsreu.contests_system.security.users_info.UserInfoResponse;
 import ru.rsreu.contests_system.api.user.service.UserService;
 
 import javax.validation.Valid;
@@ -64,23 +64,25 @@ public class UserResource {
     }
 
     @Operation(summary = "${api.users.block.operation}")
-    @PostMapping(path = "/block/{id}")
+    @PostMapping(path = "/block")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.block.response-codes.ok}"),
             @ApiResponse(responseCode = "403", description = "${api.users.block.response-codes.forbidden}"),
             @ApiResponse(responseCode = "404", description = "${api.users.block.response-codes.not-found}")
     })
-    public ResponseEntity<?> blockUser(@PathVariable String id) {
+    public ResponseEntity<?> blockUser(@RequestParam @NotBlank @Email String email) {
+        userService.blockUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "${api.users.unblock.operation}")
-    @PostMapping(path = "/unblock/{id}")
+    @PostMapping(path = "/unblock")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.unblock.response-cords.ok}"),
             @ApiResponse(responseCode = "404", description = "${api.users.unblock.response-codes.not-found}")
     })
-    public ResponseEntity<?> unblockUser(@PathVariable String id) {
+    public ResponseEntity<?> unblockUser(@RequestParam @NotBlank @Email String email) {
+        userService.unblockUserByEmail(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

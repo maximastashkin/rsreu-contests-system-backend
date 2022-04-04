@@ -8,5 +8,6 @@ public enum Authority {
     BLOCKED,
     UNBLOCKED,
     INACTIVE,
-    ACTIVE
+    ACTIVE,
+    NONE
 }
