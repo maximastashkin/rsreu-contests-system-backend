@@ -1,8 +1,12 @@
 package ru.rsreu.contests_system.api.user;
 
-public enum Role {
+public enum Authority {
     ADMIN,
     MASTER_ORGANIZER,
     ORGANIZER,
-    PARTICIPANT
+    PARTICIPANT,
+    BLOCKED,
+    UNBLOCKED,
+    INACTIVE,
+    ACTIVE
 }

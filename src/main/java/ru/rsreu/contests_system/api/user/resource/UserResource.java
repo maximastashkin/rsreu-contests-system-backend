@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.rsreu.contests_system.api.user.BlockedStatus;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpMapper;
@@ -72,7 +71,6 @@ public class UserResource {
             @ApiResponse(responseCode = "404", description = "${api.users.block.response-codes.not-found}")
     })
     public ResponseEntity<?> blockUser(@PathVariable String id) {
-        userService.updateBlockedStatus(id, BlockedStatus.BLOCKED);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -83,7 +81,6 @@ public class UserResource {
             @ApiResponse(responseCode = "404", description = "${api.users.unblock.response-codes.not-found}")
     })
     public ResponseEntity<?> unblockUser(@PathVariable String id) {
-        userService.updateBlockedStatus(id, BlockedStatus.UNBLOCKED);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

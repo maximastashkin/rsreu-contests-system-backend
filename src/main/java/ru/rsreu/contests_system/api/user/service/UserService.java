@@ -3,10 +3,7 @@ package ru.rsreu.contests_system.api.user.service;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.rsreu.contests_system.api.user.BlockedStatus;
-import ru.rsreu.contests_system.api.user.Role;
 import ru.rsreu.contests_system.api.user.User;
-import ru.rsreu.contests_system.api.user.exception.AdminBlockingAttemptException;
 import ru.rsreu.contests_system.api.user.exception.NotUniqueEmailException;
 import ru.rsreu.contests_system.api.user.exception.UserNotFoundException;
 import ru.rsreu.contests_system.api.user.repository.UserRepository;
@@ -46,16 +43,6 @@ public record UserService(UserRepository userRepository) {
 
     public List<String> getRefreshTokens(String email) {
         return userRepository.findRefreshTokensForUser(email);
-    }
-
-    public void updateBlockedStatus(String id, BlockedStatus blockedStatus) {
-        User user = getUserById(id);
-        if (user.getRole() != Role.ADMIN || blockedStatus == BlockedStatus.UNBLOCKED) {
-            user.setBlockedStatus(blockedStatus);
-            userRepository.save(user);
-        } else {
-            throw new AdminBlockingAttemptException("Admin blocking is impossible");
-        }
     }
 
     private User getUserById(String id) {
