@@ -1,6 +1,6 @@
 package ru.rsreu.contests_system.security.jwt;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,16 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component(value = "jwtAuthenticationManager")
+@AllArgsConstructor
 public class JwtAuthenticationManager implements AuthenticationManager {
     private final UserDetailsService userDetailsService;
 
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public JwtAuthenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

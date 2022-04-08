@@ -3,7 +3,6 @@ package ru.rsreu.contests_system.api.organization.repository;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import ru.rsreu.contests_system.api.organization.Organization;
-import ru.rsreu.contests_system.api.user.User;
 
 import java.util.Optional;
 

@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import ru.rsreu.contests_system.api.user.User;
 
 import java.util.Collection;
-import java.util.List;
 
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
@@ -20,7 +19,8 @@ public class UserDetailsImpl implements UserDetails {
     public UserDetailsImpl(User user) {
         username = user.getEmail();
         password = user.getPassword();
-        authorities = List.of(new SimpleGrantedAuthority(user.getRole().toString()));
+        authorities = user.getAuthorities().stream().map(authority ->
+                    new SimpleGrantedAuthority(authority.toString())).toList();
     }
 
     @Override

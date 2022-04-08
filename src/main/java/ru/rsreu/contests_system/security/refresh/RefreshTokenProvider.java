@@ -11,7 +11,7 @@ public class RefreshTokenProvider {
 
 
     public String createTokenFromJwtToken(String jwtToken) {
-        return RandomStringUtils.randomAscii(REFRESH_TOKEN_BASE_LENGTH) +
+        return RandomStringUtils.randomGraph(REFRESH_TOKEN_BASE_LENGTH) +
                 StringUtils.right(jwtToken, ACCESS_TOKEN_PART_LENGTH);
     }
 

@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Data
 @Builder
-@Document
+@Document("applications")
 public class OrganizationCreatingApplication {
     @MongoId
     private ObjectId id;

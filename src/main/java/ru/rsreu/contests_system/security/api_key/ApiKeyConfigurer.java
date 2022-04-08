@@ -15,7 +15,6 @@ public class ApiKeyConfigurer extends SecurityConfigurerAdapter<DefaultSecurityF
     @Value("${security.api_key.valid}")
     private String validApiKey;
 
-
     @Override
     public void configure(HttpSecurity http) {
         http.addFilterBefore(new ApiKeyAuthenticationFilter(

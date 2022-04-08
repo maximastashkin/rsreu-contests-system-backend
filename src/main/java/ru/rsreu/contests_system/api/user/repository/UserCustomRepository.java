@@ -9,4 +9,6 @@ public interface UserCustomRepository {
     long deleteUserRefreshToken(String email, String refreshToken);
 
     List<String> findRefreshTokensForUser(String email);
+
+    void unsetConfirmationToken(String confirmationToken);
 }

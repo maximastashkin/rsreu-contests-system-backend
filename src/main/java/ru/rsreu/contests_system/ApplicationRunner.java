@@ -6,13 +6,12 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
 @SpringBootApplication
-@PropertySources(
-      @PropertySource("classpath:swagger.properties")
-)
+@PropertySources({
+        @PropertySource("classpath:swagger.properties"),
+        @PropertySource("classpath:validation.properties")
+})
 public class ApplicationRunner {
-
     public static void main(String[] args) {
         SpringApplication.run(ApplicationRunner.class, args);
     }
-
 }
