@@ -10,6 +10,7 @@ import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.
 import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.OrganizationInfoResponse;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 
+import javax.validation.constraints.Email;
 import java.util.Optional;
 
 @RestController
@@ -31,12 +32,11 @@ public class OrganizationResource {
 
     @Operation(summary = "$api.org.info.operation")
     @GetMapping(path="/info", produces = "application/json")
-    public ResponseEntity<OrganizationInfoResponse> getOrganization(@RequestParam String id) {
-        System.out.println(id);
-        return Optional.ofNullable(organizationService.getOrganizationById(id))
+    public ResponseEntity<OrganizationInfoResponse> getOrganization(@RequestParam @Email String email) {
+        return Optional.ofNullable(organizationService.getOrganizationByEmail(email))
                 .map(result -> new ResponseEntity<>(organizationInfoMapper
-                                                        .toResponse(organizationService
-                                                                        .getOrganizationById(id)),
+                                                    .toResponse(organizationService
+                                                                .getOrganizationByEmail(email)),
                                                     HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }

@@ -18,7 +18,7 @@ public record OrganizationService(
         return organizationRepository.findByOrganizationPhone(phone).isEmpty();
     }
 
-    public Organization getOrganizationById(String id) throws NoSuchElementException {
-        return organizationRepository.findOrganizationById(new ObjectId(id)).orElseThrow();
+    public Organization getOrganizationByEmail(String email) {
+        return organizationRepository.findByOrganizationEmail(email).orElse(null);
     }
 }
