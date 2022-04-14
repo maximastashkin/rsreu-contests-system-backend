@@ -3,6 +3,7 @@ package ru.rsreu.contests_system.api.organization.service;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
+import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 
 import java.util.NoSuchElementException;
@@ -18,7 +19,9 @@ public record OrganizationService(
         return organizationRepository.findByOrganizationPhone(phone).isEmpty();
     }
 
-    public Organization getOrganizationByEmail(String email) {
-        return organizationRepository.findByOrganizationEmail(email).orElse(null);
+    public Organization getOrganizationById(String id) {
+        return organizationRepository.findOrganizationById(id).orElseThrow(
+                () -> new OrganizationNotFoundException(String.format("Organization with id: %s didn't found", id))
+        );
     }
 }
