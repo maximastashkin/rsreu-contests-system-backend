@@ -1,12 +1,9 @@
 package ru.rsreu.contests_system.api.organization.service;
 
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
-
-import java.util.NoSuchElementException;
 
 @Service
 public record OrganizationService(
