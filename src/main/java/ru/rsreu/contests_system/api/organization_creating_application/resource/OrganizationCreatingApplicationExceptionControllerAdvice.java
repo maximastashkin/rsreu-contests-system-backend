@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.api.organization_creating_application;
+package ru.rsreu.contests_system.api.organization_creating_application.resource;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -15,7 +15,7 @@ import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 
 @RestController
 @Validated
-@RequestMapping("/api/org")
+@RequestMapping("/api/orgs")
 @AllArgsConstructor
 public class OrganizationResource {
     private final OrganizationService organizationService;
