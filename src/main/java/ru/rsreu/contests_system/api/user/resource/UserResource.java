@@ -2,20 +2,25 @@ package ru.rsreu.contests_system.api.user.resource;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpRequest;
-import ru.rsreu.contests_system.api.user.resource.dto.users_info.UserInfoMapper;
-import ru.rsreu.contests_system.api.user.resource.dto.users_info.UserInfoResponse;
+import ru.rsreu.contests_system.api.user.resource.dto.user_info.UserInfoMapper;
+import ru.rsreu.contests_system.api.user.resource.dto.user_info.UserInfoResponse;
+import ru.rsreu.contests_system.api.user.resource.dto.users_info.UsersInfoMapper;
+import ru.rsreu.contests_system.api.user.resource.dto.users_info.UsersInfoResponse;
 import ru.rsreu.contests_system.api.user.service.UserService;
+import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -33,46 +38,37 @@ public class UserResource {
     private final UserService userService;
     private final UserSignUpMapper userSignUpMapper;
     private final CheckMailMapper checkMailMapper;
+    private final UsersInfoMapper usersInfoMapper;
     private final UserInfoMapper userInfoMapper;
+    private final AuthenticationUserDetailMapper authenticationUserDetailMapper;
 
-    @Operation(summary = "${api.users.signup.operation}")
-    @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")
-    @ApiResponses(
-            @ApiResponse(responseCode = "201", description = "${api.users.signup.response-codes.created}")
-    )
-    public ResponseEntity<?> signUp(@RequestBody @Valid UserSignUpRequest userSignUpRequest) {
-        userService.save(userSignUpMapper.toUser(userSignUpRequest));
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @Operation(summary = "${api.users.check-email.operation}")
-    @GetMapping(path = "/check-mail", produces = "application/json")
-    public ResponseEntity<CheckMailResponse> checkEmailUnique(@RequestParam @NotBlank @Email String email) {
-        return new ResponseEntity<>(checkMailMapper.toResponse(userService.isEmailUnique(email)), HttpStatus.OK);
+    @Operation(summary = "${api.users.info.operation}")
+    @GetMapping(value = "/info", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.users.info.response-codes.ok}"),
+            @ApiResponse(responseCode = "404", description = "${api.users.info.response-codes.not-found}",
+                    content = {
+                            @Content()
+                    })
+    })
+    public ResponseEntity<UserInfoResponse> getUserInfo(Authentication authentication) {
+        return new ResponseEntity<>(userInfoMapper.toResponse(
+                userService.getUserByEmail(
+                        authenticationUserDetailMapper.toUserDetails(authentication).getUsername())),
+                HttpStatus.OK);
     }
 
     @Operation(summary = "${api.users.all.operation}")
-    @GetMapping(path = "/{pageSize}/{pageNumber}", produces = "application/json")
-    public ResponseEntity<List<UserInfoResponse>> getAllUsers(@PathVariable @Min(1) int pageSize,
-                                                              @Parameter(description = "${api.pageable_numbering.message}")
-                                                               @PathVariable @Min(0) int pageNumber) {
+    @GetMapping(path = "/all/{pageSize}/{pageNumber}", produces = "application/json")
+    public ResponseEntity<List<UsersInfoResponse>> getAllUsersInfo(@PathVariable @Min(1) int pageSize,
+                                                                   @Parameter(description = "${api.pageable_numbering.message}")
+                                                                   @PathVariable @Min(0) int pageNumber) {
         return new ResponseEntity<>(
                 userService
                         .getAll(pageSize, pageNumber)
-                        .stream().map(userInfoMapper::toResponse).collect(Collectors.toList()),
+                        .stream().map(usersInfoMapper::toResponse).collect(Collectors.toList()),
                 HttpStatus.OK
         );
-    }
-
-    @Operation(summary = "${api.users.confirm.operation}")
-    @PostMapping(path = "/confirm/{confirmationToken}")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.users.confirm.response-codes.ok}"),
-            @ApiResponse(responseCode = "404", description = "${api.users.confirm.response-codes.not-found}")
-    })
-    public ResponseEntity<?> confirmAccount(@PathVariable @NotNull @NotBlank String confirmationToken) {
-        userService.confirmUserByToken(confirmationToken);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "${api.users.block.operation}")
@@ -95,6 +91,33 @@ public class UserResource {
     })
     public ResponseEntity<?> unblockUser(@RequestParam @NotBlank @Email String email) {
         userService.unblockUserByEmail(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.users.signup.operation}")
+    @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")
+    @ApiResponses(
+            @ApiResponse(responseCode = "201", description = "${api.users.signup.response-codes.created}")
+    )
+    public ResponseEntity<?> signUp(@RequestBody @Valid UserSignUpRequest userSignUpRequest) {
+        userService.save(userSignUpMapper.toUser(userSignUpRequest));
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "${api.users.check-email.operation}")
+    @GetMapping(path = "/check-mail", produces = "application/json")
+    public ResponseEntity<CheckMailResponse> checkEmailUnique(@RequestParam @NotBlank @Email String email) {
+        return new ResponseEntity<>(checkMailMapper.toResponse(userService.isEmailUnique(email)), HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.users.confirm.operation}")
+    @PostMapping(path = "/confirm/{confirmationToken}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.users.confirm.response-codes.ok}"),
+            @ApiResponse(responseCode = "404", description = "${api.users.confirm.response-codes.not-found}")
+    })
+    public ResponseEntity<?> confirmAccount(@PathVariable @NotNull @NotBlank String confirmationToken) {
+        userService.confirmUserByToken(confirmationToken);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -4,7 +4,7 @@ import ru.rsreu.contests_system.api.user.Authority;
 
 import java.util.EnumSet;
 
-public record UserInfoResponse(
+public record UsersInfoResponse(
         String id,
         String firstName,
         String lastName,

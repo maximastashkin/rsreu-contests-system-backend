@@ -26,7 +26,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/check-leader-email",
             "/**/applications/",
             "/**/confirm/**",
-            "/**/org/**"
+            "/**/orgs/**"
+    };
+
+    private static final String[] AUTH_LIST = {
+            "/**/users/info"
     };
 
     private static final String[] API_KEY_WHITELIST = {
@@ -36,7 +40,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     };
 
     private static final String[] ADMIN_LIST = {
-            "/**/users/**",
+            "/**/users/all",
+            "/**/users/block",
+            "/**/users/unblock",
             "/**/applications/**"
     };
 
@@ -47,7 +53,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     private final AuthorityAccessAttributeProvider authorityAccessAttributeProvider;
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -61,6 +66,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests(authorize ->
                         authorize
                                 .antMatchers(AUTH_WHITELIST).permitAll()
+                                .antMatchers(AUTH_LIST).authenticated()
                                 .antMatchers(ADMIN_LIST).access(
                                         authorityAccessAttributeProvider.formActiveUnblockedAttribute(Authority.ADMIN))
                                 .anyRequest().denyAll()
