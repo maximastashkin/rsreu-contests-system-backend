@@ -1,6 +1,7 @@
 package ru.rsreu.contests_system.api.organization;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -38,9 +39,11 @@ public class Organization {
     private User organizationLeader;
 
     @DBRef
-    @Builder.Default private Set<User> organizers = new HashSet<>();
+    @Builder.Default
+    private Set<User> organizers = new HashSet<>();
 
-    @Builder.Default private Set<Event> events = new HashSet<>();
+    @Builder.Default
+    private Set<Event> events = new HashSet<>();
 
     public void addOrganizer(User organizer) {
         organizers.add(organizer);

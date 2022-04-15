@@ -1,6 +1,8 @@
 package ru.rsreu.contests_system.api.organization.service;
 
 import org.springframework.stereotype.Service;
+import ru.rsreu.contests_system.api.organization.Organization;
+import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 
 @Service
@@ -12,5 +14,11 @@ public record OrganizationService(
 
     public boolean isPhoneUnique(String phone) {
         return organizationRepository.findByOrganizationPhone(phone).isEmpty();
+    }
+
+    public Organization getOrganizationById(String id) {
+        return organizationRepository.findOrganizationById(id).orElseThrow(
+                () -> new OrganizationNotFoundException(String.format("Organization with id: %s didn't found", id))
+        );
     }
 }
