@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 
 @Service
 public record UserService(UserRepository userRepository) {
-
     public void save(User user) {
         try {
             userRepository.save(user);

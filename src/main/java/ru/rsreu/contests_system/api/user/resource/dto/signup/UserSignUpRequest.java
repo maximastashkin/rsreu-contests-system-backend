@@ -1,16 +1,16 @@
 package ru.rsreu.contests_system.api.user.resource.dto.signup;
 
 import ru.rsreu.contests_system.validation.null_or_not_blank.NullOrNotBlank;
+import ru.rsreu.contests_system.validation.password.Password;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 public record UserSignUpRequest(
         @NotBlank @Email(message = "Email isn't valid")
         String email,
 
-        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")
+        @Password
         String password,
 
         @NotBlank

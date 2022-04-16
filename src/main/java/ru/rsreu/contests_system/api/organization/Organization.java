@@ -25,9 +25,11 @@ public class Organization {
     @Indexed(unique = true)
     private String name;
 
-    private String description;
+    @Builder.Default
+    private String description = "";
 
-    private String pictureUrl;
+    @Builder.Default
+    private String pictureUrl = "";
 
     @Indexed(unique = true)
     private String organizationEmail;
@@ -44,12 +46,4 @@ public class Organization {
 
     @Builder.Default
     private Set<Event> events = new HashSet<>();
-
-    public void addOrganizer(User organizer) {
-        organizers.add(organizer);
-    }
-
-    public void addEvent(Event event) {
-        events.add(event);
-    }
 }

@@ -1,7 +1,7 @@
 package ru.rsreu.contests_system.api.organization_creating_application.exception;
 
-public class NotUniqueOrganizationInfo extends RuntimeException {
-    public NotUniqueOrganizationInfo(String message) {
-        super(message);
-    }
+public enum NotUniqueOrganizationInfo {
+    ORG_EMAIL,
+    ORG_PHONE,
+    LEADER_EMAIL
 }

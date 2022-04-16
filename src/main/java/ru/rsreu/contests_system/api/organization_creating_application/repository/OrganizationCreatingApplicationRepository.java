@@ -10,6 +10,9 @@ import java.util.Optional;
 
 public interface OrganizationCreatingApplicationRepository
         extends MongoRepository<OrganizationCreatingApplication, ObjectId> {
+
+    Optional<OrganizationCreatingApplication> findById(ObjectId id);
+
     Optional<OrganizationCreatingApplication> findByOrganizationEmail(String organizationEmail);
 
     Optional<OrganizationCreatingApplication> findByOrganizationPhone(String phone);

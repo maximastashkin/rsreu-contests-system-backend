@@ -20,7 +20,8 @@ public class User {
 
     private String lastName;
 
-    private String middleName;
+    @Builder.Default
+    private String middleName = "";
 
     @Indexed(unique = true)
     private String email;
@@ -29,9 +30,10 @@ public class User {
 
     private String password;
 
-    private String educationPlace;
+    @Builder.Default
+    private String educationPlace = "";
 
     private List<String> refreshTokens;
-
+    
     private String confirmationToken;
 }

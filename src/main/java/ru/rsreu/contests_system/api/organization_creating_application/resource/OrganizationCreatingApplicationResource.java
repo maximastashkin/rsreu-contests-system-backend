@@ -2,11 +2,17 @@ package ru.rsreu.contests_system.api.organization_creating_application.resource;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_creating.OrganizationCreatingApplicationMapper;
+import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_creating.OrganizationCreatingApplicationRequest;
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_info.OrganizationCreatingApplicationInfoMapper;
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_info.OrganizationCreatingApplicationsInfoResponse;
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.check_lead_email.CheckLeaderEmailUniqueMapper;
@@ -15,8 +21,7 @@ import ru.rsreu.contests_system.api.organization_creating_application.resource.d
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.check_org_email.CheckOrganizationEmailUniqueResponse;
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.check_phone.CheckOrganizationPhoneUniqueMapper;
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.check_phone.CheckOrganizationPhoneUniqueResponse;
-import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_creating.OrganizationCreatingApplicationMapper;
-import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.application_creating.OrganizationCreatingApplicationRequest;
+import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.not_unique_info.NotUniqueOrganizationInfoResponse;
 import ru.rsreu.contests_system.api.organization_creating_application.service.OrganizationCreatingApplicationService;
 import ru.rsreu.contests_system.validation.phone.Phone;
 
@@ -37,6 +42,30 @@ public class OrganizationCreatingApplicationResource {
     private final CheckOrganizationEmailUniqueMapper checkOrganizationEmailUniqueMapper;
     private final CheckLeaderEmailUniqueMapper checkLeaderEmailUniqueMapper;
     private final OrganizationCreatingApplicationService organizationCreatingApplicationService;
+
+    @Operation(summary = "${api.applications.approve.operation}")
+    @PostMapping("/approve")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "${api.applications.approve.response-codes.created}",
+                    content = {
+                            @Content()
+                    }),
+            @ApiResponse(responseCode = "400", description = "${api.applications.approve.bad-request}",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(allOf = NotUniqueOrganizationInfoResponse.class)
+                            )
+                    }),
+            @ApiResponse(responseCode = "404", description = "${api.application.approve.not-found}",
+                    content = {
+                            @Content()
+                    })
+    })
+    public ResponseEntity<?> approveOrganizationCreatingApplication(@RequestParam String id) {
+        organizationCreatingApplicationService.approveOrganizationCreatingApplication(id);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
     @Operation(summary = "${api.applications.all.operation}")
     @GetMapping(path = "/{pageSize}/{pageNumber}", produces = "application/json")

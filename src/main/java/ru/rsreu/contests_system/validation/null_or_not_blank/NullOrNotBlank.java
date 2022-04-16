@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Documented
 @Constraint(validatedBy = NullOrNotBlankValidator.class)
 public @interface NullOrNotBlank {
-    String message() default "{javax.validation.constraints.NullOrNotBlank.message}";
+    String message() default "Bad null or blank field";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default {};
 }

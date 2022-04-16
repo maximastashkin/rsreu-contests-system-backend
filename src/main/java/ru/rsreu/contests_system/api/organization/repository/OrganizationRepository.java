@@ -11,5 +11,5 @@ public interface OrganizationRepository extends MongoRepository<Organization, Ob
 
     Optional<Organization> findByOrganizationPhone(String organizationPhone);
 
-    Optional<Organization> findOrganizationById(String id);
+    Optional<Organization> findOrganizationById(ObjectId id);
 }
