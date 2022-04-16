@@ -13,6 +13,8 @@ import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.
 import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.OrganizationInfoResponse;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 
+import javax.validation.constraints.NotBlank;
+
 @RestController
 @Validated
 @RequestMapping("/api/orgs")
@@ -22,20 +24,18 @@ public class OrganizationResource {
     private final OrganizationInfoMapper organizationInfoMapper;
 
     @Operation(summary = "${api.org.info.operation}")
-    @GetMapping(path="", produces = "application/json")
+    @GetMapping(produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.org.response-codes.ok}"),
+            @ApiResponse(responseCode = "400", description = "${api.org.response-codes.bad-request}",
+                    content = {@Content()}),
             @ApiResponse(responseCode = "404", description = "${api.org.response-codes.not-found}",
-            content = {
-                    @Content()
-            })
+                    content = {@Content()})
     })
-    public ResponseEntity<OrganizationInfoResponse> getOrganization(@RequestParam String id) {
+    public ResponseEntity<OrganizationInfoResponse> getOrganization(@RequestParam @NotBlank String id) {
         return new ResponseEntity<>(
                 organizationInfoMapper.toResponse(organizationService.getOrganizationById(id)),
                 HttpStatus.OK
         );
     }
-
-
 }

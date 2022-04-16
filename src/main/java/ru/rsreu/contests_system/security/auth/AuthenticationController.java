@@ -1,5 +1,6 @@
 package ru.rsreu.contests_system.security.auth;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -30,27 +31,26 @@ public class AuthenticationController {
     private final RefreshTokenProvider refreshTokenProvider;
     private final UserService userService;
 
+    @Operation(summary = "${api.auth.operation}")
     @PostMapping(consumes = "application/json", produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.auth.response-codes.ok.desc}"),
-            @ApiResponse(responseCode = "401", description = "${api.auth.response-codes.unauth.desc}",
-            content = {
-                    @Content()
-            }),
-            @ApiResponse(responseCode = "404", description = "${api.auth.response-codes.not-found.desc}",
-                    content = {
-                    @Content()
-            })
+            @ApiResponse(responseCode = "200", description = "${api.auth.response-codes.ok}"),
+            @ApiResponse(responseCode = "400", description = "${api.auth.response-codes.bad-request}",
+                    content = {@Content()}),
+            @ApiResponse(responseCode = "401", description = "${api.auth.response-codes.unauth}",
+                    content = {@Content()}),
+            @ApiResponse(responseCode = "404", description = "${api.auth.response-codes.not-found}",
+                    content = {@Content()})
     })
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody @Valid AuthenticationRequest authenticationRequest) {
         Authentication authentication = getAuthenticationFromRequest(authenticationRequest);
         String token = jwtTokenProvider.createTokenFromAuthentication(authentication);
-        String refreshToken =  refreshTokenProvider.createTokenFromJwtToken(token);
+        String refreshToken = refreshTokenProvider.createTokenFromJwtToken(token);
         userService.addRefreshToken(authentication.getName(), refreshToken);
         return new ResponseEntity<>(
                 new AuthenticationResponse(token,
-                       refreshToken),
+                        refreshToken),
                 HttpStatus.OK);
     }
 

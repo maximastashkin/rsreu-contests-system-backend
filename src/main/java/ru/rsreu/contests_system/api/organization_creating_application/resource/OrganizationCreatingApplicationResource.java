@@ -47,28 +47,29 @@ public class OrganizationCreatingApplicationResource {
     @PostMapping("/approve")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "${api.applications.approve.response-codes.created}",
-                    content = {
-                            @Content()
-                    }),
+                    content = {@Content()}),
             @ApiResponse(responseCode = "400", description = "${api.applications.approve.bad-request}",
                     content = {
                             @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(allOf = NotUniqueOrganizationInfoResponse.class)
+                                    schema = @Schema(implementation = NotUniqueOrganizationInfoResponse.class)
                             )
                     }),
             @ApiResponse(responseCode = "404", description = "${api.application.approve.not-found}",
-                    content = {
-                            @Content()
-                    })
+                    content = {@Content()})
     })
-    public ResponseEntity<?> approveOrganizationCreatingApplication(@RequestParam String id) {
+    public ResponseEntity<?> approveOrganizationCreatingApplication(@RequestParam @NotBlank String id) {
         organizationCreatingApplicationService.approveOrganizationCreatingApplication(id);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(summary = "${api.applications.all.operation}")
     @GetMapping(path = "/{pageSize}/{pageNumber}", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.applications.all.response-codes.ok}"),
+            @ApiResponse(responseCode = "400", description = "${api.applications.all.response-codes.bad-request}",
+                    content = {@Content()})
+    })
     public ResponseEntity<List<OrganizationCreatingApplicationsInfoResponse>> getAllOrganizationCreatingApplication(
             @PathVariable @Min(1) int pageSize,
             @Parameter(description = "${api.pageable_numbering.message}")
@@ -83,6 +84,12 @@ public class OrganizationCreatingApplicationResource {
 
     @Operation(summary = "${api.applications.creating.operation}")
     @PostMapping(consumes = "application/json", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.applications.creating.response-codes.ok}",
+                    content = {@Content()}),
+            @ApiResponse(responseCode = "400", description = "${api.applications.creating.response-codes.bad-request}",
+                    content = {@Content()}),
+    })
     public ResponseEntity<?> createOrganizationCreatingApplication(
             @RequestBody @Valid OrganizationCreatingApplicationRequest request) {
         organizationCreatingApplicationService
@@ -92,6 +99,13 @@ public class OrganizationCreatingApplicationResource {
 
     @Operation(summary = "${api.applications.check-organization-email.operation}")
     @GetMapping(path = "/check-organization-email", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description =
+                    "${api.applications.check-organization-email.response-codes.ok}"),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.applications.check-organization-email.response-codes.bad-request}",
+                    content = {@Content()})
+    })
     public ResponseEntity<CheckOrganizationEmailUniqueResponse> checkOrganizationEmailUnique(
             @RequestParam @NotBlank @Email String email) {
         return new ResponseEntity<>(
@@ -102,6 +116,13 @@ public class OrganizationCreatingApplicationResource {
 
     @Operation(summary = "${api.applications.check-organization-phone.operation}")
     @GetMapping(path = "/check-organization-phone", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description =
+                    "${api.applications.check-organization-phone.response-codes.ok}"),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.applications.check-organization-phone.response-codes.bad-request}",
+                    content = {@Content()})
+    })
     public ResponseEntity<CheckOrganizationPhoneUniqueResponse> checkOrganizationPhoneUnique(
             @RequestParam @NotBlank @Phone String phone) {
         return new ResponseEntity<>(
@@ -113,6 +134,13 @@ public class OrganizationCreatingApplicationResource {
 
     @Operation(summary = "${api.applications.check-leader-email.operation}")
     @GetMapping(path = "/check-leader-email", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description =
+                    "${api.applications.check-leader-email.response-codes.ok}"),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.applications.check-leader-email.response-codes.bad-request}",
+                    content = {@Content()})
+    })
     public ResponseEntity<CheckLeaderEmailUniqueResponse> checkLeaderEmailUnique(
             @RequestParam @NotBlank @Email String email) {
         return new ResponseEntity<>(
