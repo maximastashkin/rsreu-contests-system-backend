@@ -38,6 +38,12 @@ public class OrganizationCreatingApplicationResource {
     private final CheckLeaderEmailUniqueMapper checkLeaderEmailUniqueMapper;
     private final OrganizationCreatingApplicationService organizationCreatingApplicationService;
 
+    @PostMapping("/approve")
+    public ResponseEntity<?> approveOrganizationCreatingApplication(@RequestParam String id) {
+        organizationCreatingApplicationService.approveOrganizationCreatingApplication(id);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
     @Operation(summary = "${api.applications.all.operation}")
     @GetMapping(path = "/{pageSize}/{pageNumber}", produces = "application/json")
     public ResponseEntity<List<OrganizationCreatingApplicationsInfoResponse>> getAllOrganizationCreatingApplication(

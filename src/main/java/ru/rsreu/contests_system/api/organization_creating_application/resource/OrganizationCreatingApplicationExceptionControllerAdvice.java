@@ -1,17 +1,25 @@
 package ru.rsreu.contests_system.api.organization_creating_application.resource;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfo;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfoException;
+import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.not_unique_info.NotUniqueOrganizationInfoMapper;
+import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.not_unique_info.NotUniqueOrganizationInfoResponse;
 
 @RestControllerAdvice
-public class OrganizationCreatingApplicationExceptionControllerAdvice {
-    @ExceptionHandler(NotUniqueOrganizationInfo.class)
+@AllArgsConstructor
+public class OrganizationCreatingApplicationExceptionControllerAdvice extends ResponseEntityExceptionHandler {
+    private final NotUniqueOrganizationInfoMapper notUniqueOrganizationInfoMapper;
+
+    @ExceptionHandler(NotUniqueOrganizationInfoException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<?> notUniqueOrganizationEmail(NotUniqueOrganizationInfo exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<NotUniqueOrganizationInfoResponse> notUniqueOrganizationEmail(
+            NotUniqueOrganizationInfoException exception) {
+        return new ResponseEntity<>(notUniqueOrganizationInfoMapper.toResponse(exception), HttpStatus.BAD_REQUEST);
     }
 }

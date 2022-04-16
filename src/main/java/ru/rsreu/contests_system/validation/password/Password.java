@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.validation.phone;
+package ru.rsreu.contests_system.validation.password;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -7,9 +7,11 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = PhoneValidator.class)
-public @interface Phone {
-    String message() default "Bad phone";
-    Class<?>[] groups() default { };
+@Constraint(validatedBy = PasswordValidator.class)
+public @interface Password {
+    String message() default "Bad password";
+
+    Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }
