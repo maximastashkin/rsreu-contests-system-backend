@@ -1,5 +1,6 @@
 package ru.rsreu.contests_system.security.refresh;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,18 +24,21 @@ import javax.validation.Valid;
 public class RefreshController {
     private final RefreshService refreshService;
 
+    @Operation(summary = "${api.refresh.operation}")
     @PostMapping(consumes = "application/json", produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.refresh.response-codes.ok.desc}"),
-            @ApiResponse(responseCode = "401", description = "${api.refresh.response-codes.unauth.desc}",
-            content = {
-                   @Content(
-                           mediaType = "application/json",
-                           schema = @Schema(implementation = RefreshTokenErrorResponse.class)
-                   )
-            })
+            @ApiResponse(responseCode = "200", description = "${api.refresh.response-codes.ok}"),
+            @ApiResponse(responseCode = "400", description = "${api.refresh.response-codes.bad-request}",
+                    content = {@Content()}),
+            @ApiResponse(responseCode = "401", description = "${api.refresh.response-codes.unauth}",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = RefreshTokenErrorResponse.class)
+                            )
+                    }
+            )
     })
-
     public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.refreshToken();
         String accessToken = refreshTokenRequest.accessToken();

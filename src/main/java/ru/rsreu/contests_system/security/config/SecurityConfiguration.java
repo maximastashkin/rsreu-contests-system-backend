@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     };
 
     private static final String[] ADMIN_LIST = {
-            "/**/users/all",
+            "/**/users/all/**",
             "/**/users/block",
             "/**/users/unblock",
             "/**/applications/**"
