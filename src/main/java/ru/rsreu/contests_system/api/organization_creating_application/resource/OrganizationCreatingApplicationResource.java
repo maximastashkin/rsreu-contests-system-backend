@@ -48,19 +48,36 @@ public class OrganizationCreatingApplicationResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "${api.applications.approve.response-codes.created}",
                     content = {@Content()}),
-            @ApiResponse(responseCode = "400", description = "${api.applications.approve.bad-request}",
+            @ApiResponse(responseCode = "400", description = "${api.applications.approve.response-codes.bad-request}",
                     content = {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = NotUniqueOrganizationInfoResponse.class)
                             )
                     }),
-            @ApiResponse(responseCode = "404", description = "${api.application.approve.not-found}",
+            @ApiResponse(responseCode = "404", description = "${api.application.approve.response-codes.not-found}",
                     content = {@Content()})
     })
     public ResponseEntity<?> approveOrganizationCreatingApplication(@RequestParam @NotBlank String id) {
+        //TODO EMAIL Sending
         organizationCreatingApplicationService.approveOrganizationCreatingApplication(id);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "${api.application.decline.operation}")
+    @PostMapping("/decline")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.application.decline.response-codes.ok}",
+                    content = {@Content()}),
+            @ApiResponse(responseCode = "400", description = "${api.application.decline.response-codes.bad-request}",
+                    content = {@Content}),
+            @ApiResponse(responseCode = "404", description = "${api.application.decline.response-codes.not-found}",
+                    content = {@Content}),
+    })
+    public ResponseEntity<?> declineOrganizationCreatingApplication(@RequestParam @NotBlank String id) {
+        //TODO EMAIL Sending
+        organizationCreatingApplicationService.declineOrganizationCreatingApplication(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "${api.applications.all.operation}")
