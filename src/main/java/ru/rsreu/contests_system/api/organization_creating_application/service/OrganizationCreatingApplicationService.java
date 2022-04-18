@@ -42,6 +42,12 @@ public class OrganizationCreatingApplicationService {
         organizationCreatingApplicationRepository.delete(application);
     }
 
+    public void declineOrganizationCreatingApplication(String organizationId) {
+        //TODO EMAIL sending
+        OrganizationCreatingApplication application = getApplicationById(organizationId);
+        organizationCreatingApplicationRepository.delete(application);
+    }
+
     private OrganizationCreatingApplication getApplicationById(String organizationId) {
         return organizationCreatingApplicationRepository.findById(new ObjectId(organizationId)).orElseThrow(
                 () -> new NotFoundOrganizationCreatingApplicationException(
