@@ -9,11 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.OrganizationInfoMapper;
 import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.OrganizationInfoResponse;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @RestController
 @Validated
@@ -37,5 +39,16 @@ public class OrganizationResource {
                 organizationInfoMapper.toResponse(organizationService.getOrganizationById(id)),
                 HttpStatus.OK
         );
+    }
+
+    @PostMapping("/test")
+    public ResponseEntity<?> addTestOrganizationWithEvents() {
+        organizationService.addTestOrganization();
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/events/all-actual")
+    public ResponseEntity<List<Event>> getAllActualEvents() {
+        return new ResponseEntity<>(organizationService.getAllActualEvents(), HttpStatus.OK);
     }
 }
