@@ -1,6 +1,9 @@
 package ru.rsreu.contests_system.api.organization.service;
 
 import org.bson.types.ObjectId;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
@@ -85,7 +88,7 @@ public record OrganizationService(OrganizationRepository organizationRepository)
         organizationRepository.save(secondOrg);
     }
 
-    public List<Event> getAllActualEvents() {
-        return organizationRepository.getAllActualEvents();
+    public List<Event> getAllActualEvents(int pageSize, int pageNumber) {
+        return organizationRepository.getAllActualEvents(PageRequest.of(pageNumber, pageSize));
     }
 }

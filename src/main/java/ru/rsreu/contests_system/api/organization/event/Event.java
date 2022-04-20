@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
 import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.user.User;
-import ru.rsreu.contests_system.config.mongo.MongoLocalDateTime;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

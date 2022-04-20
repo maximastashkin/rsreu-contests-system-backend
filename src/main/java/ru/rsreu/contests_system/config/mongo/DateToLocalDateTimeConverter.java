@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 
-public class MongoLocalDateTimeToStringConverter implements Converter<LocalDateTime, Date> {
+public class DateToLocalDateTimeConverter implements Converter<Date, LocalDateTime> {
     @Override
-    public Date convert(LocalDateTime source) {
-        return Date.from(source.toInstant(ZoneOffset.UTC));
+    public LocalDateTime convert(Date source) {
+        return source.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
     }
 }

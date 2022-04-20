@@ -21,8 +21,8 @@ public class MongoDbConfiguration {
     @Bean
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new MongoLocalDateTimeToStringConverter());
-        converters.add(new StringToMongoLocalDateTimeConverter());
+        converters.add(new LocalDateTimeToDateConverter());
+        converters.add(new DateToLocalDateTimeConverter());
         return new MongoCustomConversions(converters);
     }
 }

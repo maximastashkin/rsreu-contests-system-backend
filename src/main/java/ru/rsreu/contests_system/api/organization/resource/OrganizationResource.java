@@ -1,6 +1,7 @@
 package ru.rsreu.contests_system.api.organization.resource;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,6 +15,7 @@ import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.
 import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.OrganizationInfoResponse;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -47,8 +49,10 @@ public class OrganizationResource {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/events/all-actual")
-    public ResponseEntity<List<Event>> getAllActualEvents() {
-        return new ResponseEntity<>(organizationService.getAllActualEvents(), HttpStatus.OK);
+    @GetMapping("/events/all-actual/{pageSize}/{pageNumber}")
+    public ResponseEntity<List<Event>> getAllActualEvents(@PathVariable @Min(1) int pageSize,
+                                                          @Parameter(description = "${api.pageable_numbering.message}")
+                                                          @PathVariable @Min(0) int pageNumber) {
+        return new ResponseEntity<>(organizationService.getAllActualEvents(pageSize, pageNumber), HttpStatus.OK);
     }
 }
