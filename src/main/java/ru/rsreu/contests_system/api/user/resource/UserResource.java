@@ -28,7 +28,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @Validated
@@ -71,7 +70,7 @@ public class UserResource {
         return new ResponseEntity<>(
                 userService
                         .getAll(pageSize, pageNumber)
-                        .stream().map(usersInfoMapper::toResponse).collect(Collectors.toList()),
+                        .stream().map(usersInfoMapper::toResponse).toList(),
                 HttpStatus.OK
         );
     }

@@ -22,9 +22,6 @@ public class Task {
 
     private long timeLimit;
 
-    @Builder.Default  private Set<TaskTest> tests = new HashSet<>();
-
-    public void addTaskTest(TaskTest test) {
-        tests.add(test);
-    }
+    @Builder.Default
+    private Set<TaskTest> tests = new HashSet<>();
 }

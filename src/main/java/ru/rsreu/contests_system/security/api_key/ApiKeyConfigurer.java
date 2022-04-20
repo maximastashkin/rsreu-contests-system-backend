@@ -19,8 +19,7 @@ public class ApiKeyConfigurer extends SecurityConfigurerAdapter<DefaultSecurityF
     public void configure(HttpSecurity http) {
         http.addFilterBefore(new ApiKeyAuthenticationFilter(
                 apiKeyHeaderName,
-                new ApiKeyProvider(validApiKey)
-        ), JwtTokenFilter.class);
+                new ApiKeyProvider(validApiKey)), JwtTokenFilter.class);
         http.addFilterBefore(new ApiKeyExceptionFilterHandler(), ApiKeyAuthenticationFilter.class);
     }
 }

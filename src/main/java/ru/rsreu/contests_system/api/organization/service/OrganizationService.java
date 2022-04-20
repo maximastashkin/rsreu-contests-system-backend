@@ -1,9 +1,6 @@
 package ru.rsreu.contests_system.api.organization.service;
 
 import org.bson.types.ObjectId;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
@@ -16,7 +13,6 @@ import ru.rsreu.contests_system.api.user.User;
 
 import java.time.LocalDateTime;
 import java.util.EnumSet;
-import java.util.List;
 
 @Service
 public record OrganizationService(OrganizationRepository organizationRepository) {
@@ -55,19 +51,19 @@ public record OrganizationService(OrganizationRepository organizationRepository)
     }
 
     public void addTestOrganization() {
-        //TODO Method test data provider
+        //TODO Delete this shit. Method test data provider
         Organization organization = Organization.builder()
                 .name("Test organization")
                 .build();
         Event firstEvent = Event.builder()
                 .name("First test event")
-                .startDateTime(LocalDateTime.of(2022, 4, 21, 10, 52 ,0))
+                .startDateTime(LocalDateTime.of(2022, 4, 21, 10, 52, 0))
                 .endDateTime(LocalDateTime.of(2022, 4, 25, 22, 0, 0))
                 .build();
         Event secondEvent = Event.builder()
                 .name("Second test event")
                 .startDateTime(LocalDateTime.of(2022, 4, 15, 10, 30, 0))
-                .endDateTime(LocalDateTime.of(2022, 4, 20, 22, 0, 0))
+                .endDateTime(LocalDateTime.of(2022, 4, 22, 22, 0, 0))
                 .build();
         Event thirdEvent = Event.builder()
                 .name("Third test event")
@@ -83,13 +79,10 @@ public record OrganizationService(OrganizationRepository organizationRepository)
                 .organizationPhone("test")
                 .organizationLeader(User.builder().id(new ObjectId("625aeddb211d133f5d5bb39f")).build())
                 .build();
-        secondEvent.addParticipantInfo(ParticipantInfo.builder().build());
+        secondEvent.addParticipantInfo(ParticipantInfo.builder()
+                .participant(User.builder().id(new ObjectId("62605d0166859e30ca269602")).email("test@mail.ru").build()).build());
         secondOrg.getEvents().add(secondEvent);
         organizationRepository.save(organization);
         organizationRepository.save(secondOrg);
-    }
-
-    public List<Event> getAllActualEvents(int pageSize, int pageNumber) {
-        return organizationRepository.getAllActualEvents(PageRequest.of(pageNumber, pageSize));
     }
 }

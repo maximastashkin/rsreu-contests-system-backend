@@ -6,9 +6,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 
-public class LocalDateTimeToDateConverter implements Converter<LocalDateTime, Date> {
+public class LocalDateTimeToDateConverter extends DateConverter implements Converter<LocalDateTime, Date> {
+    public LocalDateTimeToDateConverter(ZoneOffset zoneOffset) {
+        super(zoneOffset);
+    }
+
     @Override
     public Date convert(LocalDateTime source) {
-        return Date.from(source.toInstant(ZoneOffset.UTC));
+        return Date.from(source.toInstant(this.zoneOffset));
     }
 }
