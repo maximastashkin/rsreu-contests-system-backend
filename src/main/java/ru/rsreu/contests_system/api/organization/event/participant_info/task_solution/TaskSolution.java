@@ -14,16 +14,14 @@ import java.util.Set;
 @Builder
 public class TaskSolution {
     @MongoId
-    @Builder.Default private ObjectId id = new ObjectId();
+    @Builder.Default
+    private ObjectId id = new ObjectId();
 
     @DBRef
     private Task task;
 
     private String solution;
 
-    @Builder.Default private Set<TestInfo> testsInfos = new HashSet<>();
-
-    public void addTestInfo(TestInfo testInfo) {
-        testsInfos.add(testInfo);
-    }
+    @Builder.Default
+    private Set<TestInfo> testsInfos = new HashSet<>();
 }

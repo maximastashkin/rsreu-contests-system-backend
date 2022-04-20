@@ -33,8 +33,4 @@ public class ParticipantInfo {
     private boolean completed;
 
     @Builder.Default private Set<TaskSolution> tasksSolutions = new HashSet<>();
-
-    public void addTaskSolution(TaskSolution taskSolution) {
-        tasksSolutions.add(taskSolution);
-    }
 }
