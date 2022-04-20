@@ -10,7 +10,6 @@ import ru.rsreu.contests_system.api.user.User;
 import java.util.ArrayList;
 import java.util.List;
 
-//Here write custom methods impl.
 @AllArgsConstructor
 public class UserRepositoryImpl implements UserCustomRepository {
     private static final String REFRESH_TOKENS_FIELD_NAME = "refreshTokens";

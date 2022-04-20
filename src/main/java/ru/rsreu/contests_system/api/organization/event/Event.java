@@ -45,14 +45,6 @@ public class Event {
 
     @Builder.Default private Set<ParticipantInfo> participantsInfos = new HashSet<>();
 
-    public void addEventOrganizer(User organizer) {
-        eventOrganizers.add(organizer);
-    }
-
-    public void addTask(Task task) {
-        tasks.add(task);
-    }
-
     public void addParticipantInfo(ParticipantInfo participantInfo) {
         participantsInfos.add(participantInfo);
     }

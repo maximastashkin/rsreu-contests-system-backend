@@ -8,7 +8,6 @@ import ru.rsreu.contests_system.api.user.User;
 
 import java.util.Optional;
 
-//Here write default methods signatures. It will work without impl.
 public interface UserRepository extends MongoRepository<User, ObjectId>, UserCustomRepository {
     Optional<User> findByEmail(String email);
 
