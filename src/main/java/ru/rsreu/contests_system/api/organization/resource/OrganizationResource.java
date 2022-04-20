@@ -11,8 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.Event;
-import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.OrganizationInfoMapper;
-import ru.rsreu.contests_system.api.organization.resource.dto.organization_info.OrganizationInfoResponse;
+import ru.rsreu.contests_system.api.organization.resource.dto.organization.organization_info.OrganizationInfoMapper;
+import ru.rsreu.contests_system.api.organization.resource.dto.organization.organization_info.OrganizationInfoResponse;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 
 import javax.validation.constraints.Min;
@@ -27,13 +27,13 @@ public class OrganizationResource {
     private final OrganizationService organizationService;
     private final OrganizationInfoMapper organizationInfoMapper;
 
-    @Operation(summary = "${api.org.info.operation}")
+    @Operation(summary = "${api.orgs.info.operation}")
     @GetMapping(produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.org.response-codes.ok}"),
-            @ApiResponse(responseCode = "400", description = "${api.org.response-codes.bad-request}",
+            @ApiResponse(responseCode = "200", description = "${api.orgs.response-codes.ok}"),
+            @ApiResponse(responseCode = "400", description = "${api.orgs.response-codes.bad-request}",
                     content = {@Content()}),
-            @ApiResponse(responseCode = "404", description = "${api.org.response-codes.not-found}",
+            @ApiResponse(responseCode = "404", description = "${api.orgs.response-codes.not-found}",
                     content = {@Content()})
     })
     public ResponseEntity<OrganizationInfoResponse> getOrganization(@RequestParam @NotBlank String id) {
@@ -49,7 +49,13 @@ public class OrganizationResource {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/events/all-actual/{pageSize}/{pageNumber}")
+    @Operation(summary = "${api.orgs.events.all-actual.operation}")
+    @GetMapping(value = "/events/all-actual/{pageSize}/{pageNumber}", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.all-actual.response-codes.ok}"),
+            @ApiResponse(responseCode = "400", description = "${api.orgs.events.all-actual.response-codes.bad-request}",
+                content = {@Content()})
+    })
     public ResponseEntity<List<Event>> getAllActualEvents(@PathVariable @Min(1) int pageSize,
                                                           @Parameter(description = "${api.pageable_numbering.message}")
                                                           @PathVariable @Min(0) int pageNumber) {

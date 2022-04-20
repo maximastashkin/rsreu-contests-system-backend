@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.api.organization.resource.dto.organization_info;
+package ru.rsreu.contests_system.api.organization.resource.dto.organization.organization_info;
 
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.organization.Organization;
