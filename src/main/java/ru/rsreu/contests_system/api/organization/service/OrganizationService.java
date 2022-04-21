@@ -1,6 +1,7 @@
 package ru.rsreu.contests_system.api.organization.service;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
@@ -9,6 +10,7 @@ import ru.rsreu.contests_system.api.organization_creating_application.exception.
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfoException;
 
 import java.util.EnumSet;
+import java.util.List;
 
 @Service
 public record OrganizationService(OrganizationRepository organizationRepository) {
@@ -44,5 +46,9 @@ public record OrganizationService(OrganizationRepository organizationRepository)
         return organizationRepository.findOrganizationById(new ObjectId(id)).orElseThrow(
                 () -> new OrganizationNotFoundException(String.format("Organization with id: %s didn't found", id))
         );
+    }
+
+    public List<Organization> getAll(int pageSize, int pageNumber) {
+        return organizationRepository.findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
     }
 }
