@@ -11,15 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.rsreu.contests_system.api.organization.resource.dto.organizations_info.OrganizationsInfoMapper;
-import ru.rsreu.contests_system.api.organization.resource.dto.organizations_info.OrganizationsInfoResponse;
 import ru.rsreu.contests_system.api.organization.resource.dto.organization.organization_info.OrganizationInfoMapper;
 import ru.rsreu.contests_system.api.organization.resource.dto.organization.organization_info.OrganizationInfoResponse;
+import ru.rsreu.contests_system.api.organization.resource.dto.organizations_info.OrganizationsInfoMapper;
+import ru.rsreu.contests_system.api.organization.resource.dto.organizations_info.OrganizationsInfoResponse;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
+import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticationProvider;
+import ru.rsreu.contests_system.api.user.User;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Validated
@@ -29,6 +32,7 @@ public class OrganizationResource {
     private final OrganizationService organizationService;
     private final OrganizationInfoMapper organizationInfoMapper;
     private final OrganizationsInfoMapper organizationsInfoMapper;
+    private final UserCandidateByAuthenticationProvider userCandidateByAuthenticationProvider;
 
     @Operation(summary = "${api.orgs.info.operation}")
     @GetMapping(produces = "application/json")
@@ -42,9 +46,12 @@ public class OrganizationResource {
     })
     public ResponseEntity<OrganizationInfoResponse> getOrganization(Authentication authentication,
                                                                     @RequestParam @NotBlank String id) {
+        Optional<User> candidateForMapping =
+                userCandidateByAuthenticationProvider.getCandidateForMapping(authentication);
         return new ResponseEntity<>(
-                organizationInfoMapper.toResponse(organizationService.getOrganizationById(id), authentication),
-                authentication != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED
+                organizationInfoMapper.toResponse(organizationService.getOrganizationById(id),
+                        userCandidateByAuthenticationProvider.getCandidateForMapping(authentication)),
+                candidateForMapping.isPresent() ? HttpStatus.OK : HttpStatus.UNAUTHORIZED
         );
     }
 
