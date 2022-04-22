@@ -1,6 +1,5 @@
 package ru.rsreu.contests_system.api.organization.event.resource.dto.event_info;
 
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.organization.event.Event;
@@ -12,11 +11,8 @@ import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 import java.util.List;
 
 @Component
-@AllArgsConstructor
-public class EventInfoMapper {
-    private final UserService userService;
-    private final AuthenticationUserDetailMapper authenticationUserDetailMapper;
-
+public record EventInfoMapper(UserService userService,
+                              AuthenticationUserDetailMapper authenticationUserDetailMapper) {
     public EventInfoResponse toResponse(Event event, Authentication authentication) {
         System.out.println(authentication);
         return new EventInfoResponse(

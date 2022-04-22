@@ -34,13 +34,16 @@ public class EventResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.orgs.events.all-actual.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.orgs.events.all-actual.response-codes.bad-request}",
-                    content = {@Content()})
+                    content = {@Content()}),
+            @ApiResponse(responseCode = "401",
+                    description = "${api.orgs.events.all-actual.response-codes.unauthorized}")
     })
     public ResponseEntity<List<EventInfoResponse>> getAllActualEvents(Authentication authentication,
                                                                       @PathVariable @Min(1) int pageSize,
                                                                       @Parameter(description = "${api.pageable_numbering.message}")
                                                                       @PathVariable @Min(0) int pageNumber) {
         return new ResponseEntity<>(eventService.getAllActualEvents(pageSize, pageNumber).stream().map(event ->
-                eventInfoMapper.toResponse(event, authentication)).toList(), HttpStatus.OK);
+                eventInfoMapper.toResponse(event, authentication)).toList(),
+                authentication != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED);
     }
 }

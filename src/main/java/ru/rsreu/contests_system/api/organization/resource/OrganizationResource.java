@@ -36,6 +36,7 @@ public class OrganizationResource {
             @ApiResponse(responseCode = "200", description = "${api.orgs.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.orgs.response-codes.bad-request}",
                     content = {@Content()}),
+            @ApiResponse(responseCode = "401", description = "${api.orgs.response-codes.unauthorized}"),
             @ApiResponse(responseCode = "404", description = "${api.orgs.response-codes.not-found}",
                     content = {@Content()})
     })
@@ -43,7 +44,7 @@ public class OrganizationResource {
                                                                     @RequestParam @NotBlank String id) {
         return new ResponseEntity<>(
                 organizationInfoMapper.toResponse(organizationService.getOrganizationById(id), authentication),
-                HttpStatus.OK
+                authentication != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED
         );
     }
 
