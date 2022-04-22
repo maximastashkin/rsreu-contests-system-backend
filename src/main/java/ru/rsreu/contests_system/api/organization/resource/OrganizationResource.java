@@ -39,7 +39,7 @@ public class OrganizationResource {
             @ApiResponse(responseCode = "404", description = "${api.org.response-codes.not-found}",
                     content = {@Content()})
     })
-    public ResponseEntity<OrganizationInfoResponse> getOrganization(@RequestParam @NotBlank String id) {
+    public ResponseEntity<OrganizationInfoResponse> getOrganizationInfo(@RequestParam @NotBlank String id) {
         return new ResponseEntity<>(
                 organizationInfoMapper.toResponse(organizationService.getOrganizationById(id)),
                 HttpStatus.OK
@@ -60,7 +60,7 @@ public class OrganizationResource {
         return new ResponseEntity<>(
                 organizationService
                         .getAll(pageSize, pageNumber)
-                        .stream().map(organizationsInfoMapper::toResponse).collect(Collectors.toList()),
+                        .stream().map(organizationsInfoMapper::toResponse).toList(),
                 HttpStatus.OK);
     }
 }
