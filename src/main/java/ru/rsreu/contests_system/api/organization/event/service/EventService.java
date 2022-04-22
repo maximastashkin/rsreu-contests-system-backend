@@ -22,8 +22,8 @@ public record EventService(
     }
 
     public List<Event> getAllUserActualEvents(Authentication authentication, int pageSize, int pageNumber) {
-        User user = userService.getUserByEmail(authentication != null ?
-                authenticationUserDetailMapper.toUserDetails(authentication).getUsername() : "");
+        User user = userService.getUserByEmail(
+                authenticationUserDetailMapper.toUserDetails(authentication).getUsername());
         return organizationRepository.getAllUserActualEvents(user, PageRequest.of(pageNumber, pageSize));
     }
 }
