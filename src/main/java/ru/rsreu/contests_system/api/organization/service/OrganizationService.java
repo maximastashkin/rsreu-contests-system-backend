@@ -1,6 +1,7 @@
 package ru.rsreu.contests_system.api.organization.service;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
@@ -13,6 +14,7 @@ import ru.rsreu.contests_system.api.user.User;
 
 import java.time.LocalDateTime;
 import java.util.EnumSet;
+import java.util.List;
 
 @Service
 public record OrganizationService(OrganizationRepository organizationRepository) {
@@ -50,6 +52,10 @@ public record OrganizationService(OrganizationRepository organizationRepository)
         );
     }
 
+    public List<Organization> getAll(int pageSize, int pageNumber) {
+        return organizationRepository.findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
+	}
+	
     public void addTestOrganization() {
         //TODO Delete this shit. Method test data provider
         Organization organization = Organization.builder()
