@@ -86,7 +86,7 @@ public record OrganizationService(OrganizationRepository organizationRepository)
                 .organizationLeader(User.builder().id(new ObjectId("625aeddb211d133f5d5bb39f")).build())
                 .build();
         secondEvent.addParticipantInfo(ParticipantInfo.builder()
-                .participant(User.builder().id(new ObjectId("62605d0166859e30ca269602")).email("test@mail.ru").build()).build());
+                .participant(User.builder().id(new ObjectId("6263008a7d47a8013b335ea9")).email("test@mail.ru").build()).build());
         secondOrg.getEvents().add(secondEvent);
         organizationRepository.save(organization);
         organizationRepository.save(secondOrg);

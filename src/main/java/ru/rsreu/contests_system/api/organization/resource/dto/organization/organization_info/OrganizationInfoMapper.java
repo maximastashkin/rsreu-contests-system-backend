@@ -1,17 +1,16 @@
 package ru.rsreu.contests_system.api.organization.resource.dto.organization.organization_info;
 
-import lombok.AllArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
+import ru.rsreu.contests_system.api.user.User;
+
+import java.util.Optional;
 
 @Component
-@AllArgsConstructor
-public class OrganizationInfoMapper {
-    private final EventInfoMapper eventInfoMapper;
-
-    public OrganizationInfoResponse toResponse(Organization organization, Authentication authentication) {
+public record OrganizationInfoMapper(
+        EventInfoMapper eventInfoMapper) {
+    public OrganizationInfoResponse toResponse(Organization organization, Optional<User> candidateForEventChecking) {
         return new OrganizationInfoResponse(
                 organization.getId().toString(),
                 organization.getName(),
@@ -19,7 +18,7 @@ public class OrganizationInfoMapper {
                 organization.getPictureUrl(),
                 organization.getEvents()
                         .stream().map(event ->
-                                eventInfoMapper.toResponse(event, authentication)).toList()
+                                eventInfoMapper.toResponse(event, candidateForEventChecking)).toList()
         );
     }
 }

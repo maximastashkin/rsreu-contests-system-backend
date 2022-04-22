@@ -26,7 +26,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/check-leader-email",
             "/**/applications/",
             "/**/confirm/**",
-            "/**/orgs/**"
+            "/**/orgs/",
+            "/**/orgs/*/*",
+            "/**/orgs/test/",
+            "/**/events/all-actual/*/*"
     };
 
     private static final String[] AUTH_LIST = {
@@ -37,6 +40,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html/**",
+    };
+
+    private static final String[] PARTICIPANT_LIST = {
+            "/**/events/all-actual/user/**"
     };
 
     private static final String[] ADMIN_LIST = {
@@ -67,8 +74,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         authorize
                                 .antMatchers(AUTH_WHITELIST).permitAll()
                                 .antMatchers(AUTH_LIST).authenticated()
+                                .antMatchers(PARTICIPANT_LIST).access(
+                                        authorityAccessAttributeProvider.formActiveUnblockedAttribute(
+                                                Authority.PARTICIPANT)
+                                )
                                 .antMatchers(ADMIN_LIST).access(
-                                        authorityAccessAttributeProvider.formActiveUnblockedAttribute(Authority.ADMIN))
+                                        authorityAccessAttributeProvider.formActiveUnblockedAttribute(
+                                                Authority.ADMIN))
                                 .anyRequest().denyAll()
                 )
                 .apply(jwtConfigurer)
