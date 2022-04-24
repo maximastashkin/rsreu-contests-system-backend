@@ -29,7 +29,7 @@ public class RefreshController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.refresh.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.refresh.response-codes.bad-request}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "401", description = "${api.refresh.response-codes.unauth}",
                     content = {
                             @Content(

@@ -18,12 +18,22 @@ public record EventService(
         AuthenticationUserDetailMapper authenticationUserDetailMapper) {
 
     public List<Event> getAllActualEvents(int pageSize, int pageNumber) {
-        return organizationRepository.getAllActualEvents(PageRequest.of(pageNumber, pageSize));
+        return organizationRepository.findAllActualEvents(PageRequest.of(pageNumber, pageSize));
     }
 
     public List<Event> getAllUserActualEvents(Authentication authentication, int pageSize, int pageNumber) {
-        User user = userService.getUserByEmail(
+        return organizationRepository.findUserAllActualEvents(
+                getUserByAuthentication(authentication), PageRequest.of(pageNumber, pageSize));
+    }
+
+    private User getUserByAuthentication(Authentication authentication) {
+        return userService.getUserByEmail(
                 authenticationUserDetailMapper.toUserDetails(authentication).getUsername());
-        return organizationRepository.getAllUserActualEvents(user, PageRequest.of(pageNumber, pageSize));
+    }
+
+    public List<Event> getAllUserCompletedEvents(Authentication authentication, int pageSize, int pageNumber) {
+        return organizationRepository.findUserAllCompletedEvents(
+                getUserByAuthentication(authentication), PageRequest.of(pageNumber, pageSize)
+        );
     }
 }

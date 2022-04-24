@@ -30,7 +30,8 @@ public class ParticipantInfo {
 
     private LocalDateTime endTime;
 
-    private boolean completed;
+    @Builder.Default
+    private boolean completed = false;
 
     @Builder.Default private Set<TaskSolution> tasksSolutions = new HashSet<>();
 }

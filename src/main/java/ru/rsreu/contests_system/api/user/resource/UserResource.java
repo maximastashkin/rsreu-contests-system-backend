@@ -46,7 +46,7 @@ public class UserResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.info.response-codes.ok}"),
             @ApiResponse(responseCode = "404", description = "${api.users.info.response-codes.not-found}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<UserInfoResponse> getUserInfo(Authentication authentication) {
         return new ResponseEntity<>(userInfoMapper.toResponse(
@@ -59,9 +59,9 @@ public class UserResource {
     @GetMapping(path = "/all/{pageSize}/{pageNumber}", produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.all.response-codes.ok}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "400", description = "${api.users.all.response-codes.bad-request}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<List<UsersInfoResponse>> getAllUsersInfo(
             @PathVariable @Min(1) int pageSize,
@@ -79,13 +79,13 @@ public class UserResource {
     @PostMapping(path = "/block")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.block.response-codes.ok}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "400", description = "${api.users.block.response-coded.bad-request}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "403", description = "${api.users.block.response-codes.forbidden}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "${api.users.block.response-codes.not-found}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<?> blockUser(@RequestParam @NotBlank @Email String email) {
         userService.blockUserByEmail(email);
@@ -96,11 +96,11 @@ public class UserResource {
     @PostMapping(path = "/unblock")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.unblock.response-codes.ok}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "${api.users.unblock.response-codes.not-found}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "400", description = "${api.users.unblock.response-codes.bad-request}",
-                    content = {@Content()}),
+                    content = @Content),
     })
     public ResponseEntity<?> unblockUser(@RequestParam @NotBlank @Email String email) {
         userService.unblockUserByEmail(email);
@@ -111,9 +111,9 @@ public class UserResource {
     @PostMapping(path = "/signup", consumes = "application/json", produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "${api.users.signup.response-codes.created}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "400", description = "${api.users.signup.response-codes.bad-request}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<?> signUp(@RequestBody @Valid UserSignUpRequest userSignUpRequest) {
         userService.save(userSignUpMapper.toUser(userSignUpRequest));
@@ -124,9 +124,9 @@ public class UserResource {
     @GetMapping(path = "/check-mail", produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.check-email.responses-codes.ok}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "400", description = "${api.users.check-email.responses-codes.bad-request}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<CheckMailResponse> checkEmailUnique(@RequestParam @NotBlank @Email String email) {
         return new ResponseEntity<>(checkMailMapper.toResponse(userService.isEmailUnique(email)), HttpStatus.OK);
@@ -136,11 +136,11 @@ public class UserResource {
     @PostMapping(path = "/confirm/{confirmationToken}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.users.confirm.response-codes.ok}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "400", description = "${api.users.confirm.response-codes.bad-request}",
                     content = {@Content}),
             @ApiResponse(responseCode = "404", description = "${api.users.confirm.response-codes.not-found}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<?> confirmAccount(@PathVariable @NotNull @NotBlank String confirmationToken) {
         userService.confirmUserByToken(confirmationToken);

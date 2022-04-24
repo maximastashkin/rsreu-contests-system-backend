@@ -43,7 +43,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     };
 
     private static final String[] PARTICIPANT_LIST = {
-            "/**/events/all-actual/user/**"
+            "/**/events/all-actual/user/**",
+            "/**/events/all-completed/user/**"
     };
 
     private static final String[] ADMIN_LIST = {
