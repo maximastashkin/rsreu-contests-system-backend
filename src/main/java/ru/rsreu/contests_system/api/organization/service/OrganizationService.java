@@ -79,6 +79,8 @@ public record OrganizationService(OrganizationRepository organizationRepository)
         organization.getEvents().add(firstEvent);
         organization.getEvents().add(thirdEvent);
 
+        User user = User.builder().id(new ObjectId("6263008a7d47a8013b335ea9")).email("test@mail.ru").build();
+
         Organization secondOrg = Organization.builder()
                 .name("Second organization")
                 .organizationEmail("test")
@@ -86,7 +88,9 @@ public record OrganizationService(OrganizationRepository organizationRepository)
                 .organizationLeader(User.builder().id(new ObjectId("625aeddb211d133f5d5bb39f")).build())
                 .build();
         secondEvent.addParticipantInfo(ParticipantInfo.builder()
-                .participant(User.builder().id(new ObjectId("6263008a7d47a8013b335ea9")).email("test@mail.ru").build()).build());
+                .participant(user).completed(true).build());
+        thirdEvent.addParticipantInfo(ParticipantInfo.builder().participant(user).build());
+        firstEvent.addParticipantInfo(ParticipantInfo.builder().participant(user).build());
         secondOrg.getEvents().add(secondEvent);
         organizationRepository.save(organization);
         organizationRepository.save(secondOrg);

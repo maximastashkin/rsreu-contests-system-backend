@@ -36,11 +36,11 @@ public class AuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.auth.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.auth.response-codes.bad-request}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "401", description = "${api.auth.response-codes.unauth}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "${api.auth.response-codes.not-found}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody @Valid AuthenticationRequest authenticationRequest) {

@@ -2,7 +2,6 @@ package ru.rsreu.contests_system.api.organization.event.resource.dto.event_info;
 
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.organization.event.Event;
-import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
 import ru.rsreu.contests_system.api.user.User;
 
 import java.util.Optional;
@@ -17,14 +16,22 @@ public record EventInfoMapper() {
                 event.getDescription(),
                 event.getStartDateTime(),
                 event.getEndDateTime(),
-                getFollowingSign(event, candidateForEventChecking)
+                getParticipantStatus(event, candidateForEventChecking)
         );
     }
 
-    private boolean getFollowingSign(Event event, Optional<User> candidate) {
-        return candidate.isPresent() && event.getParticipantsInfos()
-                .stream()
-                .map(ParticipantInfo::getParticipant)
-                .toList().contains(candidate.get());
+    private ParticipantStatus getParticipantStatus(Event event, Optional<User> candidate) {
+        ParticipantStatus result = ParticipantStatus.NONE;
+        if (candidate.isPresent()) {
+            User participant = candidate.get();
+            if (event.isParticipantCompletedEvent(participant)) {
+                result = ParticipantStatus.COMPLETED;
+            } else if (event.isParticipantStartedEvent(participant)) {
+                result = ParticipantStatus.STARTED;
+            } else if (event.isParticipantFollowedOnEvent(participant)) {
+                result = ParticipantStatus.FOLLOWED;
+            }
+        }
+        return result;
     }
 }

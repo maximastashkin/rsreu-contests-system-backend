@@ -38,7 +38,7 @@ public class EventResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.orgs.events.all-actual.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.orgs.events.all-actual.response-codes.bad-request}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "401",
                     description = "${api.orgs.events.all-actual.response-codes.unauthorized}")
     })
@@ -60,10 +60,10 @@ public class EventResource {
             @ApiResponse(responseCode = "200", description = "${api.orgs.events.user-all-actual.response-codes.ok}"),
             @ApiResponse(responseCode = "400",
                     description = "${api.orgs.events.user-all-actual.response-codes.bad-request}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "404",
                     description = "${api.orgs.events.user-all-actual.response-codes.not-found}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<List<EventInfoResponse>> getAllActualEventsForUser(
             Authentication authentication,
@@ -74,8 +74,30 @@ public class EventResource {
                 userCandidateByAuthenticationProvider.getCandidateForMapping(authentication);
         return new ResponseEntity<>(eventService.getAllUserActualEvents(authentication, pageSize, pageNumber)
                 .stream().map(event ->
-                        eventInfoMapper.toResponse(event, candidateForMapping))
-                .toList(),
+                        eventInfoMapper.toResponse(event, candidateForMapping)).toList(),
+                HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.user-all-completed.operation}")
+    @GetMapping(value = "/all-completed/user/{pageSize}/{pageNumber}", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.user-all-completed.response-codes.ok}"),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.orgs.events.user-all-completed.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "${api.orgs.events.user-all-completed.response-codes.not-found}", content = @Content)
+    })
+    public ResponseEntity<List<EventInfoResponse>> getAllCompletedEventsForUser(
+            Authentication authentication,
+            @PathVariable @Min(1) int pageSize,
+            @Parameter(description = "${api.pageable_numbering.message}")
+            @PathVariable @Min(0) int pageNumber) {
+        Optional<User> candidateForMapping =
+                userCandidateByAuthenticationProvider.getCandidateForMapping(authentication);
+        return new ResponseEntity<>(eventService.getAllUserCompletedEvents(authentication, pageSize, pageNumber)
+                .stream().map(event ->
+                        eventInfoMapper.toResponse(event, candidateForMapping)).toList(),
                 HttpStatus.OK);
     }
 }

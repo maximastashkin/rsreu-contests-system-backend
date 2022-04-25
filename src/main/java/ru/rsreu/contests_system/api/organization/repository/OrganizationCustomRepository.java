@@ -7,7 +7,9 @@ import ru.rsreu.contests_system.api.user.User;
 import java.util.List;
 
 public interface OrganizationCustomRepository {
-    List<Event> getAllActualEvents(Pageable pageable);
+    List<Event> findAllActualEvents(Pageable pageable);
 
-    List<Event> getAllUserActualEvents(User user, Pageable pageable);
+    List<Event> findUserAllActualEvents(User user, Pageable pageable);
+
+    List<Event> findUserAllCompletedEvents(User user, Pageable pageable);
 }

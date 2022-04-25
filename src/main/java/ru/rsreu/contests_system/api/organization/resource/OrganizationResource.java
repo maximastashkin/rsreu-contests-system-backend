@@ -39,10 +39,10 @@ public class OrganizationResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.orgs.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.orgs.response-codes.bad-request}",
-                    content = {@Content()}),
+                    content = @Content),
             @ApiResponse(responseCode = "401", description = "${api.orgs.response-codes.unauthorized}"),
             @ApiResponse(responseCode = "404", description = "${api.orgs.response-codes.not-found}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<OrganizationInfoResponse> getOrganization(Authentication authentication,
                                                                     @RequestParam @NotBlank String id) {
@@ -60,7 +60,7 @@ public class OrganizationResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.orgs.all.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.orgs.all.response-codes.bad-request}",
-                    content = {@Content()})
+                    content = @Content)
     })
     public ResponseEntity<List<OrganizationsInfoResponse>> getAllOrganizationsInfo(
             @PathVariable @Min(1) int pageSize,
