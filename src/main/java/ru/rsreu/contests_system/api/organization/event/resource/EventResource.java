@@ -10,10 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
@@ -21,6 +18,7 @@ import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticat
 import ru.rsreu.contests_system.api.user.User;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,5 +97,24 @@ public class EventResource {
                 .stream().map(event ->
                         eventInfoMapper.toResponse(event, candidateForMapping)).toList(),
                 HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.follow.operation}")
+    @PostMapping(value = "/follow")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "${api.orgs.events.follow.response-codes.created}",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "${api.orgs.events.follow.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "${api.orgs.events.follow.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.follow.response-codes.conflict}",
+                    content = @Content),
+            @ApiResponse(responseCode = "410", description = "${api.orgs.events.follow.response-codes.gone}",
+                    content = @Content)
+    })
+    public ResponseEntity<?> followToEvent(Authentication authentication, @RequestParam @NotBlank String id) {
+        eventService.followToEvent(authentication, id);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
