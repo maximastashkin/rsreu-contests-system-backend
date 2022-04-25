@@ -18,7 +18,8 @@ import java.util.Set;
 @Builder
 public class ParticipantInfo {
     @MongoId
-    @Builder.Default private ObjectId objectId = new ObjectId();
+    @Builder.Default
+    private ObjectId objectId = new ObjectId();
 
     @DBRef
     @Indexed(unique = true)
@@ -26,12 +27,22 @@ public class ParticipantInfo {
 
     private Appeal appeal;
 
-    private LocalDateTime startTime;
+    private LocalDateTime startDateTime;
 
-    private LocalDateTime endTime;
+    private LocalDateTime endDateTime;
 
     @Builder.Default
     private boolean completed = false;
 
-    @Builder.Default private Set<TaskSolution> tasksSolutions = new HashSet<>();
+    @Builder.Default
+    private Set<TaskSolution> tasksSolutions = new HashSet<>();
+
+    public boolean isParticipantStartEvent() {
+        return startDateTime != null;
+    }
+
+    public void setEndDateTime(LocalDateTime endDateTime) {
+        this.endDateTime = endDateTime;
+        completed = true;
+    }
 }

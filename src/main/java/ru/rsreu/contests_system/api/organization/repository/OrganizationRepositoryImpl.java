@@ -42,7 +42,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     @Override
     public List<Event> findUserAllActualEvents(User user, Pageable pageable) {
         AggregationPipeline pipeline = getActualEventsAggregationPipeline();
-        pipeline.add(getUserEventsMatchOperation(user));
+        pipeline.add(getUserEventsMatchOperation(user)).add(getMatchByCompletedOperation(false));
         addOperationsFromPipeline(getPaginationPipeline(pageable), pipeline);
         return getEventsByAggregation(Aggregation.newAggregation(pipeline.getOperations()));
     }
@@ -53,11 +53,14 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
                         where("participant.$id").is(user.getId())));
     }
 
+    private AggregationOperation getMatchByCompletedOperation(boolean completed) {
+        return match(where("participantsInfos").elemMatch(where("completed").is(completed)));
+    }
+
     @Override
     public List<Event> findUserAllCompletedEvents(User user, Pageable pageable) {
         AggregationPipeline pipeline = getUnwindEventsPipeline();
-        pipeline.add(getUserEventsMatchOperation(user)).add(
-                match(where("participantsInfos").elemMatch(where("completed").is(true))));
+        pipeline.add(getUserEventsMatchOperation(user)).add(getMatchByCompletedOperation(true));
         pipeline.add(getSortByStartDateTimeOperation());
         addOperationsFromPipeline(getPaginationPipeline(pageable), pipeline);
         return getEventsByAggregation(Aggregation.newAggregation(pipeline.getOperations()));

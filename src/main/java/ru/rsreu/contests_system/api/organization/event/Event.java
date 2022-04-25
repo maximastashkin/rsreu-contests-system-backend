@@ -12,13 +12,16 @@ import ru.rsreu.contests_system.api.user.User;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
 @Builder
 public class Event {
     @MongoId
-    @Builder.Default private ObjectId id = new ObjectId();
+    @Builder.Default
+    private ObjectId id = new ObjectId();
 
     @Indexed(unique = true)
     private String name;
@@ -38,14 +41,41 @@ public class Event {
     private User eventLeader;
 
     @DBRef
-    @Builder.Default private Set<User> eventOrganizers = new HashSet<>();
+    @Builder.Default
+    private Set<User> eventOrganizers = new HashSet<>();
 
     @DBRef
-    @Builder.Default private Set<Task> tasks = new HashSet<>();
+    @Builder.Default
+    private Set<Task> tasks = new HashSet<>();
 
-    @Builder.Default private Set<ParticipantInfo> participantsInfos = new HashSet<>();
+    @Builder.Default
+    private Set<ParticipantInfo> participantsInfos = new HashSet<>();
 
     public void addParticipantInfo(ParticipantInfo participantInfo) {
         participantsInfos.add(participantInfo);
+    }
+
+    public boolean isParticipantFollowedOnEvent(User participant) {
+        return getParticipants().contains(participant);
+    }
+
+    public boolean isParticipantStartedEvent(User participant) {
+        Optional<ParticipantInfo> candidate = getParticipantInfoByParticipant(participant);
+        return candidate.isPresent() && candidate.get().isParticipantStartEvent();
+    }
+
+    public boolean isParticipantCompletedEvent(User participant) {
+        Optional<ParticipantInfo> candidate = getParticipantInfoByParticipant(participant);
+        return candidate.isPresent() && candidate.get().isCompleted();
+    }
+
+    private Optional<ParticipantInfo> getParticipantInfoByParticipant(User participant) {
+        List<ParticipantInfo> participantInfoList = participantsInfos.stream()
+                .filter(participantInfo -> participantInfo.getParticipant().equals(participant)).toList();
+        return participantsInfos.isEmpty() ? Optional.empty() : Optional.of(participantInfoList.get(0));
+    }
+
+    private List<User> getParticipants() {
+        return participantsInfos.stream().map(ParticipantInfo::getParticipant).toList();
     }
 }
