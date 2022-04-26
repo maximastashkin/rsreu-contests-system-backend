@@ -56,7 +56,7 @@ public class OrganizationResource {
     }
 
     @Operation(summary = "${api.orgs.all.operation}")
-    @GetMapping(path = "/{pageSize}/{pageNumber}", produces = "application/json")
+    @GetMapping(path = "/all/{pageSize}/{pageNumber}", produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.orgs.all.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.orgs.all.response-codes.bad-request}",
