@@ -9,10 +9,10 @@ import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundE
 
 @RestControllerAdvice
 public class OrganizationExceptionControllerAdvice {
-    @ExceptionHandler({OrganizationNotFoundException.class})
+    @ExceptionHandler(OrganizationNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<?> organizationNotFoundExceptionHandle(
-                                OrganizationNotFoundException exception) {
+    public ResponseEntity<?> handleOrganizationNotFoundException(
+            OrganizationNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

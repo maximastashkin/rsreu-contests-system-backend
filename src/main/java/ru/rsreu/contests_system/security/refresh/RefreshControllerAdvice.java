@@ -12,7 +12,7 @@ import ru.rsreu.contests_system.security.refresh.exception.RefreshTokenErrorStat
 
 @RestControllerAdvice
 public class RefreshControllerAdvice {
-    @ExceptionHandler(value = {InvalidTokenException.class})
+    @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<RefreshTokenErrorResponse> handleInvalidTokenException() {
         return formRefreshTokenErrorRequestResponseEntity(RefreshTokenErrorStatus.INVALID_TOKEN);
     }
@@ -23,12 +23,12 @@ public class RefreshControllerAdvice {
                 new RefreshTokenErrorResponse(status), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(value = {CompromisedTokenException.class})
+    @ExceptionHandler(CompromisedTokenException.class)
     public ResponseEntity<RefreshTokenErrorResponse> handleCompromisedTokenException() {
         return formRefreshTokenErrorRequestResponseEntity(RefreshTokenErrorStatus.COMPROMISED);
     }
 
-    @ExceptionHandler(value = {BlackListTokenException.class})
+    @ExceptionHandler(BlackListTokenException.class)
     public ResponseEntity<RefreshTokenErrorResponse> handleBlackListTokenException() {
         return formRefreshTokenErrorRequestResponseEntity(RefreshTokenErrorStatus.BLACK_LIST);
     }

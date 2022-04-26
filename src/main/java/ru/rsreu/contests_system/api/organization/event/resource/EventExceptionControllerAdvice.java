@@ -11,19 +11,19 @@ import ru.rsreu.contests_system.api.organization.event.exception.UserFollowingEx
 
 @RestControllerAdvice
 public class EventExceptionControllerAdvice {
-    @ExceptionHandler({EventNotFoundException.class})
+    @ExceptionHandler(EventNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<?> handleEventNotFoundException(EventNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({UserFollowingException.class})
+    @ExceptionHandler(UserFollowingException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<?> handleUserFollowingException(UserFollowingException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler({ActionWithNonActualEventException.class})
+    @ExceptionHandler(ActionWithNonActualEventException.class)
     @ResponseStatus(HttpStatus.GONE)
     public ResponseEntity<?> handleActionWithNonActualEventException(ActionWithNonActualEventException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.GONE);

@@ -13,19 +13,19 @@ import ru.rsreu.contests_system.api.user.exception.UserNotFoundException;
 public class UserExceptionControllerAdvice {
     @ExceptionHandler(NotUniqueEmailException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<?> notUniqueEmailExceptionHandle(NotUniqueEmailException exception) {
+    public ResponseEntity<?> handleNotUniqueEmailException(NotUniqueEmailException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({UserNotFoundException.class})
+    @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<?> userNotFoundExceptionHandle(UserNotFoundException exception) {
+    public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AdminBlockingAttemptException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseEntity<?> adminBlockingAttemptExceptionHandle(AdminBlockingAttemptException exception) {
+    public ResponseEntity<?> handleAdminBlockingAttemptException(AdminBlockingAttemptException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
     }
 }
