@@ -71,11 +71,16 @@ public class Event {
 
     private Optional<ParticipantInfo> getParticipantInfoByParticipant(User participant) {
         List<ParticipantInfo> participantInfoList = participantsInfos.stream()
-                .filter(participantInfo -> participantInfo.getParticipant().equals(participant)).toList();
-        return participantsInfos.isEmpty() ? Optional.empty() : Optional.of(participantInfoList.get(0));
+                .filter(participantInfo -> participant.equals(participantInfo.getParticipant())).toList();
+        return participantInfoList.isEmpty() ? Optional.empty() : Optional.of(participantInfoList.get(0));
     }
 
     private List<User> getParticipants() {
         return participantsInfos.stream().map(ParticipantInfo::getParticipant).toList();
+    }
+
+    public boolean isActual() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.isBefore(startDateTime) || now.isAfter(startDateTime) && now.isBefore(endDateTime);
     }
 }

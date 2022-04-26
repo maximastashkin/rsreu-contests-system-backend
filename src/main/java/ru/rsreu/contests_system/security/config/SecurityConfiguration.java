@@ -26,8 +26,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/check-leader-email",
             "/**/applications/",
             "/**/confirm/**",
-            "/**/orgs/",
-            "/**/orgs/*/*",
+            "/**/orgs",
+            "/**/orgs/all/*/*",
             "/**/orgs/test/",
             "/**/events/all-actual/*/*"
     };
@@ -44,7 +44,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final String[] PARTICIPANT_LIST = {
             "/**/events/all-actual/user/**",
-            "/**/events/all-completed/user/**"
+            "/**/events/all-completed/user/**",
+            "/**/events/follow"
     };
 
     private static final String[] ADMIN_LIST = {

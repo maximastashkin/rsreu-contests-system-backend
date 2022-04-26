@@ -64,17 +64,17 @@ public record OrganizationService(OrganizationRepository organizationRepository)
         Event firstEvent = Event.builder()
                 .name("First test event")
                 .startDateTime(LocalDateTime.of(2022, 4, 21, 10, 52, 0))
-                .endDateTime(LocalDateTime.of(2022, 4, 25, 22, 0, 0))
+                .endDateTime(LocalDateTime.of(2022, 4, 30, 22, 0, 0))
                 .build();
         Event secondEvent = Event.builder()
                 .name("Second test event")
                 .startDateTime(LocalDateTime.of(2022, 4, 15, 10, 30, 0))
-                .endDateTime(LocalDateTime.of(2022, 4, 22, 22, 0, 0))
+                .endDateTime(LocalDateTime.of(2022, 4, 30, 22, 0, 0))
                 .build();
         Event thirdEvent = Event.builder()
                 .name("Third test event")
-                .startDateTime(LocalDateTime.of(2022, 4, 15, 10, 30, 0))
-                .endDateTime(LocalDateTime.of(2022, 4, 18, 22, 0, 0))
+                .startDateTime(LocalDateTime.of(2022, 4, 26, 10, 30, 0))
+                .endDateTime(LocalDateTime.of(2022, 4, 30, 22, 0, 0))
                 .build();
         organization.getEvents().add(firstEvent);
         organization.getEvents().add(thirdEvent);
@@ -85,11 +85,10 @@ public record OrganizationService(OrganizationRepository organizationRepository)
                 .name("Second organization")
                 .organizationEmail("test")
                 .organizationPhone("test")
-                .organizationLeader(User.builder().id(new ObjectId("625aeddb211d133f5d5bb39f")).build())
+                .organizationLeader(User.builder().id(new ObjectId("6263008a7d47a8013b335ea9")).build())
                 .build();
         secondEvent.addParticipantInfo(ParticipantInfo.builder()
                 .participant(user).completed(true).build());
-        thirdEvent.addParticipantInfo(ParticipantInfo.builder().participant(user).build());
         firstEvent.addParticipantInfo(ParticipantInfo.builder().participant(user).build());
         secondOrg.getEvents().add(secondEvent);
         organizationRepository.save(organization);
