@@ -10,6 +10,8 @@ import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundE
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfo;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfoException;
+import ru.rsreu.contests_system.api.task.Task;
+import ru.rsreu.contests_system.api.task.repository.TaskRepository;
 import ru.rsreu.contests_system.api.user.User;
 
 import java.time.LocalDateTime;
@@ -17,7 +19,9 @@ import java.util.EnumSet;
 import java.util.List;
 
 @Service
-public record OrganizationService(OrganizationRepository organizationRepository) {
+public record OrganizationService(
+        OrganizationRepository organizationRepository,
+        TaskRepository taskRepository) {
     public void save(Organization organization) {
         EnumSet<NotUniqueOrganizationInfo> exceptionInfo = getNotUniqueOrganizationInfo(organization);
         try {
@@ -66,32 +70,14 @@ public record OrganizationService(OrganizationRepository organizationRepository)
                 .startDateTime(LocalDateTime.of(2022, 4, 21, 10, 52, 0))
                 .endDateTime(LocalDateTime.of(2022, 4, 30, 22, 0, 0))
                 .build();
-        Event secondEvent = Event.builder()
-                .name("Second test event")
-                .startDateTime(LocalDateTime.of(2022, 4, 15, 10, 30, 0))
-                .endDateTime(LocalDateTime.of(2022, 4, 30, 22, 0, 0))
-                .build();
-        Event thirdEvent = Event.builder()
-                .name("Third test event")
-                .startDateTime(LocalDateTime.of(2022, 4, 26, 10, 30, 0))
-                .endDateTime(LocalDateTime.of(2022, 4, 30, 22, 0, 0))
-                .build();
+        //Task task = Task.builder().text("Test task").build();
+        //taskRepository.save(task);
+        firstEvent.getTasks().add(Task.builder().id(new ObjectId("626969c56df10307047e95c2")).build());
         organization.getEvents().add(firstEvent);
-        organization.getEvents().add(thirdEvent);
 
-        User user = User.builder().id(new ObjectId("6263008a7d47a8013b335ea9")).email("test@mail.ru").build();
+        User user = User.builder().id(new ObjectId("62693ccb3da5f601f907bf54")).email("test@mail.ru").build();
 
-        Organization secondOrg = Organization.builder()
-                .name("Second organization")
-                .organizationEmail("test")
-                .organizationPhone("test")
-                .organizationLeader(User.builder().id(new ObjectId("6263008a7d47a8013b335ea9")).build())
-                .build();
-        secondEvent.addParticipantInfo(ParticipantInfo.builder()
-                .participant(user).completed(true).build());
         firstEvent.addParticipantInfo(ParticipantInfo.builder().participant(user).build());
-        secondOrg.getEvents().add(secondEvent);
         organizationRepository.save(organization);
-        organizationRepository.save(secondOrg);
     }
 }

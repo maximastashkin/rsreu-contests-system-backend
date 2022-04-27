@@ -9,12 +9,19 @@ import ru.rsreu.contests_system.api.organization.event.exception.ActionWithNonAc
 import ru.rsreu.contests_system.api.organization.event.exception.EventNotFoundException;
 import ru.rsreu.contests_system.api.organization.event.exception.UserFollowingException;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
+import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
 import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 
+import javax.servlet.http.Part;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public record EventService(
@@ -44,7 +51,7 @@ public record EventService(
 
     public void followToEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
-        Event event = getEventById(eventId, new ObjectId(eventId));
+        Event event = getEventById(new ObjectId(eventId));
         performFollowingToEvent(participant, event);
     }
 
@@ -84,14 +91,15 @@ public record EventService(
         return String.format("User with email:%s already start or completed this event", participant.getEmail());
     }
 
-    private Event getEventById(String eventId, ObjectId eventObjectId) {
+    private Event getEventById(ObjectId eventObjectId) {
         return organizationRepository.findEventById(eventObjectId).orElseThrow(
-                () -> new EventNotFoundException(String.format("Event with id:%s didn't found", eventId)));
+                () -> new EventNotFoundException(String.format("Event with id:%s didn't found",
+                        eventObjectId.toString())));
     }
 
     public void unfollowFromEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
-        Event event = getEventById(eventId, new ObjectId(eventId));
+        Event event = getEventById(new ObjectId(eventId));
         performUnfollowingFromEvent(participant, event);
     }
 
@@ -106,5 +114,23 @@ public record EventService(
             organizationRepository.removeParticipantInfoFromEvent(
                     ParticipantInfo.getTaskSolutionForDeletingByParticipant(participant), event);
         }
+    }
+
+    public void startEvent(Authentication authentication, String eventId) {
+        User participant = getUserByAuthentication(authentication);
+        Event event = getEventById(new ObjectId(eventId));
+        performStartingEvent(participant, event);
+    }
+
+    private void performStartingEvent(User participant, Event event) {
+        performFollowingToEvent(participant, event);
+        Set<Task> tasks = event.getTasks();
+        List<TaskSolution> tasksSolutions =
+                tasks.stream().map(task -> TaskSolution.builder().task(task).build()).toList();
+        ParticipantInfo participantInfo =
+                organizationRepository.findParticipantInfoByEventAndParticipant(event, participant).orElseThrow(IllegalArgumentException::new);
+        participantInfo.setTasksSolutions(new HashSet<>(tasksSolutions));
+        participantInfo.setStartDateTime(LocalDateTime.now());
+        organizationRepository.addStartingInfoToParticipantInfo(participantInfo);
     }
 }

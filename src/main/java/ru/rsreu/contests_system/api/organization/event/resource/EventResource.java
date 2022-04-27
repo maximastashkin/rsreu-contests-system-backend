@@ -136,4 +136,14 @@ public class EventResource {
         eventService.unfollowFromEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Operation
+    @PostMapping(value = "/start")
+    @ApiResponses(value = {
+
+    })
+    public ResponseEntity<?> startEvent(Authentication authentication, @RequestParam @NotBlank String id) {
+        eventService.startEvent(authentication, id);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }

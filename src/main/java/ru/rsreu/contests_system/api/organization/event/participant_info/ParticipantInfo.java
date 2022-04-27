@@ -19,7 +19,7 @@ import java.util.Set;
 public class ParticipantInfo {
     @MongoId
     @Builder.Default
-    private ObjectId objectId = new ObjectId();
+    private ObjectId id = new ObjectId();
 
     @DBRef
     @Indexed(unique = true)
@@ -47,6 +47,6 @@ public class ParticipantInfo {
     }
 
     public static ParticipantInfo getTaskSolutionForDeletingByParticipant(User participant) {
-        return builder().objectId(null).participant(participant).tasksSolutions(null).build();
+        return builder().id(null).participant(participant).tasksSolutions(null).build();
     }
 }
