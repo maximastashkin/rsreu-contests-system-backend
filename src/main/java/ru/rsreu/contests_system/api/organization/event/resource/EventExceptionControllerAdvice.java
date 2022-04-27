@@ -5,9 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.rsreu.contests_system.api.organization.event.exception.ActionWithNonActualEventException;
-import ru.rsreu.contests_system.api.organization.event.exception.EventNotFoundException;
-import ru.rsreu.contests_system.api.organization.event.exception.UserFollowingException;
+import ru.rsreu.contests_system.api.organization.event.exception.*;
 
 @RestControllerAdvice
 public class EventExceptionControllerAdvice {
@@ -27,5 +25,17 @@ public class EventExceptionControllerAdvice {
     @ResponseStatus(HttpStatus.GONE)
     public ResponseEntity<?> handleActionWithNonActualEventException(ActionWithNonActualEventException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.GONE);
+    }
+
+    @ExceptionHandler(ParticipantInfoNotFoundException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<?> handleParticipantInfoNotFoundException(ParticipantInfoNotFoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ActionWithNonStartedEventException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ResponseEntity<?> handleActionWithNonStartedEventException(ActionWithNonStartedEventException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

@@ -24,4 +24,8 @@ public class TaskSolution {
 
     @Builder.Default
     private Set<TestInfo> testsInfos = new HashSet<>();
+
+    public static TaskSolution getTaskSolutionByTask(Task task) {
+        return builder().task(task).build();
+    }
 }

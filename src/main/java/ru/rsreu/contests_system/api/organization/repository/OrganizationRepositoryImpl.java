@@ -5,10 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationPipeline;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.aggregation.BooleanOperators.And;
 import org.springframework.data.mongodb.core.aggregation.BooleanOperators.Or;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -83,11 +80,53 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
                 Organization.class);
     }
 
+    @Override
+    public void addStartingInfoToParticipantInfo(ParticipantInfo participantInfo) {
+        mongoTemplate.updateFirst(
+                getEventByParticipantInfoQuery(participantInfo),
+                getUpdateForSettingParticipantInfoStartingProperties(participantInfo),
+                Organization.class);
+    }
+
+    private Query getEventByParticipantInfoQuery(ParticipantInfo participantInfo) {
+        return Query.query(Criteria.where("events")
+                .elemMatch(Criteria.where("participantsInfos._id").is(participantInfo.getId())));
+    }
+
+    private Update getUpdateForSettingParticipantInfoStartingProperties(ParticipantInfo participantInfo) {
+        return new Update()
+                .set("events.$.participantsInfos.0.tasksSolutions", participantInfo.getTasksSolutions())
+                .set("events.$.participantsInfos.0.startDateTime", participantInfo.getStartDateTime())
+                .set("events.$.participantsInfos.0.maxEndDateTime", participantInfo.getMaxEndDateTime());
+    }
+
+    @Override
+    public Optional<ParticipantInfo> findParticipantInfoByEventAndParticipant(Event event, User participant) {
+        List<ParticipantInfo> mappedResults = getParticipantsInfosByAggregation(
+                Aggregation.newAggregation(
+                        getParticipantInfoByEventAndParticipantPipeline(event, participant).getOperations()));
+        return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+    }
+
+    private AggregationPipeline getParticipantInfoByEventAndParticipantPipeline(Event event, User participant) {
+        AggregationPipeline pipeline = getEventByIdAggregationPipeline(event.getId());
+        addOperationsFromPipeline(getUnwindParticipantsInfosPipeline(), pipeline);
+        pipeline.add(getParticipantInfosMatchOperation(participant));
+        return pipeline;
+    }
+
+    private MatchOperation getParticipantInfosMatchOperation(User participant) {
+        return match(Criteria.where("participant.$id").is(participant.getId()));
+    }
+
+    private AggregationPipeline getUnwindParticipantsInfosPipeline() {
+        return new AggregationPipeline().add(unwind("participantsInfos"))
+                .add(replaceRoot("participantsInfos"));
+    }
 
     private AggregationPipeline getActualEventsAggregationPipeline() {
-        AggregationPipeline pipeline = getBaseEventAggregationPipelineWithFilter(getActualEventsFilter());
-        pipeline.add(getSortByStartDateTimeOperation());
-        return pipeline;
+        return getBaseEventAggregationPipelineWithFilter(getActualEventsFilter())
+                .add(getSortByStartDateTimeOperation());
     }
 
     private void addOperationsFromPipeline(AggregationPipeline source, AggregationPipeline destination) {
@@ -95,10 +134,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     }
 
     private AggregationPipeline getUnwindEventsPipeline() {
-        AggregationPipeline aggregationPipeline = new AggregationPipeline();
-        aggregationPipeline.add(unwind("events"));
-        aggregationPipeline.add(replaceRoot("events"));
-        return aggregationPipeline;
+        return new AggregationPipeline().add(unwind("events")).add(replaceRoot("events"));
     }
 
     private AggregationPipeline getPaginationPipeline(Pageable pageable) {
@@ -151,10 +187,15 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     }
 
     private AggregationOperation getMatchByCompletedOperation(boolean completed) {
-        return match(where("participantsInfos").elemMatch(where("completed").is(completed)));
+        return match(where("participantsInfos").elemMatch(where("factEndDateTime").exists(completed)));
     }
 
     private List<Event> getEventsByAggregation(Aggregation aggregation) {
         return mongoTemplate.aggregate(aggregation, "organizations", Event.class).getMappedResults();
+    }
+
+    private List<ParticipantInfo> getParticipantsInfosByAggregation(Aggregation aggregation) {
+        return mongoTemplate.aggregate(
+                aggregation, "organizations", ParticipantInfo.class).getMappedResults();
     }
 }

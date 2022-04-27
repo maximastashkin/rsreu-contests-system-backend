@@ -19,7 +19,7 @@ import java.util.Set;
 public class ParticipantInfo {
     @MongoId
     @Builder.Default
-    private ObjectId objectId = new ObjectId();
+    private ObjectId id = new ObjectId();
 
     @DBRef
     @Indexed(unique = true)
@@ -29,10 +29,9 @@ public class ParticipantInfo {
 
     private LocalDateTime startDateTime;
 
-    private LocalDateTime endDateTime;
+    private LocalDateTime maxEndDateTime;
 
-    @Builder.Default
-    private boolean completed = false;
+    private LocalDateTime factEndDateTime;
 
     @Builder.Default
     private Set<TaskSolution> tasksSolutions = new HashSet<>();
@@ -41,12 +40,11 @@ public class ParticipantInfo {
         return startDateTime != null;
     }
 
-    public void setEndDateTime(LocalDateTime endDateTime) {
-        this.endDateTime = endDateTime;
-        completed = true;
+    public boolean isParticipantCompletedEvent() {
+        return factEndDateTime != null;
     }
 
     public static ParticipantInfo getTaskSolutionForDeletingByParticipant(User participant) {
-        return builder().objectId(null).participant(participant).tasksSolutions(null).build();
+        return builder().id(null).participant(participant).tasksSolutions(null).build();
     }
 }
