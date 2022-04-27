@@ -58,9 +58,14 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
 
     @Override
     public void addParticipantInfoToEvent(ParticipantInfo participantInfo, Event event) {
-        Query query = Query.query(Criteria.where("events._id").is(event.getId()));
-        Update update = new Update().addToSet("events.$.participantsInfos", participantInfo);
-        mongoTemplate.updateFirst(query, update, Organization.class);
+        mongoTemplate.updateFirst(
+                getOrganizationByEventQuery(event),
+                new Update().addToSet("events.$.participantsInfos", participantInfo),
+                Organization.class);
+    }
+
+    private Query getOrganizationByEventQuery(Event event) {
+        return Query.query(Criteria.where("events._id").is(event.getId()));
     }
 
     @Override
@@ -68,6 +73,14 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
         List<Event> mappedResults = getEventsByAggregation(
                 Aggregation.newAggregation(getEventByIdAggregationPipeline(eventId).getOperations()));
         return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+    }
+
+    @Override
+    public void removeParticipantInfoFromEvent(ParticipantInfo participantInfo, Event event) {
+        mongoTemplate.updateFirst(
+                getOrganizationByEventQuery(event),
+                new Update().pull("events.$.participantsInfos", participantInfo),
+                Organization.class);
     }
 
 

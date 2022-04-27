@@ -19,4 +19,6 @@ public interface OrganizationCustomRepository {
     void addParticipantInfoToEvent(ParticipantInfo participantInfo, Event event);
 
     Optional<Event> findEventById(ObjectId eventId);
+
+    void removeParticipantInfoFromEvent(ParticipantInfo participantInfo, Event event);
 }

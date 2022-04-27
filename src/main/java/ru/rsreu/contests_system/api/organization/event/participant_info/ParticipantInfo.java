@@ -45,4 +45,8 @@ public class ParticipantInfo {
         this.endDateTime = endDateTime;
         completed = true;
     }
+
+    public static ParticipantInfo getTaskSolutionForDeletingByParticipant(User participant) {
+        return builder().objectId(null).participant(participant).tasksSolutions(null).build();
+    }
 }

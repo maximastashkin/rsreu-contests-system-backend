@@ -49,20 +49,35 @@ public record EventService(
     }
 
     private void performFollowingToEvent(User participant, Event event) {
-        if (!event.isActual()) {
-            throw new ActionWithNonActualEventException(formActionWithNonActualEventException(event));
-        }
-        if (event.isParticipantStartedEvent(participant) || event.isParticipantCompletedEvent(participant)) {
-            throw new UserFollowingException(formUserFollowingExceptionMessage(participant));
-        } else if (!event.isParticipantFollowedOnEvent(participant)) {
+        checkActual(event);
+        checkStartedOrCompleted(participant, event);
+        performAddingParticipantInfoToEvent(participant, event);
+    }
+
+    private void performAddingParticipantInfoToEvent(User participant, Event event) {
+        if (!event.isParticipantFollowedOnEvent(participant)) {
             organizationRepository.addParticipantInfoToEvent(
                     ParticipantInfo.builder()
                             .participant(participant).build(), event);
         }
     }
 
+    private void checkStartedOrCompleted(User participant, Event event) {
+        if (event.isParticipantStartedEvent(participant) || event.isParticipantCompletedEvent(participant)) {
+            throw new UserFollowingException(formUserFollowingExceptionMessage(participant));
+        }
+    }
+
+    private void checkActual(Event event) {
+        if (!event.isActual()) {
+            throw new ActionWithNonActualEventException(formActionWithNonActualEventException(event));
+        }
+    }
+
     private String formActionWithNonActualEventException(Event event) {
-        return String.format("Unable to follow to event with id:%s, because it's non-actual", event.getId());
+        return String.format(
+                "Unable to perform participant action with event with id:%s, because it's non-actual",
+                event.getId());
     }
 
     private String formUserFollowingExceptionMessage(User participant) {
@@ -72,5 +87,24 @@ public record EventService(
     private Event getEventById(String eventId, ObjectId eventObjectId) {
         return organizationRepository.findEventById(eventObjectId).orElseThrow(
                 () -> new EventNotFoundException(String.format("Event with id:%s didn't found", eventId)));
+    }
+
+    public void unfollowFromEvent(Authentication authentication, String eventId) {
+        User participant = getUserByAuthentication(authentication);
+        Event event = getEventById(eventId, new ObjectId(eventId));
+        performUnfollowingFromEvent(participant, event);
+    }
+
+    private void performUnfollowingFromEvent(User participant, Event event) {
+        checkActual(event);
+        checkStartedOrCompleted(participant, event);
+        performRemovingParticipantInfoFromEvent(participant, event);
+    }
+
+    private void performRemovingParticipantInfoFromEvent(User participant, Event event) {
+        if (event.isParticipantFollowedOnEvent(participant)) {
+            organizationRepository.removeParticipantInfoFromEvent(
+                    ParticipantInfo.getTaskSolutionForDeletingByParticipant(participant), event);
+        }
     }
 }

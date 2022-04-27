@@ -117,4 +117,23 @@ public class EventResource {
         eventService.followToEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @Operation(summary = "${api.orgs.events.unfollow.operation}")
+    @PostMapping(value = "/unfollow")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.unfollow.response-codes.ok}",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "${api.orgs.events.unfollow.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "${api.orgs.events.unfollow.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.unfollow.response-codes.conflict}",
+                    content = @Content),
+            @ApiResponse(responseCode = "410", description = "${api.orgs.events.unfollow.response-codes.gone}",
+                    content = @Content)
+    })
+    public ResponseEntity<?> unfollowFromEvent(Authentication authentication, @RequestParam @NotBlank String id) {
+        eventService.unfollowFromEvent(authentication, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
