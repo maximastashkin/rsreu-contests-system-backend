@@ -95,9 +95,10 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
 
     private Update getUpdateForSettingParticipantInfoStartingProperties(ParticipantInfo participantInfo) {
         return new Update()
-                .set("events.$.participantsInfos.0.tasksSolutions", participantInfo.getTasksSolutions())
-                .set("events.$.participantsInfos.0.startDateTime", participantInfo.getStartDateTime())
-                .set("events.$.participantsInfos.0.maxEndDateTime", participantInfo.getMaxEndDateTime());
+                .set("events.$.participantsInfos.$[i].tasksSolutions", participantInfo.getTasksSolutions())
+                .set("events.$.participantsInfos.$[i].startDateTime", participantInfo.getStartDateTime())
+                .set("events.$.participantsInfos.$[i].maxEndDateTime", participantInfo.getMaxEndDateTime())
+                .filterArray(where("i._id").is(participantInfo.getId()));
     }
 
     @Override
