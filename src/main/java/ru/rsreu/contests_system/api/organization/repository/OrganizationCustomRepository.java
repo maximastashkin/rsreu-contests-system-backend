@@ -4,10 +4,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
 import ru.rsreu.contests_system.api.user.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

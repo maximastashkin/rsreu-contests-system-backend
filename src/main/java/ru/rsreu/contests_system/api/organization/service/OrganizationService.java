@@ -5,14 +5,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
-import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfo;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfoException;
 import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.task.repository.TaskRepository;
-import ru.rsreu.contests_system.api.user.User;
 
 import java.time.LocalDateTime;
 import java.util.EnumSet;
@@ -72,12 +70,8 @@ public record OrganizationService(
                 .build();
         //Task task = Task.builder().text("Test task").build();
         //taskRepository.save(task);
-        firstEvent.getTasks().add(Task.builder().id(new ObjectId("626969c56df10307047e95c2")).build());
+        firstEvent.getTasks().add(Task.builder().id(new ObjectId("6269a2e9452fba24e9a46444")).build());
         organization.getEvents().add(firstEvent);
-
-        User user = User.builder().id(new ObjectId("62693ccb3da5f601f907bf54")).email("test@mail.ru").build();
-
-        firstEvent.addParticipantInfo(ParticipantInfo.builder().participant(user).build());
         organizationRepository.save(organization);
     }
 }

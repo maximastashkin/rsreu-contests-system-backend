@@ -29,10 +29,9 @@ public class ParticipantInfo {
 
     private LocalDateTime startDateTime;
 
-    private LocalDateTime endDateTime;
+    private LocalDateTime maxEndDateTime;
 
-    @Builder.Default
-    private boolean completed = false;
+    private LocalDateTime factEndDateTime;
 
     @Builder.Default
     private Set<TaskSolution> tasksSolutions = new HashSet<>();
@@ -41,9 +40,8 @@ public class ParticipantInfo {
         return startDateTime != null;
     }
 
-    public void setEndDateTime(LocalDateTime endDateTime) {
-        this.endDateTime = endDateTime;
-        completed = true;
+    public boolean isParticipantCompletedEvent() {
+        return factEndDateTime != null;
     }
 
     public static ParticipantInfo getTaskSolutionForDeletingByParticipant(User participant) {

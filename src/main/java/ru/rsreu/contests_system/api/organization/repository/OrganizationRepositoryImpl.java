@@ -83,12 +83,21 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     @Override
     public void addStartingInfoToParticipantInfo(ParticipantInfo participantInfo) {
         mongoTemplate.updateFirst(
-                Query.query(Criteria.where("events")
-                        .elemMatch(Criteria.where("participantsInfos._id").is(participantInfo.getId()))),
-                new Update()
-                        .set("events.$.participantsInfos.0.tasksSolutions", participantInfo.getTasksSolutions())
-                        .set("events.$.participantsInfos.0.startDateTime", participantInfo.getStartDateTime()),
+                getEventByParticipantInfoQuery(participantInfo),
+                getUpdateForSettingParticipantInfoStartingProperties(participantInfo),
                 Organization.class);
+    }
+
+    private Query getEventByParticipantInfoQuery(ParticipantInfo participantInfo) {
+        return Query.query(Criteria.where("events")
+                .elemMatch(Criteria.where("participantsInfos._id").is(participantInfo.getId())));
+    }
+
+    private Update getUpdateForSettingParticipantInfoStartingProperties(ParticipantInfo participantInfo) {
+        return new Update()
+                .set("events.$.participantsInfos.0.tasksSolutions", participantInfo.getTasksSolutions())
+                .set("events.$.participantsInfos.0.startDateTime", participantInfo.getStartDateTime())
+                .set("events.$.participantsInfos.0.maxEndDateTime", participantInfo.getMaxEndDateTime());
     }
 
     @Override
@@ -116,9 +125,8 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     }
 
     private AggregationPipeline getActualEventsAggregationPipeline() {
-        AggregationPipeline pipeline = getBaseEventAggregationPipelineWithFilter(getActualEventsFilter());
-        pipeline.add(getSortByStartDateTimeOperation());
-        return pipeline;
+        return getBaseEventAggregationPipelineWithFilter(getActualEventsFilter())
+                .add(getSortByStartDateTimeOperation());
     }
 
     private void addOperationsFromPipeline(AggregationPipeline source, AggregationPipeline destination) {
@@ -179,7 +187,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     }
 
     private AggregationOperation getMatchByCompletedOperation(boolean completed) {
-        return match(where("participantsInfos").elemMatch(where("completed").is(completed)));
+        return match(where("participantsInfos").elemMatch(where("factEndDateTime").exists(completed)));
     }
 
     private List<Event> getEventsByAggregation(Aggregation aggregation) {

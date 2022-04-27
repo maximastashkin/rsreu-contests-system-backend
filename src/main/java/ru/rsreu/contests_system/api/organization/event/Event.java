@@ -51,10 +51,6 @@ public class Event {
     @Builder.Default
     private Set<ParticipantInfo> participantsInfos = new HashSet<>();
 
-    public void addParticipantInfo(ParticipantInfo participantInfo) {
-        participantsInfos.add(participantInfo);
-    }
-
     public boolean isParticipantFollowedOnEvent(User participant) {
         return getParticipants().contains(participant);
     }
@@ -66,10 +62,13 @@ public class Event {
 
     public boolean isParticipantCompletedEvent(User participant) {
         Optional<ParticipantInfo> candidate = getParticipantInfoByParticipant(participant);
-        return candidate.isPresent() && candidate.get().isCompleted();
+        return candidate.isPresent() && candidate.get().isParticipantCompletedEvent();
     }
 
     private Optional<ParticipantInfo> getParticipantInfoByParticipant(User participant) {
+        if (participantsInfos == null) {
+            return Optional.empty();
+        }
         List<ParticipantInfo> participantInfoList = participantsInfos.stream()
                 .filter(participantInfo -> participant.equals(participantInfo.getParticipant())).toList();
         return participantInfoList.isEmpty() ? Optional.empty() : Optional.of(participantInfoList.get(0));
@@ -82,5 +81,9 @@ public class Event {
     public boolean isActual() {
         LocalDateTime now = LocalDateTime.now();
         return now.isBefore(startDateTime) || now.isAfter(startDateTime) && now.isBefore(endDateTime);
+    }
+
+    public boolean isStarted() {
+        return LocalDateTime.now().isAfter(startDateTime);
     }
 }

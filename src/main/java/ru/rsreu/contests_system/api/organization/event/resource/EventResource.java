@@ -137,13 +137,27 @@ public class EventResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Operation
+    @Operation(summary = "${api.orgs.events.start.operation}")
     @PostMapping(value = "/start")
     @ApiResponses(value = {
-
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.start.response-codes.ok}",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "${api.orgs.events.start.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "${api.orgs.events.start.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406", description = "${api.orgs.events.start.response-codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.start.response-codes.conflict}",
+                    content = @Content),
+            @ApiResponse(responseCode = "410", description = "${api.orgs.events.start.response-codes.gone}",
+                    content = @Content),
+            @ApiResponse(responseCode = "500",
+                    description = "${api.orgs.events.start.response-codes.internal-server-error}",
+                    content = @Content)
     })
     public ResponseEntity<?> startEvent(Authentication authentication, @RequestParam @NotBlank String id) {
         eventService.startEvent(authentication, id);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
