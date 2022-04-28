@@ -98,7 +98,11 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
                 .set("events.$.participantsInfos.$[i].tasksSolutions", participantInfo.getTasksSolutions())
                 .set("events.$.participantsInfos.$[i].startDateTime", participantInfo.getStartDateTime())
                 .set("events.$.participantsInfos.$[i].maxEndDateTime", participantInfo.getMaxEndDateTime())
-                .filterArray(where("i._id").is(participantInfo.getId()));
+                .filterArray(getCriteriaForFilterArrayById(participantInfo.getId()));
+    }
+
+    private Criteria getCriteriaForFilterArrayById(ObjectId id) {
+        return where("i._id").is(id);
     }
 
     @Override
@@ -107,6 +111,20 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
                 Aggregation.newAggregation(
                         getParticipantInfoByEventAndParticipantPipeline(event, participant).getOperations()));
         return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+    }
+
+    @Override
+    public void addFactEndDateTimeToParticipantInfo(ParticipantInfo participantInfo) {
+        mongoTemplate.updateFirst(
+                getEventByParticipantInfoQuery(participantInfo),
+                getUpdateForSettingParticipantInfoFactEndDateTime(participantInfo),
+                Organization.class);
+    }
+
+    private Update getUpdateForSettingParticipantInfoFactEndDateTime(ParticipantInfo participantInfo) {
+        return new Update()
+                .set("events.$.participantsInfos.$[i].factEndDateTime", participantInfo.getFactEndDateTime())
+                .filterArray(getCriteriaForFilterArrayById(participantInfo.getId()));
     }
 
     private AggregationPipeline getParticipantInfoByEventAndParticipantPipeline(Event event, User participant) {

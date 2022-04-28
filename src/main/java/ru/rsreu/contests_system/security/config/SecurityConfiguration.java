@@ -47,7 +47,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/events/all-completed/user/**",
             "/**/events/follow",
             "/**/events/unfollow",
-            "/**/events/start"
+            "/**/events/start",
+            "/**/events/complete"
     };
 
     private static final String[] ADMIN_LIST = {

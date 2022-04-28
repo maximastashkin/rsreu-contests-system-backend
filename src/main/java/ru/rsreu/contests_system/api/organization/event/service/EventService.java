@@ -48,16 +48,16 @@ public record EventService(
     public void followToEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
         Event event = getEventById(new ObjectId(eventId));
-        performFollowingToEvent(participant, event);
+        performFollowingToEvent(event, participant);
     }
 
-    private void performFollowingToEvent(User participant, Event event) {
-        checkActual(event);
-        checkStartedOrCompletedByParticipant(participant, event);
-        performAddingParticipantInfoToEvent(participant, event);
+    private void performFollowingToEvent(Event event, User participant) {
+        checkNonActual(event);
+        checkStartedOrCompletedByParticipant(event, participant);
+        performAddingParticipantInfoToEvent(event, participant);
     }
 
-    private void performAddingParticipantInfoToEvent(User participant, Event event) {
+    private void performAddingParticipantInfoToEvent(Event event, User participant) {
         if (!event.isParticipantFollowedOnEvent(participant)) {
             organizationRepository.addParticipantInfoToEvent(
                     ParticipantInfo.builder()
@@ -65,13 +65,13 @@ public record EventService(
         }
     }
 
-    private void checkStartedOrCompletedByParticipant(User participant, Event event) {
+    private void checkStartedOrCompletedByParticipant(Event event, User participant) {
         if (event.isParticipantStartedEvent(participant) || event.isParticipantCompletedEvent(participant)) {
             throw new UserFollowingException(formUserFollowingExceptionMessage(participant));
         }
     }
 
-    private void checkActual(Event event) {
+    private void checkNonActual(Event event) {
         if (!event.isActual()) {
             throw new ActionWithNonActualEventException(formActionWithNonActualEventException(event));
         }
@@ -96,16 +96,16 @@ public record EventService(
     public void unfollowFromEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
         Event event = getEventById(new ObjectId(eventId));
-        performUnfollowingFromEvent(participant, event);
+        performUnfollowingFromEvent(event, participant);
     }
 
-    private void performUnfollowingFromEvent(User participant, Event event) {
-        checkActual(event);
-        checkStartedOrCompletedByParticipant(participant, event);
-        performRemovingParticipantInfoFromEvent(participant, event);
+    private void performUnfollowingFromEvent(Event event, User participant) {
+        checkNonActual(event);
+        checkStartedOrCompletedByParticipant(event, participant);
+        performRemovingParticipantInfoFromEvent(event, participant);
     }
 
-    private void performRemovingParticipantInfoFromEvent(User participant, Event event) {
+    private void performRemovingParticipantInfoFromEvent(Event event, User participant) {
         if (event.isParticipantFollowedOnEvent(participant)) {
             organizationRepository.removeParticipantInfoFromEvent(
                     ParticipantInfo.getTaskSolutionForDeletingByParticipant(participant), event);
@@ -115,17 +115,20 @@ public record EventService(
     public void startEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
         Event event = getEventById(new ObjectId(eventId));
-        performFollowingToEvent(participant, event);
-        performStartingEvent(participant, event);
+        performFollowingToEvent(event, participant);
+        performStartingEvent(event, participant);
     }
 
-    private void performStartingEvent(User participant, Event event) {
-        checkStarted(event);
-        ParticipantInfo participantInfo = organizationRepository
+    private void performStartingEvent(Event event, User participant) {
+        checkNonStarted(event);
+        performAddingStartingInfoToParticipantInfo(getParticipantInfoByEventAndParticipant(event, participant), event);
+    }
+
+    private ParticipantInfo getParticipantInfoByEventAndParticipant(Event event, User participant) {
+        return organizationRepository
                 .findParticipantInfoByEventAndParticipant(event, participant)
                 .orElseThrow(() ->
                         new ParticipantInfoNotFoundException(formParticipantInfoNotFoundException(participant)));
-        performAddingStartingInfoToParticipantInfo(participantInfo, event);
     }
 
     private String formParticipantInfoNotFoundException(User participant) {
@@ -133,13 +136,13 @@ public record EventService(
                 participant.getEmail());
     }
 
-    private void checkStarted(Event event) {
+    private void checkNonStarted(Event event) {
         if (!event.isStarted()) {
             throw new ActionWithNonStartedEventException(formActionWithNonStartedEventException(event.getId()));
         }
     }
 
-    private String formActionWithNonStartedEventException(ObjectId eventObjectId){
+    private String formActionWithNonStartedEventException(ObjectId eventObjectId) {
         return String.format("Event with id:%s non started yet. Following have done", eventObjectId.toString());
     }
 
@@ -161,9 +164,58 @@ public record EventService(
             LocalDateTime eventEndDateTime,
             long timeLimit) {
         LocalDateTime theoreticalEndDateTime = participantStartDateTime.plusSeconds(timeLimit);
-        if (theoreticalEndDateTime.isAfter(eventEndDateTime)) {
+        if (theoreticalEndDateTime.isAfter(eventEndDateTime) || timeLimit == 0) {
             theoreticalEndDateTime = eventEndDateTime;
         }
         return theoreticalEndDateTime;
+    }
+
+    public void completeEvent(Authentication authentication, String eventId) {
+        User participant = getUserByAuthentication(authentication);
+        Event event = getEventById(new ObjectId(eventId));
+        performCompletingEvent(event, participant);
+    }
+
+    private void performCompletingEvent(Event event, User participant) {
+        checkNonActual(event); //TODO Probably this checking doesn't need, because future events will solve this problem
+        checkNonStartedByParticipant(event, participant);
+        checkCompletedByParticipant(event, participant);
+        ParticipantInfo participantInfo = getParticipantInfoByEventAndParticipant(event, participant);
+        performAddingCompletingDateToParticipantInfo(participantInfo,
+                calculateFactEndDateTime(LocalDateTime.now(), participantInfo.getMaxEndDateTime()));
+    }
+
+    private void checkNonStartedByParticipant(Event event, User participant) {
+        if (!event.isParticipantStartedEvent(participant)) {
+            throw new ActionWithNonStartedByParticipantEventException(
+                    formActionWithNonStartedByParticipantEventExceptionMessage(event, participant));
+        }
+    }
+
+    private String formActionWithNonStartedByParticipantEventExceptionMessage(Event event, User participant) {
+        return String.format("Participant with email:%s didn't start the event with id:%s",
+                participant.getEmail(), event.getId());
+    }
+
+    private void checkCompletedByParticipant(Event event, User participant) {
+        if (event.isParticipantCompletedEvent(participant)) {
+            throw new ActionWithCompletedEventException(
+                    formActionWithCompletedEventExceptionMessage(event, participant));
+        }
+    }
+
+    private String formActionWithCompletedEventExceptionMessage(Event event, User participant) {
+        return String.format("Participant with email:%s have already completed the event with id:%s",
+                participant.getEmail(), event.getId());
+    }
+
+    private void performAddingCompletingDateToParticipantInfo(ParticipantInfo participantInfo,
+                                                              LocalDateTime factEndDateTime) {
+        participantInfo.setFactEndDateTime(factEndDateTime);
+        organizationRepository.addFactEndDateTimeToParticipantInfo(participantInfo);
+    }
+
+    private LocalDateTime calculateFactEndDateTime(LocalDateTime now, LocalDateTime maxEndDateTime) {
+        return now.isBefore(maxEndDateTime) ? now : maxEndDateTime;
     }
 }
