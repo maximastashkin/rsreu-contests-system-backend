@@ -4,15 +4,12 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
-import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfo;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfoException;
-import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.task.repository.TaskRepository;
 
-import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.List;
 
