@@ -47,7 +47,7 @@ public record EventService(
 
     public void followToEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
-        Event event = getEventById(new ObjectId(eventId));
+        Event event = getEventById(eventId);
         performFollowingToEvent(event, participant);
     }
 
@@ -87,15 +87,14 @@ public record EventService(
         return String.format("User with email:%s already start or completed this event", participant.getEmail());
     }
 
-    private Event getEventById(ObjectId eventObjectId) {
-        return organizationRepository.findEventById(eventObjectId).orElseThrow(
-                () -> new EventNotFoundException(String.format("Event with id:%s didn't found",
-                        eventObjectId.toString())));
+    public Event getEventById(String eventObjectId) {
+        return organizationRepository.findEventById(new ObjectId(eventObjectId)).orElseThrow(
+                () -> new EventNotFoundException(String.format("Event with id:%s didn't found", eventObjectId)));
     }
 
     public void unfollowFromEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
-        Event event = getEventById(new ObjectId(eventId));
+        Event event = getEventById(eventId);
         performUnfollowingFromEvent(event, participant);
     }
 
@@ -114,7 +113,7 @@ public record EventService(
 
     public void startEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
-        Event event = getEventById(new ObjectId(eventId));
+        Event event = getEventById(eventId);
         performFollowingToEvent(event, participant);
         performStartingEvent(event, participant);
     }
@@ -122,6 +121,14 @@ public record EventService(
     private void performStartingEvent(Event event, User participant) {
         checkNonStarted(event);
         performAddingStartingInfoToParticipantInfo(getParticipantInfoByEventAndParticipant(event, participant), event);
+    }
+
+    public ParticipantInfo getParticipantInfoByEventAndAuthentication(Event event, Authentication authentication) {
+        User participant = getUserByAuthentication(authentication);
+        checkNonActual(event);
+        checkNonStartedByParticipant(event, participant);
+        checkCompletedByParticipant(event, participant);
+        return getParticipantInfoByEventAndParticipant(event, participant);
     }
 
     private ParticipantInfo getParticipantInfoByEventAndParticipant(Event event, User participant) {
@@ -172,7 +179,7 @@ public record EventService(
 
     public void completeEvent(Authentication authentication, String eventId) {
         User participant = getUserByAuthentication(authentication);
-        Event event = getEventById(new ObjectId(eventId));
+        Event event = getEventById(eventId);
         performCompletingEvent(event, participant);
     }
 
