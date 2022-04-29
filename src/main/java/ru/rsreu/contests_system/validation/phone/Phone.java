@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 public @interface Phone {
     @Value("${validation.phone.message}")
     String defaultMessage = "";
-    String message() default "Bad phone";
+    String message() default defaultMessage;
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default {};
 }

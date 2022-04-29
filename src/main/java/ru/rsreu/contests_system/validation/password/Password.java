@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 public @interface Password {
     @Value("${validation.password.message}")
     String defaultMessage = "";
-    String message() default "Bad password";
+    String message() default defaultMessage;
 
     Class<?>[] groups() default {};
 
