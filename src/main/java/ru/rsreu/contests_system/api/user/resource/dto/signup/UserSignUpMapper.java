@@ -14,7 +14,7 @@ public record UserSignUpMapper(PasswordEncoder passwordEncoder) {
         return User.builder()
                 .firstName(userSignUpRequest.firstName().trim())
                 .lastName(userSignUpRequest.lastName().trim())
-                .middleName(userSignUpRequest.middleName().trim())
+                .middleName(userSignUpRequest.middleName() != null ? userSignUpRequest.middleName().trim() : "")
                 .educationPlace(userSignUpRequest.educationPlace().trim())
                 .password(passwordEncoder.encode(userSignUpRequest.password()))
                 .email(userSignUpRequest.email().trim())
