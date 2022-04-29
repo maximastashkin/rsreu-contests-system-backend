@@ -3,6 +3,7 @@ package ru.rsreu.contests_system.api.organization.event.resource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
@@ -11,8 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.started_event_info.StartedEventInfoMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.started_event_info.StartedEventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
 import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticationProvider;
 import ru.rsreu.contests_system.api.user.User;
@@ -29,6 +33,7 @@ import java.util.Optional;
 public class EventResource {
     private final EventService eventService;
     private final EventInfoMapper eventInfoMapper;
+    private final StartedEventInfoMapper startedEventInfoMapper;
     private final UserCandidateByAuthenticationProvider userCandidateByAuthenticationProvider;
 
     @Operation(summary = "${api.orgs.events.all-actual.operation}")
@@ -135,6 +140,35 @@ public class EventResource {
     public ResponseEntity<?> unfollowFromEvent(Authentication authentication, @RequestParam @NotBlank String id) {
         eventService.unfollowFromEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.start-info.operation}")
+    @GetMapping(value = "/start")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.start-info.response-codes.ok}",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = StartedEventInfoResponse.class))),
+            @ApiResponse(responseCode = "400", description = "${api.orgs.events.start-info.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "${api.orgs.events.start-info.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406",
+                    description = "${api.orgs.events.start-info.response-codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.start-info.response-codes.conflict}",
+                    content = @Content),
+            @ApiResponse(responseCode = "410", description = "${api.orgs.events.start-info.response-codes.gone}",
+                    content = @Content),
+            @ApiResponse(responseCode = "500",
+                    description = "${api.orgs.events.start-info.response-codes.internal-server-error}",
+                    content = @Content)
+    })
+    public ResponseEntity<StartedEventInfoResponse> getStartedEventInfo(
+            Authentication authentication, @RequestParam @NotBlank String id) {
+        Event event = eventService.getEventById(id);
+        return new ResponseEntity<>(startedEventInfoMapper.toResponse(
+                event, eventService.getParticipantInfoByEventAndAuthentication(event, authentication)), HttpStatus.OK);
     }
 
     @Operation(summary = "${api.orgs.events.start.operation}")
