@@ -1,11 +1,15 @@
 package ru.rsreu.contests_system.validation.password;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 public class PasswordValidator implements ConstraintValidator<Password, String> {
-    private static final Pattern PATTERN = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+    @Value("${validation.password.regex}")
+    private static String regex;
+    private static final Pattern PATTERN = Pattern.compile(regex);
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {

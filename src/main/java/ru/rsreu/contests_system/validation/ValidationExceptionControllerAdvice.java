@@ -1,5 +1,6 @@
 package ru.rsreu.contests_system.validation;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,9 +11,12 @@ import javax.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class ValidationExceptionControllerAdvice {
+    @Value("${validation.exception}")
+    private static String message;
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException e) {
-        return new ResponseEntity<>("Not valid due to validation error: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(message + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
