@@ -4,15 +4,12 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.Organization;
-import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfo;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfoException;
-import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.task.repository.TaskRepository;
 
-import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -57,21 +54,4 @@ public record OrganizationService(
     public List<Organization> getAll(int pageSize, int pageNumber) {
         return organizationRepository.findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
 	}
-	
-    public void addTestOrganization() {
-        //TODO Delete this shit. Method test data provider
-        Organization organization = Organization.builder()
-                .name("Test organization")
-                .build();
-        Event firstEvent = Event.builder()
-                .name("First test event")
-                .startDateTime(LocalDateTime.of(2022, 4, 21, 10, 52, 0))
-                .endDateTime(LocalDateTime.of(2022, 4, 30, 22, 0, 0))
-                .build();
-        //Task task = Task.builder().text("Test task").build();
-        //taskRepository.save(task);
-        firstEvent.getTasks().add(Task.builder().id(new ObjectId("6269a2e9452fba24e9a46444")).build());
-        organization.getEvents().add(firstEvent);
-        organizationRepository.save(organization);
-    }
 }

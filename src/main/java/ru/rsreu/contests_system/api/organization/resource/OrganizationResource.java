@@ -72,10 +72,4 @@ public class OrganizationResource {
                         .stream().map(organizationsInfoMapper::toResponse).toList(),
                 HttpStatus.OK);
     }
-
-    @PostMapping("/test")
-    public ResponseEntity<?> addTestOrganizationWithEvents() {
-        organizationService.addTestOrganization();
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
 }
