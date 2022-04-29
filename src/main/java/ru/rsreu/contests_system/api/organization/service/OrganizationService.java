@@ -57,21 +57,4 @@ public record OrganizationService(
     public List<Organization> getAll(int pageSize, int pageNumber) {
         return organizationRepository.findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
 	}
-	
-    public void addTestOrganization() {
-        //TODO Delete this shit. Method test data provider
-        Organization organization = Organization.builder()
-                .name("Test organization")
-                .build();
-        Event firstEvent = Event.builder()
-                .name("First test event")
-                .startDateTime(LocalDateTime.of(2022, 4, 21, 10, 52, 0))
-                .endDateTime(LocalDateTime.of(2022, 4, 30, 22, 0, 0))
-                .build();
-        //Task task = Task.builder().text("Test task").build();
-        //taskRepository.save(task);
-        firstEvent.getTasks().add(Task.builder().id(new ObjectId("6269a2e9452fba24e9a46444")).build());
-        organization.getEvents().add(firstEvent);
-        organizationRepository.save(organization);
-    }
 }
