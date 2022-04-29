@@ -12,7 +12,7 @@ import javax.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class ValidationExceptionControllerAdvice {
     @Value("${validation.exception}")
-    private static String message;
+    String message;
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

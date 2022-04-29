@@ -1,5 +1,7 @@
 package ru.rsreu.contests_system.validation.null_or_not_blank;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
@@ -9,7 +11,9 @@ import java.lang.annotation.*;
 @Documented
 @Constraint(validatedBy = NullOrNotBlankValidator.class)
 public @interface NullOrNotBlank {
-    String message() default "Bad null or blank field";
+    @Value("${validation.not-null-or-blank.message}")
+    String defaultMessage = "";
+    String message() default defaultMessage;
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default {};
 }
