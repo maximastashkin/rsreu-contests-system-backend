@@ -25,4 +25,6 @@ public interface OrganizationCustomRepository {
     void addStartingInfoToParticipantInfo(ParticipantInfo participantInfo);
 
     Optional<ParticipantInfo> findParticipantInfoByEventAndParticipant(Event event, User participant);
+
+    void addFactEndDateTimeToParticipantInfo(ParticipantInfo participantInfo);
 }

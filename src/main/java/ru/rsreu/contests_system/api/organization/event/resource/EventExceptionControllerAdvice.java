@@ -38,4 +38,18 @@ public class EventExceptionControllerAdvice {
     public ResponseEntity<?> handleActionWithNonStartedEventException(ActionWithNonStartedEventException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ActionWithNonStartedByParticipantEventException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ResponseEntity<?> handleActionWithNonStartedByParticipantEventException
+            (ActionWithNonStartedByParticipantEventException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(ActionWithCompletedEventException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<?> handleActionWithCompletedEventException
+            (ActionWithCompletedEventException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
 }
