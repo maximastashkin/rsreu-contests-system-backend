@@ -80,28 +80,33 @@ public class TestResource {
                                             .input("1 2")
                                             .output("3")
                                             .isPublic(true)
+                                            .weight(10)
                                             .build(),
                                     TaskTest.builder()
                                             .input("5 6")
                                             .output("11")
                                             .isPublic(true)
+                                            .weight(10)
                                             .build(),
                                     TaskTest.builder()
                                             .input("-5 5")
                                             .output("0")
+                                            .weight(10)
                                             .build(),
                                     TaskTest.builder()
                                             .input("-7 -2")
                                             .output("-9")
+                                            .weight(10)
                                             .build(),
                                     TaskTest.builder()
                                             .input("-15 3")
                                             .output("-12")
+                                            .weight(10)
                                             .build()
                             ));
                         }
                     })
-                    .memoryLimit(10000)
+                    .memoryLimitKb(10000)
                     .timeLimit(10000)
                     .build();
             taskService.save(task);

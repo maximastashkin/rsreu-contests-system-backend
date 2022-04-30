@@ -1,6 +1,7 @@
 package ru.rsreu.contests_system.api.user.service;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.user.Authority;
 import ru.rsreu.contests_system.api.user.User;
@@ -8,12 +9,15 @@ import ru.rsreu.contests_system.api.user.exception.AdminBlockingAttemptException
 import ru.rsreu.contests_system.api.user.exception.NotUniqueEmailException;
 import ru.rsreu.contests_system.api.user.exception.UserNotFoundException;
 import ru.rsreu.contests_system.api.user.repository.UserRepository;
+import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public record UserService(UserRepository userRepository) {
+public record UserService(
+        UserRepository userRepository,
+        AuthenticationUserDetailMapper authenticationUserDetailMapper) {
     public void save(User user) {
         try {
             userRepository.save(user);
@@ -72,5 +76,9 @@ public record UserService(UserRepository userRepository) {
         );
         replaceUserAuthority(user, Authority.INACTIVE, Authority.ACTIVE);
         userRepository.unsetConfirmationToken(confirmationToken);
+    }
+
+    public User getUserByAuthentication(Authentication authentication) {
+        return getUserByEmail(authenticationUserDetailMapper.toUserDetails(authentication).getUsername());
     }
 }

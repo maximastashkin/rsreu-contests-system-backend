@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
 import ru.rsreu.contests_system.api.user.User;
 
 import java.time.LocalDateTime;
@@ -121,6 +122,49 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
                 Organization.class);
     }
 
+    @Override
+    public Optional<Event> findEventByTaskSolutionId(ObjectId taskSolutionId) {
+        List<Event> mappedResults = getEventsByAggregation(
+                Aggregation.newAggregation(getEventByTaskSolutionIdPipeline(taskSolutionId).getOperations()));
+        return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+    }
+
+    @Override
+    public Optional<TaskSolution> findParticipantTaskSolutionById(User participant, ObjectId taskSolutionId) {
+        List<TaskSolution> mappedResults = getTasksSolutionsByAggregation(
+                newAggregation(
+                        getTasksSolutionsByParticipantAndIdPipeline(participant, taskSolutionId).getOperations()));
+        return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+    }
+
+    private AggregationPipeline getTasksSolutionsByParticipantAndIdPipeline(User participant, ObjectId id) {
+        AggregationPipeline pipeline = getUnwindEventsPipeline();
+        addOperationsFromPipeline(getUnwindParticipantsInfosPipeline(), pipeline);
+        pipeline.add(getParticipantInfosMatchOperation(participant));
+        addOperationsFromPipeline(getUnwindTasksSolutionsPipeline(), pipeline);
+        pipeline.add(getEntityByIdMatchOperation(id));
+        return pipeline;
+    }
+
+    private MatchOperation getEntityByIdMatchOperation(ObjectId id) {
+        return match(where("_id").is(id));
+    }
+
+    private AggregationPipeline getUnwindTasksSolutionsPipeline() {
+        return new AggregationPipeline().add(unwind("tasksSolutions"))
+                .add(replaceRoot("tasksSolutions"));
+    }
+
+    private AggregationPipeline getEventByTaskSolutionIdPipeline(ObjectId taskSolutionId) {
+        AggregationPipeline pipeline = getUnwindEventsPipeline();
+        pipeline.add(getEventByTaskSolutionIdMatchOperation(taskSolutionId));
+        return pipeline;
+    }
+
+    private MatchOperation getEventByTaskSolutionIdMatchOperation(ObjectId taskSolutionId) {
+        return match(where("participantsInfos.tasksSolutions._id").is(taskSolutionId));
+    }
+
     private Update getUpdateForSettingParticipantInfoFactEndDateTime(ParticipantInfo participantInfo) {
         return new Update()
                 .set("events.$.participantsInfos.$[i].factEndDateTime", participantInfo.getFactEndDateTime())
@@ -216,5 +260,10 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     private List<ParticipantInfo> getParticipantsInfosByAggregation(Aggregation aggregation) {
         return mongoTemplate.aggregate(
                 aggregation, "organizations", ParticipantInfo.class).getMappedResults();
+    }
+
+    private List<TaskSolution> getTasksSolutionsByAggregation(Aggregation aggregation) {
+        return mongoTemplate.aggregate(
+                aggregation, "organizations", TaskSolution.class).getMappedResults();
     }
 }

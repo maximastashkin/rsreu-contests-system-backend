@@ -22,10 +22,18 @@ public class TaskSolution {
 
     private String solution;
 
+    private ProgrammingLanguage programmingLanguage;
+
+    @Builder.Default
+    private ExecutionStatus executionStatus = ExecutionStatus.NO_SOLUTION;
+
     @Builder.Default
     private Set<TestInfo> testsInfos = new HashSet<>();
 
     public static TaskSolution getTaskSolutionByTask(Task task) {
-        return builder().task(task).build();
+        Set<TestInfo> testInfos = new HashSet<>();
+        task.getTests().forEach(test-> testInfos.add(
+                TestInfo.builder().taskTest(test).build()));
+        return builder().task(task).testsInfos(testInfos).build();
     }
 }

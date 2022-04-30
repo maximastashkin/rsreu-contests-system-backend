@@ -14,4 +14,6 @@ public class TaskTest {
 
     @Builder.Default
     private boolean isPublic = false;
+
+    private int weight;
 }

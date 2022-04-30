@@ -18,9 +18,9 @@ public class Task {
 
     private String text;
 
-    private long memoryLimit;
+    private long memoryLimitKb;
 
-    private long timeLimit;
+    private long timeLimitMs;
 
     @Builder.Default
     private Set<TaskTest> tests = new HashSet<>();
