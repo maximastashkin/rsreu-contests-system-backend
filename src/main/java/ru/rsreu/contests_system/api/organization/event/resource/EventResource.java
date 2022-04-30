@@ -3,7 +3,6 @@ package ru.rsreu.contests_system.api.organization.event.resource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
@@ -143,12 +142,9 @@ public class EventResource {
     }
 
     @Operation(summary = "${api.orgs.events.start-info.operation}")
-    @GetMapping(value = "/start")
+    @GetMapping(value = "/start", produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.orgs.events.start-info.response-codes.ok}",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = StartedEventInfoResponse.class))),
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.start-info.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.orgs.events.start-info.response-codes.bad-request}",
                     content = @Content),
             @ApiResponse(responseCode = "404", description = "${api.orgs.events.start-info.response-codes.not-found}",

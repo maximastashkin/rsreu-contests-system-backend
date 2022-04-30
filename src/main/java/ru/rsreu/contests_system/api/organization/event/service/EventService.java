@@ -158,7 +158,7 @@ public record EventService(
     }
 
     private void performCompletingEvent(Event event, User participant) {
-        checkNonActual(event); //TODO Probably this checking doesn't need, because future events will solve this problem
+        checkNonActual(event); //TODO Probably this checking doesn't need, because future events system will solve this problem
         checkNonStartedByParticipant(event, participant);
         checkCompletedByParticipant(event, participant);
         ParticipantInfo participantInfo = getParticipantInfoByEventAndParticipant(event, participant);

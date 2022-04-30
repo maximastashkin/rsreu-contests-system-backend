@@ -22,6 +22,10 @@ public record TaskSolutionService(
         User participant = userService.getUserByAuthentication(authentication);
         Event event = eventService.getEventByTaskSolutionId(id);
         eventService.checkParticipantPerformingEventCondition(participant, event);
+        return getTaskSolutionByIdAndParticipant(id, participant);
+    }
+
+    private TaskSolution getTaskSolutionByIdAndParticipant(String id, User participant) {
         return organizationRepository.findParticipantTaskSolutionById(participant, new ObjectId(id)).orElseThrow(
                 () -> new TaskSolutionForParticipantNotFoundException(
                         taskSolutionExceptionMessageUtil.

@@ -107,7 +107,7 @@ public class TestResource {
                         }
                     })
                     .memoryLimitKb(10000)
-                    .timeLimit(10000)
+                    .timeLimitMs(10000)
                     .build();
             taskService.save(task);
         }
