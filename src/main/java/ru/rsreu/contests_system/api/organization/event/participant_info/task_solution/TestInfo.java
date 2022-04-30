@@ -2,15 +2,21 @@ package ru.rsreu.contests_system.api.organization.event.participant_info.task_so
 
 import lombok.Builder;
 import lombok.Data;
+import ru.rsreu.contests_system.api.task.TaskTest;
 
 @Builder
 @Data
 public class TestInfo {
-    private long time;
+    private TaskTest taskTest;
 
-    private long memory;
+    private String executionOutput;
 
-    private int score;
+    private long memoryKb;
 
-    private TestStatus testStatus;
+    private long timeMs;
+
+    @Builder.Default
+    private ExecutionStatus executionStatus = ExecutionStatus.NO_SOLUTION;
+
+    private String log;
 }
