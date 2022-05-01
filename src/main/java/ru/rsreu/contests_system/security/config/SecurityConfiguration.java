@@ -50,7 +50,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/events/unfollow",
             "/**/events/start",
             "/**/events/complete",
-            "/**/tasks/performed"
+            "/**/tasks/performed",
+            "/**/tasks/check"
     };
 
     private static final String[] ADMIN_LIST = {

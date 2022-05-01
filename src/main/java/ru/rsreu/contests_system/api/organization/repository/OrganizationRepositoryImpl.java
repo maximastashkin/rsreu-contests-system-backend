@@ -84,14 +84,14 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     @Override
     public void addStartingInfoToParticipantInfo(ParticipantInfo participantInfo) {
         mongoTemplate.updateFirst(
-                getEventByParticipantInfoQuery(participantInfo),
+                getOrganizationByParticipantInfoQuery(participantInfo),
                 getUpdateForSettingParticipantInfoStartingProperties(participantInfo),
                 Organization.class);
     }
 
-    private Query getEventByParticipantInfoQuery(ParticipantInfo participantInfo) {
-        return Query.query(Criteria.where("events")
-                .elemMatch(Criteria.where("participantsInfos._id").is(participantInfo.getId())));
+    private Query getOrganizationByParticipantInfoQuery(ParticipantInfo participantInfo) {
+        return Query.query(where("events")
+                .elemMatch(where("participantsInfos._id").is(participantInfo.getId())));
     }
 
     private Update getUpdateForSettingParticipantInfoStartingProperties(ParticipantInfo participantInfo) {
@@ -99,11 +99,11 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
                 .set("events.$.participantsInfos.$[i].tasksSolutions", participantInfo.getTasksSolutions())
                 .set("events.$.participantsInfos.$[i].startDateTime", participantInfo.getStartDateTime())
                 .set("events.$.participantsInfos.$[i].maxEndDateTime", participantInfo.getMaxEndDateTime())
-                .filterArray(getCriteriaForFilterArrayById(participantInfo.getId()));
+                .filterArray(getCriteriaForFilterArrayById(participantInfo.getId(), "i"));
     }
 
-    private Criteria getCriteriaForFilterArrayById(ObjectId id) {
-        return where("i._id").is(id);
+    private Criteria getCriteriaForFilterArrayById(ObjectId id, String iteratorName) {
+        return where(iteratorName + "._id").is(id);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     @Override
     public void addFactEndDateTimeToParticipantInfo(ParticipantInfo participantInfo) {
         mongoTemplate.updateFirst(
-                getEventByParticipantInfoQuery(participantInfo),
+                getOrganizationByParticipantInfoQuery(participantInfo),
                 getUpdateForSettingParticipantInfoFactEndDateTime(participantInfo),
                 Organization.class);
     }
@@ -137,6 +137,38 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
         return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
     }
 
+    @Override
+    public void setTaskSolutionCheckingInfo(TaskSolution taskSolution) {
+        mongoTemplate.updateFirst(
+                getOrganizationByTaskSolutionQuery(taskSolution),
+                getUpdateForSettingTaskSolutionCheckingInfo(taskSolution),
+                Organization.class
+        );
+    }
+
+    private Query getOrganizationByTaskSolutionQuery(TaskSolution taskSolution) {
+        return Query.query(where("events.participantsInfos.tasksSolutions").elemMatch(
+                getByIdCriteria(taskSolution.getId())));
+    }
+
+    private Update getUpdateForSettingTaskSolutionCheckingInfo(TaskSolution taskSolution) {
+        return new Update()
+                .set("events.$.participantsInfos.$[i].tasksSolutions.$[j].executionStatus",
+                        taskSolution.getExecutionStatus())
+                .set("events.$.participantsInfos.$[i].tasksSolutions.$[j].solution", taskSolution.getSolution())
+                .set("events.$.participantsInfos.$[i].tasksSolutions.$[j].testsInfos", taskSolution.getTestsInfos())
+                .set("events.$.participantsInfos.$[i].tasksSolutions.$[j].programmingLanguage",
+                        taskSolution.getProgrammingLanguage())
+                .filterArray(getCriteriaForFilterParticipantsInfosArrayByTasksSolution(taskSolution, "i"))
+                .filterArray(getCriteriaForFilterArrayById(taskSolution.getId(), "j"));
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private Criteria getCriteriaForFilterParticipantsInfosArrayByTasksSolution(TaskSolution taskSolution,
+                                                                               String iteratorName) {
+        return where(iteratorName + ".tasksSolutions").elemMatch(where("_id").is(taskSolution.getId()));
+    }
+
     private AggregationPipeline getTasksSolutionsByParticipantAndIdPipeline(User participant, ObjectId id) {
         AggregationPipeline pipeline = getUnwindEventsPipeline();
         addOperationsFromPipeline(getUnwindParticipantsInfosPipeline(), pipeline);
@@ -147,7 +179,11 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     }
 
     private MatchOperation getEntityByIdMatchOperation(ObjectId id) {
-        return match(where("_id").is(id));
+        return match(getByIdCriteria(id));
+    }
+
+    private Criteria getByIdCriteria(ObjectId id) {
+        return where("_id").is(id);
     }
 
     private AggregationPipeline getUnwindTasksSolutionsPipeline() {
@@ -168,7 +204,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     private Update getUpdateForSettingParticipantInfoFactEndDateTime(ParticipantInfo participantInfo) {
         return new Update()
                 .set("events.$.participantsInfos.$[i].factEndDateTime", participantInfo.getFactEndDateTime())
-                .filterArray(getCriteriaForFilterArrayById(participantInfo.getId()));
+                .filterArray(getCriteriaForFilterArrayById(participantInfo.getId(), "i"));
     }
 
     private AggregationPipeline getParticipantInfoByEventAndParticipantPipeline(Event event, User participant) {

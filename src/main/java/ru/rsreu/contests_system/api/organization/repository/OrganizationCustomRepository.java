@@ -32,4 +32,6 @@ public interface OrganizationCustomRepository {
     Optional<Event> findEventByTaskSolutionId(ObjectId taskSolutionId);
 
     Optional<TaskSolution> findParticipantTaskSolutionById(User participant, ObjectId taskSolutionId);
+
+    void setTaskSolutionCheckingInfo(TaskSolution taskSolution);
 }

@@ -11,6 +11,8 @@ public class TestInfo {
 
     private String executionOutput;
 
+    private boolean isTestPassed;
+
     private long memoryKb;
 
     private long timeMs;

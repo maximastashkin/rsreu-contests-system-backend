@@ -8,16 +8,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponseMapper;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.task_checking.TaskCheckingRequest;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.TaskSolutionService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 @RestController
@@ -48,10 +46,19 @@ public class TaskSolutionResource {
                     content = @Content)
     })
     public ResponseEntity<PerformedTaskSolutionInfoResponse> getStartedTaskInfo(
-            @AuthenticationPrincipal Authentication authentication, @RequestParam @NotBlank String id) {
+            Authentication authentication, @RequestParam @NotBlank String id) {
         return new ResponseEntity<>(
                 performedTaskSolutionInfoResponseMapper.toResponse(
                         taskSolutionService.getTaskSolutionByAuthenticationAndId(authentication, id)),
                 HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/check", consumes = "application/json")
+    public ResponseEntity<?> checkTask(
+            Authentication authentication,
+            @RequestParam @NotBlank String id,
+            @RequestBody @Valid TaskCheckingRequest taskCheckingRequest) {
+        taskSolutionService.checkTask(authentication, id, taskCheckingRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
