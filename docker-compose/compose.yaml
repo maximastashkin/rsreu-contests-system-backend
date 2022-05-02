@@ -1,20 +1,9 @@
 version: '3.9'
 
 services:
-  mongo:
-    container_name: rcs-db
-    build: ./
-    restart: always
-    ports:
-      - "8891:27017"
-    command: ["--keyFile", "file.key", "--replSet", "rs0"]
-    volumes:
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - ./users-init.js:/docker-entrypoint-initdb.d/users-init.js:ro
   rcs-rest-service:
     container_name: rcs-rest-service
     build: ./../
-    image: rcs-rest-serive:latest
     ports:
       - "8080:8091"
     restart: always
@@ -37,3 +26,13 @@ services:
       - EXEC_SERVICE_API_KEY=${EXEC_SERVICE_API_KEY}
       - EXEC_SERVICE_EXEC_ROUTE=${EXEC_SERVICE_EXEC_ROUTE}
       - EXEC_SERVICE_ALIVE_ROUTE=${EXEC_SERVICE_ALIVE_ROUTE}
+  mongo:
+    container_name: rcs-db
+    build: ./
+    restart: always
+    ports:
+      - "8891:27017"
+    command: ["--keyFile", "file.key", "--replSet", "rs0"]
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./users-init.js:/docker-entrypoint-initdb.d/users-init.js:ro
