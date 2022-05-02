@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.response;
+package ru.rsreu.contests_system.config.serialization;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

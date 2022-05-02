@@ -11,9 +11,9 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.ProgrammingLanguage;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TestInfo;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.exception.RustCodeExecutorServiceNonAvailableException;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.exception.TaskSolutionExceptionMessageUtil;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.exception.TaskSolutionForParticipantNotFoundException;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.RustCodeExecutorServiceNonAvailableException;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.TaskSolutionExceptionMessageUtil;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.TaskSolutionForParticipantNotFoundException;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.task_checking.TaskCheckingRequest;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.CodeExecutorServiceProvider;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.response.ExecutionResponse;
@@ -80,14 +80,29 @@ public class TaskSolutionService {
                 organizationRepository.setTaskSolutionCheckingResultInfo(taskSolution);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new RustCodeExecutorServiceNonAvailableException("Now code executor service is not available");
+            throwRustCodeExecutorServiceNonAvailableException();
+        }
+    }
+
+    private void throwRustCodeExecutorServiceNonAvailableException() {
+        throw new RustCodeExecutorServiceNonAvailableException(
+                taskSolutionExceptionMessageUtil.formRustCodeExecutorServiceNonAvailableException());
+    }
+
+    public void checkServiceAlive() {
+        try {
+            codeExecutorServiceProvider.checkServiceAlive();
+        } catch (InterruptedException | ExecutionException e) {
+            throwRustCodeExecutorServiceNonAvailableException();
         }
     }
 
     private void setTaskSolutionInfoAfterChecking(TaskSolution taskSolution, ExecutionResponse executionResponse) {
-        taskSolution.setExecutionStatus(executionResponse.getStatus());
-        taskSolution.setErrorOutput(executionResponse.getErrorOutput());
-        copyExecutionResponseTestToTaskSolutionTests(taskSolution, executionResponse);
+        if (executionResponse.getStatus() != ExecutionStatus.ALREADY_TEST) {
+            taskSolution.setExecutionStatus(executionResponse.getStatus());
+            taskSolution.setErrorOutput(executionResponse.getErrorOutput());
+            copyExecutionResponseTestToTaskSolutionTests(taskSolution, executionResponse);
+        }
     }
 
     private void copyExecutionResponseTestToTaskSolutionTests(TaskSolution taskSolution,

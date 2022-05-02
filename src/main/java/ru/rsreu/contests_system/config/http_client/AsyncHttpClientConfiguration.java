@@ -20,21 +20,32 @@ public class AsyncHttpClientConfiguration {
     @Value("${code_executor_service.execute_route}")
     private String codeExecutorServiceExecuteRoute;
 
+    @Value("${code_executor_service.alive_route}")
+    private String codeExecutorAliveRoute;
+
     @Value("${code_executor_service.api_key}")
     private String codeExecutorServiceApiKey;
 
-    @Bean
+    @Bean("executorRequestBuilder")
     public BoundRequestBuilder executorRequestBuilder() {
         AsyncHttpClient client = Dsl.asyncHttpClient();
         return client
-                .prepareGet(formRequestUrl())
+                .prepareGet(formRequestUrl(codeExecutorServiceExecuteRoute))
                 .addHeader("Content-Type", "application/json")
                 .addHeader("x-api-key", codeExecutorServiceApiKey);
     }
 
+    @Bean("aliveRequestBuilder")
+    public BoundRequestBuilder aliveRequestBuilder() {
+        AsyncHttpClient client = Dsl.asyncHttpClient();
+        return client
+                .prepareGet(formRequestUrl(codeExecutorAliveRoute))
+                .addHeader("x-api-key", codeExecutorServiceApiKey);
+    }
+
     @SuppressWarnings("HttpUrlsUsage")
-    private String formRequestUrl() {
-        return String.format("http://%s:%s%s",
-                codeExecutorServiceHost, codeExecutorServicePort, codeExecutorServiceExecuteRoute);
+    private String formRequestUrl(String route) {
+        return String.format("http://%s:%s/api%s",
+                codeExecutorServiceHost, codeExecutorServicePort, route);
     }
 }

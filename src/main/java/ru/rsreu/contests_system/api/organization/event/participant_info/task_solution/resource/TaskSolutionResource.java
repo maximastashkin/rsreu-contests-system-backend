@@ -41,9 +41,9 @@ public class TaskSolutionResource {
                     description = "${api.orgs.events.tasks.performed.response-codes.not-acceptable}",
                     content = @Content),
             @ApiResponse(responseCode = "409",
-                    description = "${api.orgs.events.tasks.performed.response-code.conflict}",
+                    description = "${api.orgs.events.tasks.performed.response-codes.conflict}",
                     content = @Content),
-            @ApiResponse(responseCode = "410", description = "${api.orgs.events.tasks.performed.response-code.gone}",
+            @ApiResponse(responseCode = "410", description = "${api.orgs.events.tasks.performed.response-codes.gone}",
                     content = @Content)
     })
     public ResponseEntity<PerformedTaskSolutionInfoResponse> getStartedTaskInfo(
@@ -54,13 +54,34 @@ public class TaskSolutionResource {
                 HttpStatus.OK);
     }
 
+    @Operation(summary = "${api.orgs.events.tasks.check.operation}")
     @PostMapping(value = "/check", consumes = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.tasks.check.response-codes.ok}",
+                    content = @Content),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.orgs.events.tasks.check.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "${api.orgs.events.tasks.check.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406",
+                    description = "${api.orgs.events.tasks.check.response-codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.tasks.check.response-codes.conflict}",
+                    content = @Content),
+            @ApiResponse(responseCode = "410", description = "${api.orgs.events.tasks.check.response-codes.gone}",
+                    content = @Content),
+            @ApiResponse(responseCode = "503",
+                    description = "${api.orgs.events.tasks.check.response-codes.service-unavailable}",
+                    content = @Content)
+    })
     public ResponseEntity<?> checkTask(
             Authentication authentication,
             @RequestParam @NotBlank String id,
             @RequestBody @Valid TaskCheckingRequest taskCheckingRequest) {
         TaskSolution taskSolution = taskSolutionService
                 .prepareTaskSolutionForChecking(authentication, id, taskCheckingRequest);
+        taskSolutionService.checkServiceAlive();
         taskSolutionService.asyncPerformCheckingTaskSolution(taskSolution);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -1,43 +1,38 @@
 package ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.BoundRequestBuilder;
 import org.asynchttpclient.ListenableFuture;
 import org.asynchttpclient.Response;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.ExecutionStatus;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.ProgrammingLanguage;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.request.ExecutionRequest;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.response.ExecutionResponse;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.response.ExecutionStatusDeserializer;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.request.ProgrammingLanguageSerializer;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 
+@SuppressWarnings("ClassCanBeRecord")
 @Service
-@RequiredArgsConstructor
 @Data
 public class CodeExecutorServiceProvider {
     private final BoundRequestBuilder executeRequestBuilder;
-    private final ProgrammingLanguageSerializer programmingLanguageSerializer;
-    private final ExecutionStatusDeserializer executionStatusDeserializer;
 
-    private Gson gson;
+    private final BoundRequestBuilder aliveRequestBuilder;
 
-    @PostConstruct
-    public void initGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ProgrammingLanguage.class, programmingLanguageSerializer);
-        gsonBuilder.registerTypeAdapter(ExecutionStatus.class, executionStatusDeserializer);
-        gson = gsonBuilder.create();
+    private final Gson gson;
+
+    public CodeExecutorServiceProvider(@Qualifier("executorRequestBuilder") BoundRequestBuilder executeRequestBuilder,
+                                       @Qualifier("aliveRequestBuilder") BoundRequestBuilder aliveRequestBuilder,
+                                       Gson gson) {
+        this.executeRequestBuilder = executeRequestBuilder;
+        this.aliveRequestBuilder = aliveRequestBuilder;
+        this.gson = gson;
     }
 
     @Async
@@ -46,10 +41,19 @@ public class CodeExecutorServiceProvider {
         ListenableFuture<ExecutionResponse> whenResponse = executeRequestBuilder.setBody(gson.toJson(executionRequest))
                 .execute(new AsyncCompletionHandler<>() {
                     @Override
-                    public ExecutionResponse onCompleted(Response response) {
+                    public ExecutionResponse onCompleted(Response response) throws InterruptedException {
+                        if (response.getStatusCode() != 200) {
+                            throw new InterruptedException();
+                        }
                         return gson.fromJson(response.getResponseBody(), ExecutionResponse.class);
                     }
                 });
         return whenResponse.toCompletableFuture();
+    }
+
+    public void checkServiceAlive() throws InterruptedException, ExecutionException {
+        if (aliveRequestBuilder.execute().get().getStatusCode() != 200) {
+            throw new InterruptedException();
+        }
     }
 }
