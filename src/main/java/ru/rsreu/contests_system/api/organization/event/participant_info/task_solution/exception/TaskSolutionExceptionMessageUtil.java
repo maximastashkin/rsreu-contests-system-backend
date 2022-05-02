@@ -9,4 +9,8 @@ public class TaskSolutionExceptionMessageUtil {
         return String.format("Participant with email:%s  is not related to TaskSolution with id:%s",
                 participant.getEmail(), taskSolutionId);
     }
+
+    public String formRustCodeExecutorServiceNonAvailableException() {
+        return "Now code executor service is not available";
+    }
 }

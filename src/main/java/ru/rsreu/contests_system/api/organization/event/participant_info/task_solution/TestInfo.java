@@ -11,6 +11,8 @@ public class TestInfo {
 
     private String executionOutput;
 
+    private boolean isTestPassed;
+
     private long memoryKb;
 
     private long timeMs;
@@ -18,5 +20,14 @@ public class TestInfo {
     @Builder.Default
     private ExecutionStatus executionStatus = ExecutionStatus.NO_SOLUTION;
 
-    private String log;
+    private String errorOutput;
+
+    public void setOnCheckingStatus() {
+        executionOutput = "";
+        isTestPassed = false;
+        memoryKb = 0;
+        timeMs = 0;
+        executionStatus = ExecutionStatus.ON_CHECKING;
+        errorOutput = "";
+    }
 }

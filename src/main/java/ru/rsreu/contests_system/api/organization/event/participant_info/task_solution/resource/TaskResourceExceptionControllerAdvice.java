@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.RustCodeExecutorServiceNonAvailableException;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.TaskSolutionForParticipantNotFoundException;
 
 @RestControllerAdvice
@@ -14,5 +15,12 @@ public class TaskResourceExceptionControllerAdvice {
     public ResponseEntity<?> handleTaskSolutionForParticipantNotFoundException(
             TaskSolutionForParticipantNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(value = RustCodeExecutorServiceNonAvailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ResponseEntity<?> handleRustCodeExecutorServiceNonAvailableException(
+            RustCodeExecutorServiceNonAvailableException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 }

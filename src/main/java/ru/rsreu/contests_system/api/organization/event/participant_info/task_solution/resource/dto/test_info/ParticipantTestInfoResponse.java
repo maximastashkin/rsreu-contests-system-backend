@@ -2,5 +2,10 @@ package ru.rsreu.contests_system.api.organization.event.participant_info.task_so
 
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.ExecutionStatus;
 
-public record ParticipantTestInfoResponse(String input, String output, ExecutionStatus executionStatus) {
+public record ParticipantTestInfoResponse(
+        String input,
+        String output,
+        ExecutionStatus executionStatus,
+        String errorOutput,
+        boolean isTestPassed) {
 }

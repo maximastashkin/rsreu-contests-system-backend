@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import ru.rsreu.contests_system.api.task.Task;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,11 +27,13 @@ public class TaskSolution {
     @Builder.Default
     private ExecutionStatus executionStatus = ExecutionStatus.NO_SOLUTION;
 
+    private String errorOutput;
+
     @Builder.Default
-    private Set<TestInfo> testsInfos = new HashSet<>();
+    private List<TestInfo> testsInfos = new ArrayList<>();
 
     public static TaskSolution getTaskSolutionByTask(Task task) {
-        Set<TestInfo> testInfos = new HashSet<>();
+        List<TestInfo> testInfos = new ArrayList<>();
         task.getTests().forEach(test-> testInfos.add(
                 TestInfo.builder().taskTest(test).build()));
         return builder().task(task).testsInfos(testInfos).build();

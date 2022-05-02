@@ -6,8 +6,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "tasks")
 @Data
@@ -23,5 +23,5 @@ public class Task {
     private long timeLimitMs;
 
     @Builder.Default
-    private Set<TaskTest> tests = new HashSet<>();
+    private List<TaskTest> tests = new ArrayList<>();
 }
