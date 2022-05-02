@@ -1,6 +1,31 @@
-version: '3.1'
+version: '3.9'
 
 services:
+  rcs-rest-service:
+    container_name: rcs-rest-service
+    build: ./../
+    ports:
+      - "8080:8091"
+    restart: always
+    depends_on:
+      - mongo
+    environment:
+      - HOST=${HOST}
+      - PORT=${PORT}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASS=${MONGO_PASS}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+      - API_KEY=${API_KEY}
+      - CORS_FRONT_URL=${CORS_FRONT_URL}
+      - EXEC_SERVICE_HOST=${EXEC_SERVICE_HOST}
+      - EXEC_SERVICE_PORT=${EXEC_SERVICE_PORT}
+      - EXEC_SERVICE_API_KEY=${EXEC_SERVICE_API_KEY}
+      - EXEC_SERVICE_EXEC_ROUTE=${EXEC_SERVICE_EXEC_ROUTE}
+      - EXEC_SERVICE_ALIVE_ROUTE=${EXEC_SERVICE_ALIVE_ROUTE}
   mongo:
     container_name: rcs-db
     build: ./
@@ -11,14 +36,3 @@ services:
     volumes:
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./users-init.js:/docker-entrypoint-initdb.d/users-init.js:ro
-  rest-service:
-    container_name: rest-service
-    build: ./../
-    ports:
-      - "8080:8091"
-    restart: always
-    depends_on:
-      - mongo
-    environment:
-      - MONGO_PORT=${MONGO_PORT}
-      - MONGO_HOST=${MONGO_HOST}

@@ -79,9 +79,9 @@ public class TaskSolutionResource {
             Authentication authentication,
             @RequestParam @NotBlank String id,
             @RequestBody @Valid TaskCheckingRequest taskCheckingRequest) {
+        taskSolutionService.checkServiceAlive();
         TaskSolution taskSolution = taskSolutionService
                 .prepareTaskSolutionForChecking(authentication, id, taskCheckingRequest);
-        taskSolutionService.checkServiceAlive();
         taskSolutionService.asyncPerformCheckingTaskSolution(taskSolution);
         return new ResponseEntity<>(HttpStatus.OK);
     }
