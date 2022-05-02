@@ -10,6 +10,7 @@ public class ParticipantTestInfoResponseMapper {
                 testInfo.getTaskTest().getInput(),
                 testInfo.getTaskTest().getOutput(),
                 testInfo.getExecutionStatus(),
+                testInfo.getErrorOutput(),
                 testInfo.isTestPassed());
     }
 }

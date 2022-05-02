@@ -146,6 +146,15 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
         );
     }
 
+    @Override
+    public void setTaskSolutionCheckingResultInfo(TaskSolution taskSolution) {
+        mongoTemplate.updateFirst(
+                getOrganizationByTaskSolutionQuery(taskSolution),
+                getUpdateForSettingTaskSolutionCheckingResultInfo(taskSolution),
+                Organization.class
+        );
+    }
+
     private Query getOrganizationByTaskSolutionQuery(TaskSolution taskSolution) {
         return Query.query(where("events.participantsInfos.tasksSolutions").elemMatch(
                 getByIdCriteria(taskSolution.getId())));
@@ -167,6 +176,16 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     private Criteria getCriteriaForFilterParticipantsInfosArrayByTasksSolution(TaskSolution taskSolution,
                                                                                String iteratorName) {
         return where(iteratorName + ".tasksSolutions").elemMatch(where("_id").is(taskSolution.getId()));
+    }
+
+    private Update getUpdateForSettingTaskSolutionCheckingResultInfo(TaskSolution taskSolution) {
+        return new Update()
+                .set("events.$.participantsInfos.$[i].tasksSolutions.$[j].executionStatus",
+                        taskSolution.getExecutionStatus())
+                .set("events.$.participantsInfos.$[i].tasksSolutions.$[j].errorOutput", taskSolution.getErrorOutput())
+                .set("events.$.participantsInfos.$[i].tasksSolutions.$[j].testsInfos", taskSolution.getTestsInfos())
+                .filterArray(getCriteriaForFilterParticipantsInfosArrayByTasksSolution(taskSolution, "i"))
+                .filterArray(getCriteriaForFilterArrayById(taskSolution.getId(), "j"));
     }
 
     private AggregationPipeline getTasksSolutionsByParticipantAndIdPipeline(User participant, ObjectId id) {

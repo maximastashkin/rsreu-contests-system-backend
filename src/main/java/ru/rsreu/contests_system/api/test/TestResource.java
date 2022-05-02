@@ -17,6 +17,7 @@ import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -73,7 +74,7 @@ public class TestResource {
         if (taskService.getAll().isEmpty()) {
             Task task = Task.builder()
                     .text("На вход даются 2 числа a и b. Необходимо вывести сумму этих чисел")
-                    .tests(new HashSet<>() {
+                    .tests(new ArrayList<>() {
                         {
                             addAll(List.of(
                                     TaskTest.builder()
@@ -85,6 +86,12 @@ public class TestResource {
                                     TaskTest.builder()
                                             .input("5 6")
                                             .output("11")
+                                            .isPublic(true)
+                                            .weight(10)
+                                            .build(),
+                                    TaskTest.builder()
+                                            .input("-5 5")
+                                            .output("0")
                                             .isPublic(true)
                                             .weight(10)
                                             .build(),

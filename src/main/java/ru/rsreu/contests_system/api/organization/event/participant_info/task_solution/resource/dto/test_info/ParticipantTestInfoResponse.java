@@ -6,5 +6,6 @@ public record ParticipantTestInfoResponse(
         String input,
         String output,
         ExecutionStatus executionStatus,
+        String errorOutput,
         boolean isTestPassed) {
 }

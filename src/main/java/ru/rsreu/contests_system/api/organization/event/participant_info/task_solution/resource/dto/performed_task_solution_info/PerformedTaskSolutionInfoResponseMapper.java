@@ -15,6 +15,7 @@ public record PerformedTaskSolutionInfoResponseMapper(
                 taskSolution.getSolution(),
                 taskSolution.getProgrammingLanguage(),
                 taskSolution.getExecutionStatus(),
+                taskSolution.getErrorOutput(),
                 taskSolution.getTestsInfos().stream().filter(
                                 testInfo -> testInfo.getTaskTest().isPublic())
                         .map(participantTestInfoResponseMapper::toResponse).toList()

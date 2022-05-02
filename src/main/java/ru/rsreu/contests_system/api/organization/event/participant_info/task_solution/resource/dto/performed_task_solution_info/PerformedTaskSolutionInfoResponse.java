@@ -13,5 +13,6 @@ public record PerformedTaskSolutionInfoResponse(
         String solutionText,
         ProgrammingLanguage language,
         ExecutionStatus executionStatus,
+        String errorOutput,
         List<ParticipantTestInfoResponse> publicTests) {
 }

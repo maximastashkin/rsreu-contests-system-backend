@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponseMapper;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.task_checking.TaskCheckingRequest;
@@ -58,7 +59,9 @@ public class TaskSolutionResource {
             Authentication authentication,
             @RequestParam @NotBlank String id,
             @RequestBody @Valid TaskCheckingRequest taskCheckingRequest) {
-        taskSolutionService.checkTask(authentication, id, taskCheckingRequest);
+        TaskSolution taskSolution = taskSolutionService
+                .prepareTaskSolutionForChecking(authentication, id, taskCheckingRequest);
+        taskSolutionService.asyncPerformCheckingTaskSolution(taskSolution);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

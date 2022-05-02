@@ -25,7 +25,7 @@ public enum ExecutionStatus {
         Arrays.stream(ExecutionStatus.values()).forEach(elem -> map.put(elem.rustAnalogue, elem));
     }
 
-    public static ExecutionStatus getByRustAnalogue(String rustAnalogue) {
+    public static ExecutionStatus fromRustAnalogue(String rustAnalogue) {
         return map.get(rustAnalogue);
     }
 
