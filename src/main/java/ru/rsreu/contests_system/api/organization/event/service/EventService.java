@@ -14,6 +14,7 @@ import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
 import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +28,14 @@ public record EventService(
         EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
         EventDateUtil eventDateUtil,
         EventCompletingTasksHolder tasksHolder) {
+
+    @PostConstruct
+    public void initAllNotCompletedParticipantsInfosTasks() {
+        organizationRepository.findAllNotCompletedParticipantsInfos().forEach(
+                participantInfo ->
+                        tasksHolder.addTask(new CompleteEventRunnableTask(this, participantInfo)));
+    }
+
     public List<Event> getAllActualEvents(int pageSize, int pageNumber) {
         return organizationRepository.findAllActualEvents(PageRequest.of(pageNumber, pageSize));
     }

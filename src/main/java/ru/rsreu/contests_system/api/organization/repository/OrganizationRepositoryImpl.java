@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.aggregation.BooleanOperators.And;
+import org.springframework.data.mongodb.core.aggregation.BooleanOperators.Not;
 import org.springframework.data.mongodb.core.aggregation.BooleanOperators.Or;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -153,6 +154,33 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
                 getUpdateForSettingTaskSolutionCheckingResultInfo(taskSolution),
                 Organization.class
         );
+    }
+
+    @Override
+    public List<ParticipantInfo> findAllNotCompletedParticipantsInfos() {
+        AggregationPipeline pipeline = getUnwindEventsPipeline();
+        addOperationsFromPipeline(
+                getBaseParticipantInfoAggregationPipelineWithFilter(getFilterForAllNotCompletedParticipantsInfos()),
+                pipeline);
+        return getParticipantsInfosByAggregation(newAggregation(pipeline.getOperations()));
+    }
+
+    private AggregationPipeline getBaseParticipantInfoAggregationPipelineWithFilter(ArrayOperators.Filter filter) {
+        AggregationPipeline pipeline = new AggregationPipeline()
+                .add(project().and(filter).as("participantsInfos"));
+        addOperationsFromPipeline(getUnwindParticipantsInfosPipeline(), pipeline);
+        return pipeline;
+    }
+
+    private ArrayOperators.Filter getFilterForAllNotCompletedParticipantsInfos() {
+        return filter("participantsInfos")
+                .as("info")
+                .by(getNotOperationForFilterCondForFieldExistChecking("info.factEndDateTime"));
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private Not getNotOperationForFilterCondForFieldExistChecking(String field) {
+        return Not.not(field);
     }
 
     private Query getOrganizationByTaskSolutionQuery(TaskSolution taskSolution) {
