@@ -21,13 +21,17 @@ public class MongoDbConfiguration {
     @Bean
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new LocalDateTimeToDateConverter(dateZoneOffset()));
-        converters.add(new DateToLocalDateTimeConverter(dateZoneOffset()));
+        converters.add(new LocalDateTimeToDateConverter(ZoneOffset()));
+        converters.add(new DateToLocalDateTimeConverter(ZoneOffset()));
         return new MongoCustomConversions(converters);
     }
 
-    @Bean
-    public ZoneOffset dateZoneOffset() {
+    private ZoneOffset ZoneOffset() {
         return ZoneOffset.UTC;
+    }
+
+    @Bean
+    public ZoneOffset moscowZoneOffset() {
+        return ZoneOffset.ofHours(3);
     }
 }

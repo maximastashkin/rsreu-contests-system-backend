@@ -14,6 +14,7 @@ import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
 import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,15 @@ public record EventService(
         UserService userService,
         AuthenticationUserDetailMapper authenticationUserDetailMapper,
         EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
-        EventDateUtil eventDateUtil) {
+        EventDateUtil eventDateUtil,
+        EventCompletingTasksHolder tasksHolder) {
+
+    @PostConstruct
+    public void initAllNotCompletedParticipantsInfosTasks() {
+        organizationRepository.findAllNotCompletedParticipantsInfos().forEach(
+                participantInfo ->
+                        tasksHolder.addTask(new CompleteEventRunnableTask(this, participantInfo)));
+    }
 
     public List<Event> getAllActualEvents(int pageSize, int pageNumber) {
         return organizationRepository.findAllActualEvents(PageRequest.of(pageNumber, pageSize));
@@ -144,6 +153,7 @@ public record EventService(
         participantInfo.setStartDateTime(LocalDateTime.now());
         participantInfo.setMaxEndDateTime(eventDateUtil.calculateMaxEndDateTime(
                 participantInfo.getStartDateTime(), event.getEndDateTime(), event.getTimeLimit()));
+        tasksHolder.addTask(new CompleteEventRunnableTask(this, participantInfo));
         organizationRepository.addStartingInfoToParticipantInfo(participantInfo);
     }
 
@@ -158,7 +168,7 @@ public record EventService(
     }
 
     private void performCompletingEvent(Event event, User participant) {
-        checkNonActual(event); //TODO Probably this checking doesn't need, because future events system will solve this problem
+        checkNonActual(event);
         checkNonStartedByParticipant(event, participant);
         checkCompletedByParticipant(event, participant);
         ParticipantInfo participantInfo = getParticipantInfoByEventAndParticipant(event, participant);
@@ -181,8 +191,9 @@ public record EventService(
         }
     }
 
-    private void performAddingCompletingDateToParticipantInfo(ParticipantInfo participantInfo,
-                                                              LocalDateTime factEndDateTime) {
+    void performAddingCompletingDateToParticipantInfo(ParticipantInfo participantInfo,
+                                                      LocalDateTime factEndDateTime) {
+        tasksHolder.cancelTaskByParticipantInfo(participantInfo);
         participantInfo.setFactEndDateTime(factEndDateTime);
         organizationRepository.addFactEndDateTimeToParticipantInfo(participantInfo);
     }

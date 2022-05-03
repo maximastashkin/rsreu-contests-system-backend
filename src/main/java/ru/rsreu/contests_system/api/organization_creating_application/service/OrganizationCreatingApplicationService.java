@@ -22,6 +22,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("ClassCanBeRecord")
 @AllArgsConstructor
 @Service
 public class OrganizationCreatingApplicationService {

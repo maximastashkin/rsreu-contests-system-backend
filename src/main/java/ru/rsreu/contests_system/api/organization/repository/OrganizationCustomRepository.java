@@ -36,4 +36,6 @@ public interface OrganizationCustomRepository {
     void setTaskSolutionCheckingInfo(TaskSolution taskSolution);
 
     void setTaskSolutionCheckingResultInfo(TaskSolution taskSolution);
+
+    List<ParticipantInfo> findAllNotCompletedParticipantsInfos();
 }
