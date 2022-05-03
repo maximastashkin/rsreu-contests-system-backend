@@ -12,6 +12,7 @@ import ru.rsreu.contests_system.api.user.User;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -46,5 +47,18 @@ public class ParticipantInfo {
 
     public static ParticipantInfo getTaskSolutionForDeletingByParticipant(User participant) {
         return builder().id(null).participant(participant).tasksSolutions(null).build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ParticipantInfo that = (ParticipantInfo) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
