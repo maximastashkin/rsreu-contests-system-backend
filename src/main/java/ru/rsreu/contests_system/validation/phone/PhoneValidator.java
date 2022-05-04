@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 public class PhoneValidator implements ConstraintValidator<Phone, String> {
-    @Value("${validation.phone.regex.regexp}")
+    @Value("${validation.phone.regexp}")
     private String regex;
     private Pattern pattern;
 
@@ -16,7 +16,6 @@ public class PhoneValidator implements ConstraintValidator<Phone, String> {
     private void initPattern() {
         pattern = Pattern.compile(regex);
     }
-
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {

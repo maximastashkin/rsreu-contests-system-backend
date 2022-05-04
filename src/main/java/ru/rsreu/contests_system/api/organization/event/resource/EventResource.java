@@ -19,9 +19,9 @@ import ru.rsreu.contests_system.api.organization.event.resource.dto.started_even
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
 import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticationProvider;
 import ru.rsreu.contests_system.api.user.User;
+import ru.rsreu.contests_system.validation.object_id.ObjectId;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,7 +117,7 @@ public class EventResource {
             @ApiResponse(responseCode = "410", description = "${api.orgs.events.follow.response-codes.gone}",
                     content = @Content)
     })
-    public ResponseEntity<?> followToEvent(Authentication authentication, @RequestParam @NotBlank String id) {
+    public ResponseEntity<?> followToEvent(Authentication authentication, @RequestParam @ObjectId String id) {
         eventService.followToEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -136,7 +136,7 @@ public class EventResource {
             @ApiResponse(responseCode = "410", description = "${api.orgs.events.unfollow.response-codes.gone}",
                     content = @Content)
     })
-    public ResponseEntity<?> unfollowFromEvent(Authentication authentication, @RequestParam @NotBlank String id) {
+    public ResponseEntity<?> unfollowFromEvent(Authentication authentication, @RequestParam @ObjectId String id) {
         eventService.unfollowFromEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -161,7 +161,7 @@ public class EventResource {
                     content = @Content)
     })
     public ResponseEntity<StartedEventInfoResponse> getStartedEventInfo(
-            Authentication authentication, @RequestParam @NotBlank String id) {
+            Authentication authentication, @RequestParam @ObjectId String id) {
         Event event = eventService.getEventById(id);
         return new ResponseEntity<>(startedEventInfoMapper.toResponse(
                 event, eventService.getParticipantInfoByEventAndAuthentication(event, authentication)), HttpStatus.OK);
@@ -186,7 +186,7 @@ public class EventResource {
                     description = "${api.orgs.events.start.response-codes.internal-server-error}",
                     content = @Content)
     })
-    public ResponseEntity<?> startEvent(Authentication authentication, @RequestParam @NotBlank String id) {
+    public ResponseEntity<?> startEvent(Authentication authentication, @RequestParam @ObjectId String id) {
         eventService.startEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -211,7 +211,7 @@ public class EventResource {
                     description = "${api.orgs.events.complete.response-codes.internal-server-error}",
                     content = @Content)
     })
-    public ResponseEntity<?> completeEvent(Authentication authentication, @RequestParam @NotBlank String id) {
+    public ResponseEntity<?> completeEvent(Authentication authentication, @RequestParam @ObjectId String id) {
         eventService.completeEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

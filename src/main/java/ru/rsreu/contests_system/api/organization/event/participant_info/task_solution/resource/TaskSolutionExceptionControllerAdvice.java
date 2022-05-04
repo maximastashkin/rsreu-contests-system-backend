@@ -9,7 +9,7 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.TaskSolutionForParticipantNotFoundException;
 
 @RestControllerAdvice
-public class TaskResourceExceptionControllerAdvice {
+public class TaskSolutionExceptionControllerAdvice {
     @ExceptionHandler(value = TaskSolutionForParticipantNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public ResponseEntity<?> handleTaskSolutionForParticipantNotFoundException(

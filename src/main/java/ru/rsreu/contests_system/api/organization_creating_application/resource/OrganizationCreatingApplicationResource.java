@@ -23,6 +23,7 @@ import ru.rsreu.contests_system.api.organization_creating_application.resource.d
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.check_phone.CheckOrganizationPhoneUniqueResponse;
 import ru.rsreu.contests_system.api.organization_creating_application.resource.dto.not_unique_info.NotUniqueOrganizationInfoResponse;
 import ru.rsreu.contests_system.api.organization_creating_application.service.OrganizationCreatingApplicationService;
+import ru.rsreu.contests_system.validation.object_id.ObjectId;
 import ru.rsreu.contests_system.validation.phone.Phone;
 
 import javax.validation.Valid;
@@ -58,7 +59,7 @@ public class OrganizationCreatingApplicationResource {
             @ApiResponse(responseCode = "404", description = "${api.application.approve.response-codes.not-found}",
                     content = @Content)
     })
-    public ResponseEntity<?> approveOrganizationCreatingApplication(@RequestParam @NotBlank String id) {
+    public ResponseEntity<?> approveOrganizationCreatingApplication(@RequestParam @ObjectId String id) {
         //TODO EMAIL Sending
         organizationCreatingApplicationService.approveOrganizationCreatingApplication(id);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -74,7 +75,7 @@ public class OrganizationCreatingApplicationResource {
             @ApiResponse(responseCode = "404", description = "${api.application.decline.response-codes.not-found}",
                     content = @Content),
     })
-    public ResponseEntity<?> declineOrganizationCreatingApplication(@RequestParam @NotBlank String id) {
+    public ResponseEntity<?> declineOrganizationCreatingApplication(@RequestParam @ObjectId String id) {
         //TODO EMAIL Sending
         organizationCreatingApplicationService.declineOrganizationCreatingApplication(id);
         return new ResponseEntity<>(HttpStatus.OK);
