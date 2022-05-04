@@ -3,7 +3,6 @@ package ru.rsreu.contests_system.api.organization.event.participant_info;
 import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import ru.rsreu.contests_system.api.organization.event.participant_info.appeal.Appeal;
@@ -23,7 +22,6 @@ public class ParticipantInfo {
     private ObjectId id = new ObjectId();
 
     @DBRef
-    @Indexed(unique = true)
     private User participant;
 
     private Appeal appeal;

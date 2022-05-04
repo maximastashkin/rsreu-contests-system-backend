@@ -1,11 +1,16 @@
 package ru.rsreu.contests_system.security.user;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PasswordGenerator {
+    @Value("${security.password_generation.regexp}")
+    private String passwordGenerationRegex;
+
     public String generatePassword() {
-        return new RgxGen("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$").generate().substring(0, 7);
+        RgxGen rgxGen = new RgxGen(passwordGenerationRegex);
+        return rgxGen.generate().substring(0, 17);
     }
 }

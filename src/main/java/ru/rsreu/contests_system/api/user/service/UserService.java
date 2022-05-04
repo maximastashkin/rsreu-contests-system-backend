@@ -18,9 +18,9 @@ import java.util.NoSuchElementException;
 public record UserService(
         UserRepository userRepository,
         AuthenticationUserDetailMapper authenticationUserDetailMapper) {
-    public void save(User user) {
+    public User save(User user) {
         try {
-            userRepository.save(user);
+            return userRepository.save(user);
         } catch (RuntimeException exception) {
             throw new NotUniqueEmailException(String.format("Email:%s not unique!", user.getEmail()));
         }

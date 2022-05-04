@@ -14,6 +14,7 @@ public class OrganizationCreatingApplication {
     @MongoId
     private ObjectId id;
 
+    @Indexed(unique = true)
     private String name;
 
     @Indexed(unique = true)

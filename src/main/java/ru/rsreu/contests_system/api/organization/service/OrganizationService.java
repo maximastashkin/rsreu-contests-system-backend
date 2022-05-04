@@ -28,6 +28,9 @@ public record OrganizationService(
 
     private EnumSet<NotUniqueOrganizationInfo> getNotUniqueOrganizationInfo(Organization organization) {
         EnumSet<NotUniqueOrganizationInfo> info = EnumSet.noneOf(NotUniqueOrganizationInfo.class);
+        if (!isNameUnique(organization.getName())) {
+            info.add(NotUniqueOrganizationInfo.ORG_NAME);
+        }
         if (!isEmailUnique(organization.getOrganizationEmail())) {
             info.add(NotUniqueOrganizationInfo.ORG_EMAIL);
         }
@@ -35,6 +38,10 @@ public record OrganizationService(
             info.add(NotUniqueOrganizationInfo.ORG_PHONE);
         }
         return info;
+    }
+
+    public boolean isNameUnique(String name) {
+        return organizationRepository.findByName(name).isEmpty();
     }
 
     public boolean isEmailUnique(String email) {
