@@ -28,7 +28,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/confirm/**",
             "/**/orgs",
             "/**/orgs/all/*/*",
-            "/**/orgs/test/",
             "/**/events/all-actual/*/*",
             "/**/test/**"
     };

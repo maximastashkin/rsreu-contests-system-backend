@@ -15,9 +15,9 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponseMapper;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.task_checking.TaskCheckingRequest;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.TaskSolutionService;
+import ru.rsreu.contests_system.validation.object_id.ObjectId;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 @RestController
 @Validated
@@ -47,7 +47,7 @@ public class TaskSolutionResource {
                     content = @Content)
     })
     public ResponseEntity<PerformedTaskSolutionInfoResponse> getStartedTaskInfo(
-            Authentication authentication, @RequestParam @NotBlank String id) {
+            Authentication authentication, @RequestParam @ObjectId String id) {
         return new ResponseEntity<>(
                 performedTaskSolutionInfoResponseMapper.toResponse(
                         taskSolutionService.getTaskSolutionByAuthenticationAndId(authentication, id)),
@@ -77,7 +77,7 @@ public class TaskSolutionResource {
     })
     public ResponseEntity<?> checkTask(
             Authentication authentication,
-            @RequestParam @NotBlank String id,
+            @RequestParam @ObjectId String id,
             @RequestBody @Valid TaskCheckingRequest taskCheckingRequest) {
         taskSolutionService.checkServiceAlive();
         TaskSolution taskSolution = taskSolutionService

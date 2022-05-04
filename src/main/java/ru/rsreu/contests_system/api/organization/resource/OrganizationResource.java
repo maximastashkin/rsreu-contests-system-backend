@@ -18,9 +18,9 @@ import ru.rsreu.contests_system.api.organization.resource.dto.organizations_info
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticationProvider;
 import ru.rsreu.contests_system.api.user.User;
+import ru.rsreu.contests_system.validation.object_id.ObjectId;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +45,7 @@ public class OrganizationResource {
                     content = @Content)
     })
     public ResponseEntity<OrganizationInfoResponse> getOrganization(Authentication authentication,
-                                                                    @RequestParam @NotBlank String id) {
+                                                                    @RequestParam @ObjectId String id) {
         Optional<User> candidateForMapping =
                 userCandidateByAuthenticationProvider.getCandidateForMapping(authentication);
         return new ResponseEntity<>(
