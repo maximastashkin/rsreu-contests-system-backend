@@ -9,6 +9,8 @@ import ru.rsreu.contests_system.api.organization.Organization;
 import java.util.Optional;
 
 public interface OrganizationRepository extends MongoRepository<Organization, ObjectId>, OrganizationCustomRepository {
+    Optional<Organization> findByName(String name);
+
     Optional<Organization> findByOrganizationEmail(String organizationEmail);
 
     Optional<Organization> findByOrganizationPhone(String organizationPhone);

@@ -38,8 +38,8 @@ public class OrganizationCreatingApplicationService {
         User leader = mapApplicationToUser(application);
         String password = passwordGenerator.generatePassword(); // TODO EMAIL sending
         leader.setPassword(passwordEncoder.encode(password));
-        userService.save(leader);
-        organizationService.save(mapApplicationToOrganization(application));
+        leader = userService.save(leader);
+        organizationService.save(mapApplicationToOrganization(application, leader));
         organizationCreatingApplicationRepository.delete(application);
     }
 
@@ -67,25 +67,31 @@ public class OrganizationCreatingApplicationService {
                 .build();
     }
 
-    private Organization mapApplicationToOrganization(OrganizationCreatingApplication application) {
+    private Organization mapApplicationToOrganization(OrganizationCreatingApplication application, User leader) {
         return Organization.builder()
                 .name(application.getName())
                 .organizationEmail(application.getOrganizationEmail())
                 .organizationPhone(application.getOrganizationPhone())
+                .organizationLeader(leader)
                 .build();
     }
 
-    public boolean isUniqueOrganizationEmail(String email) {
+    public boolean isNameUnique(String name) {
+        return organizationCreatingApplicationRepository.findByName(name).isEmpty() &&
+                organizationService.isNameUnique(name);
+    }
+
+    public boolean isOrganizationEmailUnique(String email) {
         return organizationCreatingApplicationRepository.findByOrganizationEmail(email).isEmpty()
                 && organizationService.isEmailUnique(email);
     }
 
-    public boolean isUniqueOrganizationPhone(String phone) {
+    public boolean isOrganizationPhoneUnique(String phone) {
         return organizationCreatingApplicationRepository.findByOrganizationPhone(phone).isEmpty()
                 && organizationService.isPhoneUnique(phone);
     }
 
-    public boolean isUniqueOrganizationLeaderEmail(String email) {
+    public boolean isOrganizationLeaderEmailUnique(String email) {
         return organizationCreatingApplicationRepository.findByLeaderEmail(email).isEmpty()
                 && userService.isEmailUnique(email);
     }
@@ -100,13 +106,16 @@ public class OrganizationCreatingApplicationService {
 
     private EnumSet<NotUniqueOrganizationInfo> getNotUniqueOrganizationInfo(OrganizationCreatingApplication application) {
         EnumSet<NotUniqueOrganizationInfo> info = EnumSet.noneOf(NotUniqueOrganizationInfo.class);
-        if (!isUniqueOrganizationEmail(application.getOrganizationEmail())) {
+        if (!isNameUnique(application.getName())) {
+            info.add(NotUniqueOrganizationInfo.ORG_NAME);
+        }
+        if (!isOrganizationEmailUnique(application.getOrganizationEmail())) {
             info.add(NotUniqueOrganizationInfo.ORG_EMAIL);
         }
-        if (!isUniqueOrganizationPhone(application.getOrganizationPhone())) {
+        if (!isOrganizationPhoneUnique(application.getOrganizationPhone())) {
             info.add(NotUniqueOrganizationInfo.ORG_PHONE);
         }
-        if (!isUniqueOrganizationLeaderEmail(application.getLeaderEmail())) {
+        if (!isOrganizationLeaderEmailUnique(application.getLeaderEmail())) {
             info.add(NotUniqueOrganizationInfo.LEADER_EMAIL);
         }
         return info;

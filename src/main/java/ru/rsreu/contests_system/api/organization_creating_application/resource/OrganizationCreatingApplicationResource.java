@@ -127,7 +127,7 @@ public class OrganizationCreatingApplicationResource {
             @RequestParam @NotBlank @Email String email) {
         return new ResponseEntity<>(
                 checkOrganizationEmailUniqueMapper.toResponse(
-                        organizationCreatingApplicationService.isUniqueOrganizationEmail(email)),
+                        organizationCreatingApplicationService.isOrganizationEmailUnique(email)),
                 HttpStatus.OK);
     }
 
@@ -144,7 +144,7 @@ public class OrganizationCreatingApplicationResource {
             @RequestParam @NotBlank @Phone String phone) {
         return new ResponseEntity<>(
                 checkOrganizationPhoneUniqueMapper.toResponse(
-                        organizationCreatingApplicationService.isUniqueOrganizationPhone(phone)),
+                        organizationCreatingApplicationService.isOrganizationPhoneUnique(phone)),
                 HttpStatus.OK
         );
     }
@@ -162,7 +162,7 @@ public class OrganizationCreatingApplicationResource {
             @RequestParam @NotBlank @Email String email) {
         return new ResponseEntity<>(
                 checkLeaderEmailUniqueMapper.toResponse(
-                        organizationCreatingApplicationService.isUniqueOrganizationLeaderEmail(email)),
+                        organizationCreatingApplicationService.isOrganizationLeaderEmailUnique(email)),
                 HttpStatus.OK
         );
     }

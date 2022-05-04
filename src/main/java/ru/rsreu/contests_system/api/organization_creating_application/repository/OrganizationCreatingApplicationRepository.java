@@ -13,6 +13,8 @@ public interface OrganizationCreatingApplicationRepository
 
     Optional<OrganizationCreatingApplication> findById(ObjectId id);
 
+    Optional<OrganizationCreatingApplication> findByName(String name);
+
     Optional<OrganizationCreatingApplication> findByOrganizationEmail(String organizationEmail);
 
     Optional<OrganizationCreatingApplication> findByOrganizationPhone(String phone);
