@@ -34,8 +34,13 @@ public class TaskSolution {
 
     public static TaskSolution getTaskSolutionByTask(Task task) {
         List<TestInfo> testInfos = new ArrayList<>();
-        task.getTests().forEach(test-> testInfos.add(
+        task.getTests().forEach(test -> testInfos.add(
                 TestInfo.builder().taskTest(test).build()));
         return builder().task(task).testsInfos(testInfos).build();
+    }
+
+    public int calculateScore() {
+        return testsInfos.stream().mapToInt(
+                testInfo -> testInfo.isTestPassed() ? testInfo.getTaskTest().getWeight() : 0).sum();
     }
 }

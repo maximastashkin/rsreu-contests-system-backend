@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
-import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_event_info.ParticipantEventInfoMapper;
-import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_event_info.ParticipantEventInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_completed_event_info.ParticipantCompletedEventInfoMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_completed_event_info.ParticipantCompletedEventInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_started_event_info.ParticipantStartedEventInfoMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_started_event_info.ParticipantStartedEventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
 import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticationProvider;
 import ru.rsreu.contests_system.api.user.User;
@@ -32,8 +34,9 @@ import java.util.Optional;
 public class EventResource {
     private final EventService eventService;
     private final EventInfoMapper eventInfoMapper;
-    private final ParticipantEventInfoMapper participantEventInfoMapper;
+    private final ParticipantStartedEventInfoMapper participantStartedEventInfoMapper;
     private final UserCandidateByAuthenticationProvider userCandidateByAuthenticationProvider;
+    private final ParticipantCompletedEventInfoMapper participantCompletedEventInfoMapper;
 
     @Operation(summary = "${api.orgs.events.all-actual.operation}")
     @GetMapping(value = "/all-actual/{pageSize}/{pageNumber}", produces = "application/json")
@@ -160,10 +163,10 @@ public class EventResource {
                     description = "${api.orgs.events.start-info.response-codes.internal-server-error}",
                     content = @Content)
     })
-    public ResponseEntity<ParticipantEventInfoResponse> getStartedEventInfo(
+    public ResponseEntity<ParticipantStartedEventInfoResponse> getStartedEventInfo(
             Authentication authentication, @RequestParam @ObjectId String id) {
         Event event = eventService.getEventById(id);
-        return new ResponseEntity<>(participantEventInfoMapper.toResponse(
+        return new ResponseEntity<>(participantStartedEventInfoMapper.toResponse(
                 event, eventService.getStartedParticipantInfoByEventAndAuthentication(event, authentication)),
                 HttpStatus.OK);
     }
@@ -218,7 +221,7 @@ public class EventResource {
     }
 
     @Operation(summary = "${api.orgs.events.completed-info.operation}")
-    @GetMapping("/complete")
+    @GetMapping(value = "/complete", produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.orgs.events.completed-info.responses.codes.ok}"),
             @ApiResponse(responseCode = "400",
@@ -234,11 +237,12 @@ public class EventResource {
                     description = "${api.orgs.events.completed-info.responses.codes.conflict}",
                     content = @Content)
     })
-    public ResponseEntity<ParticipantEventInfoResponse> getCompletedEventInfo(Authentication authentication,
-                                                                              @RequestParam @ObjectId String id) {
+    public ResponseEntity<ParticipantCompletedEventInfoResponse> getCompletedEventInfo(
+            Authentication authentication,
+            @RequestParam @ObjectId String id) {
         Event event = eventService.getEventById(id);
         return new ResponseEntity<>(
-                participantEventInfoMapper
+                participantCompletedEventInfoMapper
                         .toResponse(event,
                                 eventService
                                         .getCompletedParticipantInfoByEventAndAuthentication(event, authentication)),

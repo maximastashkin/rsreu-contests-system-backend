@@ -89,7 +89,22 @@ public class TaskSolutionResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping(value = "/completed")
+    @Operation(summary = "${api.orgs.events.tasks.completed.operation}")
+    @GetMapping(value = "/completed", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.tasks.completed.response-codes.ok}"),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.orgs.events.tasks.completed.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "${api.orgs.events.tasks.completed.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406",
+                    description = "${api.orgs.events.tasks.completed.response-codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.tasks.completed.response-codes.conflict}",
+                    content = @Content)
+    })
     public ResponseEntity<CompletedTaskSolutionInfoResponse> getCompletedTaskInfo(Authentication authentication,
                                                                                   @RequestParam @ObjectId String id) {
         return new ResponseEntity<>(

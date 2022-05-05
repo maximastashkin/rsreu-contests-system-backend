@@ -41,6 +41,7 @@ public class TaskSolutionService {
     private Integer codeExecutorServiceTimeout;
 
     public TaskSolution getPerformingTaskSolutionByAuthenticationAndId(Authentication authentication, String id) {
+        //TODO Maybe some refactoring those two methods
         User participant = userService.getUserByAuthentication(authentication);
         Event event = eventService.getEventByTaskSolutionId(id);
         eventService.checkParticipantPerformingEventCondition(participant, event);
@@ -134,6 +135,7 @@ public class TaskSolutionService {
     }
 
     public TaskSolution getCompletedTaskSolutionByAuthenticationAndId(Authentication authentication, String id) {
+        //TODO Maybe some refactoring those two methods
         User participant = userService.getUserByAuthentication(authentication);
         Event event = eventService.getEventByTaskSolutionId(id);
         eventService.checkCompletedByParticipantAndFinishedEventCondition(event, participant);

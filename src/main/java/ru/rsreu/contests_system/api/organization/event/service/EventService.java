@@ -131,10 +131,9 @@ public record EventService(
 
     public ParticipantInfo getStartedParticipantInfoByEventAndAuthentication(
             Event event, Authentication authentication) {
+        //TODO Maybe some refactoring those two methods
         User participant = userService.getUserByAuthentication(authentication);
-        checkNonActual(event);
-        checkNonStartedByParticipant(event, participant);
-        checkCompletedByParticipant(event, participant);
+        checkParticipantPerformingEventCondition(participant, event);
         return getParticipantInfoByEventAndParticipant(event, participant);
     }
 
@@ -226,6 +225,7 @@ public record EventService(
 
     public ParticipantInfo getCompletedParticipantInfoByEventAndAuthentication(Event event,
                                                                                Authentication authentication) {
+        //TODO Maybe some refactoring those two methods
         User participant = userService.getUserByAuthentication(authentication);
         checkCompletedByParticipantAndFinishedEventCondition(event, participant);
         return getParticipantInfoByEventAndParticipant(event, participant);
