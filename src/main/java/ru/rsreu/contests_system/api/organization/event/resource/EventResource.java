@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
-import ru.rsreu.contests_system.api.organization.event.resource.dto.started_event_info.StartedEventInfoMapper;
-import ru.rsreu.contests_system.api.organization.event.resource.dto.started_event_info.StartedEventInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_event_info.ParticipantEventInfoMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_event_info.ParticipantEventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
 import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticationProvider;
 import ru.rsreu.contests_system.api.user.User;
@@ -32,7 +32,7 @@ import java.util.Optional;
 public class EventResource {
     private final EventService eventService;
     private final EventInfoMapper eventInfoMapper;
-    private final StartedEventInfoMapper startedEventInfoMapper;
+    private final ParticipantEventInfoMapper participantEventInfoMapper;
     private final UserCandidateByAuthenticationProvider userCandidateByAuthenticationProvider;
 
     @Operation(summary = "${api.orgs.events.all-actual.operation}")
@@ -160,11 +160,12 @@ public class EventResource {
                     description = "${api.orgs.events.start-info.response-codes.internal-server-error}",
                     content = @Content)
     })
-    public ResponseEntity<StartedEventInfoResponse> getStartedEventInfo(
+    public ResponseEntity<ParticipantEventInfoResponse> getStartedEventInfo(
             Authentication authentication, @RequestParam @ObjectId String id) {
         Event event = eventService.getEventById(id);
-        return new ResponseEntity<>(startedEventInfoMapper.toResponse(
-                event, eventService.getParticipantInfoByEventAndAuthentication(event, authentication)), HttpStatus.OK);
+        return new ResponseEntity<>(participantEventInfoMapper.toResponse(
+                event, eventService.getStartedParticipantInfoByEventAndAuthentication(event, authentication)),
+                HttpStatus.OK);
     }
 
     @Operation(summary = "${api.orgs.events.start.operation}")
@@ -214,5 +215,33 @@ public class EventResource {
     public ResponseEntity<?> completeEvent(Authentication authentication, @RequestParam @ObjectId String id) {
         eventService.completeEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.completed-info.operation}")
+    @GetMapping("/complete")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.completed-info.responses.codes.ok}"),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.orgs.events.completed-info.responses.codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "${api.orgs.events.completed-info.responses.codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406",
+                    description = "${api.orgs.events.completed-info.responses.codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409",
+                    description = "${api.orgs.events.completed-info.responses.codes.conflict}",
+                    content = @Content)
+    })
+    public ResponseEntity<ParticipantEventInfoResponse> getCompletedEventInfo(Authentication authentication,
+                                                                              @RequestParam @ObjectId String id) {
+        Event event = eventService.getEventById(id);
+        return new ResponseEntity<>(
+                participantEventInfoMapper
+                        .toResponse(event,
+                                eventService
+                                        .getCompletedParticipantInfoByEventAndAuthentication(event, authentication)),
+                HttpStatus.OK);
     }
 }

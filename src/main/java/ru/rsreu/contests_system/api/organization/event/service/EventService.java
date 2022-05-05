@@ -12,7 +12,6 @@ import ru.rsreu.contests_system.api.organization.repository.OrganizationReposito
 import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
-import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 public record EventService(
         OrganizationRepository organizationRepository,
         UserService userService,
-        AuthenticationUserDetailMapper authenticationUserDetailMapper,
         EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
         EventDateUtil eventDateUtil,
         EventCompletingTasksHolder tasksHolder) {
@@ -87,6 +85,13 @@ public record EventService(
         }
     }
 
+    private void checkFinished(Event event) {
+        if (event.isActual()) {
+            throw new ActionWithNonFinishedEventException(eventExceptionsMessagesUtil()
+                    .formActionWithNonFinishedEventException(event));
+        }
+    }
+
     public Event getEventById(String eventObjectId) {
         return organizationRepository.findEventById(new ObjectId(eventObjectId)).orElseThrow(
                 () -> new EventNotFoundException(
@@ -124,7 +129,8 @@ public record EventService(
         performAddingStartingInfoToParticipantInfo(getParticipantInfoByEventAndParticipant(event, participant), event);
     }
 
-    public ParticipantInfo getParticipantInfoByEventAndAuthentication(Event event, Authentication authentication) {
+    public ParticipantInfo getStartedParticipantInfoByEventAndAuthentication(
+            Event event, Authentication authentication) {
         User participant = userService.getUserByAuthentication(authentication);
         checkNonActual(event);
         checkNonStartedByParticipant(event, participant);
@@ -143,7 +149,7 @@ public record EventService(
     private void checkNonStarted(Event event) {
         if (!event.isStarted()) {
             throw new ActionWithNonStartedEventException(
-                    eventExceptionsMessagesUtil.formActionWithNonStartedEventException(event.getId()));
+                    eventExceptionsMessagesUtil.formActionWithNonStartedEventException(event));
         }
     }
 
@@ -191,6 +197,14 @@ public record EventService(
         }
     }
 
+    private void checkNonCompletedByParticipant(Event event, User participant) {
+        if (!event.isParticipantCompletedEvent(participant)) {
+            throw new ActionWithNonCompletedByParticipantEventException(
+                    eventExceptionsMessagesUtil()
+                            .formActionWithNonCompletedByParticipantEventException(event, participant));
+        }
+    }
+
     void performAddingCompletingDateToParticipantInfo(ParticipantInfo participantInfo,
                                                       LocalDateTime factEndDateTime) {
         tasksHolder.cancelTaskByParticipantInfo(participantInfo);
@@ -208,5 +222,17 @@ public record EventService(
         return organizationRepository.findEventByTaskSolutionId(new ObjectId(taskSolutionId))
                 .orElseThrow(() -> new EventNotFoundException(
                         eventExceptionsMessagesUtil.formEventNotFoundExceptionMessageByTaskSolutionId(taskSolutionId)));
+    }
+
+    public ParticipantInfo getCompletedParticipantInfoByEventAndAuthentication(Event event,
+                                                                               Authentication authentication) {
+        User participant = userService.getUserByAuthentication(authentication);
+        checkCompletedByParticipantAndFinishedEventCondition(event, participant);
+        return getParticipantInfoByEventAndParticipant(event, participant);
+    }
+
+    public void checkCompletedByParticipantAndFinishedEventCondition(Event event, User participant) {
+        checkNonCompletedByParticipant(event, participant);
+        checkFinished(event);
     }
 }

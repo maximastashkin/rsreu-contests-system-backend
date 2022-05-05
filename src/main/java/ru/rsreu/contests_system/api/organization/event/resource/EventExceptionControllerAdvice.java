@@ -52,4 +52,17 @@ public class EventExceptionControllerAdvice {
             (ActionWithCompletedEventException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(ActionWithNonCompletedByParticipantEventException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ResponseEntity<?> handleActionWithNonCompletedByParticipantEventException(
+            ActionWithNonCompletedByParticipantEventException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(ActionWithNonFinishedEventException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<?> handleActionWithNonFinishedEventException(ActionWithNonFinishedEventException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
 }
