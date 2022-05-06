@@ -59,4 +59,8 @@ public class ParticipantInfo {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public int calculateScore() {
+        return tasksSolutions.stream().mapToInt(TaskSolution::calculateScore).sum();
+    }
 }

@@ -24,4 +24,8 @@ public class Task {
 
     @Builder.Default
     private List<TaskTest> tests = new ArrayList<>();
+
+    public int calculateMaxScore() {
+        return tests.stream().mapToInt(TaskTest::getWeight).sum();
+    }
 }

@@ -86,4 +86,8 @@ public class Event {
     public boolean isStarted() {
         return LocalDateTime.now().isAfter(startDateTime);
     }
+
+    public int calculateMaxScore() {
+        return tasks.stream().mapToInt(Task::calculateMaxScore).sum();
+    }
 }

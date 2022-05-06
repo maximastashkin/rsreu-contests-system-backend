@@ -40,7 +40,8 @@ public class TaskSolutionService {
     @Value("${code_executor_service.seconds_timeout}")
     private Integer codeExecutorServiceTimeout;
 
-    public TaskSolution getTaskSolutionByAuthenticationAndId(Authentication authentication, String id) {
+    public TaskSolution getPerformingTaskSolutionByAuthenticationAndId(Authentication authentication, String id) {
+        //TODO Maybe some refactoring those two methods
         User participant = userService.getUserByAuthentication(authentication);
         Event event = eventService.getEventByTaskSolutionId(id);
         eventService.checkParticipantPerformingEventCondition(participant, event);
@@ -56,7 +57,7 @@ public class TaskSolutionService {
 
     public TaskSolution prepareTaskSolutionForChecking(Authentication authentication, String id,
                                                        TaskCheckingRequest request) {
-        TaskSolution taskSolution = getTaskSolutionByAuthenticationAndId(authentication, id);
+        TaskSolution taskSolution = getPerformingTaskSolutionByAuthenticationAndId(authentication, id);
         setTaskSolutionCheckingInfoFromRequest(request, taskSolution);
         organizationRepository.setTaskSolutionCheckingInfo(taskSolution);
         return taskSolution;
@@ -131,5 +132,13 @@ public class TaskSolutionService {
             return executionOutput.substring(0, executionOutput.length() - 1);
         }
         return executionOutput;
+    }
+
+    public TaskSolution getCompletedTaskSolutionByAuthenticationAndId(Authentication authentication, String id) {
+        //TODO Maybe some refactoring those two methods
+        User participant = userService.getUserByAuthentication(authentication);
+        Event event = eventService.getEventByTaskSolutionId(id);
+        eventService.checkCompletedByParticipantAndFinishedEventCondition(event, participant);
+        return getTaskSolutionByIdAndParticipant(id, participant);
     }
 }

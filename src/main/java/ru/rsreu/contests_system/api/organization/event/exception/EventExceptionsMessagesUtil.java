@@ -1,6 +1,5 @@
 package ru.rsreu.contests_system.api.organization.event.exception;
 
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.user.User;
@@ -22,8 +21,8 @@ public class EventExceptionsMessagesUtil {
                 participant.getEmail());
     }
 
-    public String formActionWithNonStartedEventException(ObjectId eventObjectId) {
-        return String.format("Event with id:%s non started yet. Following have done", eventObjectId.toString());
+    public String formActionWithNonStartedEventException(Event event) {
+        return String.format("Event with id:%s non started yet. Following have done", event.getId().toString());
     }
 
     public String formActionWithNonStartedByParticipantEventExceptionMessage(Event event, User participant) {
@@ -37,11 +36,20 @@ public class EventExceptionsMessagesUtil {
     }
 
     public String formEventNotFoundExceptionMessageById(String eventObjectId) {
-        return String.format("Event with id:%s didn't found", eventObjectId);
+        return String.format("Event with id:%s didn't find", eventObjectId);
     }
 
     public String formEventNotFoundExceptionMessageByTaskSolutionId(String taskSolutionId) {
         return String.format("Event with TaskSolution with id:%s didn't found. In fact that TaskSolution doesn't exist",
                 taskSolutionId);
+    }
+
+    public String formActionWithNonFinishedEventException(Event event) {
+        return String.format("Event with id:%s haven't finished yet", event.getId().toString());
+    }
+
+    public String formActionWithNonCompletedByParticipantEventException(Event event, User participant) {
+        return String.format("User with email:%s hasn't completed event with id:%s",
+                participant.getEmail(), event.getId().toString());
     }
 }

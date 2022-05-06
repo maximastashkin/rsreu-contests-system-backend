@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
-import ru.rsreu.contests_system.api.organization.event.resource.dto.started_event_info.StartedEventInfoMapper;
-import ru.rsreu.contests_system.api.organization.event.resource.dto.started_event_info.StartedEventInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_completed_event_info.ParticipantCompletedEventInfoMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_completed_event_info.ParticipantCompletedEventInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_started_event_info.ParticipantStartedEventInfoMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_started_event_info.ParticipantStartedEventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantCompletingEventConditionChecker;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantPerformingEventConditionChecker;
 import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticationProvider;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.validation.object_id.ObjectId;
@@ -32,8 +36,11 @@ import java.util.Optional;
 public class EventResource {
     private final EventService eventService;
     private final EventInfoMapper eventInfoMapper;
-    private final StartedEventInfoMapper startedEventInfoMapper;
+    private final ParticipantStartedEventInfoMapper participantStartedEventInfoMapper;
     private final UserCandidateByAuthenticationProvider userCandidateByAuthenticationProvider;
+    private final ParticipantCompletedEventInfoMapper participantCompletedEventInfoMapper;
+    private final ParticipantPerformingEventConditionChecker performingEventConditionChecker;
+    private final ParticipantCompletingEventConditionChecker participantCompletingEventConditionChecker;
 
     @Operation(summary = "${api.orgs.events.all-actual.operation}")
     @GetMapping(value = "/all-actual/{pageSize}/{pageNumber}", produces = "application/json")
@@ -160,11 +167,13 @@ public class EventResource {
                     description = "${api.orgs.events.start-info.response-codes.internal-server-error}",
                     content = @Content)
     })
-    public ResponseEntity<StartedEventInfoResponse> getStartedEventInfo(
+    public ResponseEntity<ParticipantStartedEventInfoResponse> getStartedEventInfo(
             Authentication authentication, @RequestParam @ObjectId String id) {
         Event event = eventService.getEventById(id);
-        return new ResponseEntity<>(startedEventInfoMapper.toResponse(
-                event, eventService.getParticipantInfoByEventAndAuthentication(event, authentication)), HttpStatus.OK);
+        return new ResponseEntity<>(participantStartedEventInfoMapper.toResponse(
+                event, eventService
+                        .getParticipantInfoByConditionChecking(event, performingEventConditionChecker, authentication)),
+                HttpStatus.OK);
     }
 
     @Operation(summary = "${api.orgs.events.start.operation}")
@@ -214,5 +223,36 @@ public class EventResource {
     public ResponseEntity<?> completeEvent(Authentication authentication, @RequestParam @ObjectId String id) {
         eventService.completeEvent(authentication, id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.completed-info.operation}")
+    @GetMapping(value = "/complete", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.completed-info.responses.codes.ok}"),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.orgs.events.completed-info.responses.codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "${api.orgs.events.completed-info.responses.codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406",
+                    description = "${api.orgs.events.completed-info.responses.codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409",
+                    description = "${api.orgs.events.completed-info.responses.codes.conflict}",
+                    content = @Content)
+    })
+    public ResponseEntity<ParticipantCompletedEventInfoResponse> getCompletedEventInfo(
+            Authentication authentication,
+            @RequestParam @ObjectId String id) {
+        Event event = eventService.getEventById(id);
+        return new ResponseEntity<>(
+                participantCompletedEventInfoMapper
+                        .toResponse(event,
+                                eventService.getParticipantInfoByConditionChecking(
+                                        event,
+                                        participantCompletingEventConditionChecker,
+                                        authentication)),
+                HttpStatus.OK);
     }
 }

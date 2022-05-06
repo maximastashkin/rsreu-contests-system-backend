@@ -2,11 +2,11 @@ package ru.rsreu.contests_system.api.organization.event.participant_info.task_so
 
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.test_info.ParticipantTestInfoResponseMapper;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.test_info.ParticipantTestInfoMapper;
 
 @Component
-public record PerformedTaskSolutionInfoResponseMapper(
-        ParticipantTestInfoResponseMapper participantTestInfoResponseMapper) {
+public record PerformedTaskSolutionInfoMapper(
+        ParticipantTestInfoMapper participantTestInfoMapper) {
     public PerformedTaskSolutionInfoResponse toResponse(TaskSolution taskSolution) {
         return new PerformedTaskSolutionInfoResponse(
                 taskSolution.getTask().getText(),
@@ -18,7 +18,7 @@ public record PerformedTaskSolutionInfoResponseMapper(
                 taskSolution.getErrorOutput(),
                 taskSolution.getTestsInfos().stream().filter(
                                 testInfo -> testInfo.getTaskTest().isPublic())
-                        .map(participantTestInfoResponseMapper::toResponse).toList()
+                        .map(participantTestInfoMapper::toResponse).toList()
         );
     }
 }

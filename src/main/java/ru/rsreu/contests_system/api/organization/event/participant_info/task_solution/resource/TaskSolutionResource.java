@@ -11,8 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.completed_task_solution_info.CompletedTaskSolutionInfoMapper;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.completed_task_solution_info.CompletedTaskSolutionInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponse;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponseMapper;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.task_checking.TaskCheckingRequest;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.TaskSolutionService;
 import ru.rsreu.contests_system.validation.object_id.ObjectId;
@@ -25,7 +27,8 @@ import javax.validation.Valid;
 @AllArgsConstructor
 public class TaskSolutionResource {
     private final TaskSolutionService taskSolutionService;
-    private final PerformedTaskSolutionInfoResponseMapper performedTaskSolutionInfoResponseMapper;
+    private final PerformedTaskSolutionInfoMapper performedTaskSolutionInfoMapper;
+    private final CompletedTaskSolutionInfoMapper completedTaskSolutionInfoMapper;
 
     @Operation(summary = "${api.orgs.events.tasks.performed.operation}")
     @GetMapping(value = "/performed", produces = "application/json")
@@ -49,8 +52,8 @@ public class TaskSolutionResource {
     public ResponseEntity<PerformedTaskSolutionInfoResponse> getStartedTaskInfo(
             Authentication authentication, @RequestParam @ObjectId String id) {
         return new ResponseEntity<>(
-                performedTaskSolutionInfoResponseMapper.toResponse(
-                        taskSolutionService.getTaskSolutionByAuthenticationAndId(authentication, id)),
+                performedTaskSolutionInfoMapper.toResponse(
+                        taskSolutionService.getPerformingTaskSolutionByAuthenticationAndId(authentication, id)),
                 HttpStatus.OK);
     }
 
@@ -84,5 +87,31 @@ public class TaskSolutionResource {
                 .prepareTaskSolutionForChecking(authentication, id, taskCheckingRequest);
         taskSolutionService.asyncPerformCheckingTaskSolution(taskSolution);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.tasks.completed.operation}")
+    @GetMapping(value = "/completed", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.tasks.completed.response-codes.ok}"),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.orgs.events.tasks.completed.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "${api.orgs.events.tasks.completed.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406",
+                    description = "${api.orgs.events.tasks.completed.response-codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.tasks.completed.response-codes.conflict}",
+                    content = @Content)
+    })
+    public ResponseEntity<CompletedTaskSolutionInfoResponse> getCompletedTaskInfo(Authentication authentication,
+                                                                                  @RequestParam @ObjectId String id) {
+        return new ResponseEntity<>(
+                completedTaskSolutionInfoMapper
+                        .toResponse(
+                                taskSolutionService
+                                        .getCompletedTaskSolutionByAuthenticationAndId(authentication, id)),
+                HttpStatus.OK);
     }
 }
