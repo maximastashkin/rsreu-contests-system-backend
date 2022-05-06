@@ -19,6 +19,8 @@ import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_
 import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_started_event_info.ParticipantStartedEventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_started_event_info.ParticipantStartedEventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantCompletingEventConditionChecker;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantPerformingEventConditionChecker;
 import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticationProvider;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.validation.object_id.ObjectId;
@@ -37,6 +39,8 @@ public class EventResource {
     private final ParticipantStartedEventInfoMapper participantStartedEventInfoMapper;
     private final UserCandidateByAuthenticationProvider userCandidateByAuthenticationProvider;
     private final ParticipantCompletedEventInfoMapper participantCompletedEventInfoMapper;
+    private final ParticipantPerformingEventConditionChecker performingEventConditionChecker;
+    private final ParticipantCompletingEventConditionChecker participantCompletingEventConditionChecker;
 
     @Operation(summary = "${api.orgs.events.all-actual.operation}")
     @GetMapping(value = "/all-actual/{pageSize}/{pageNumber}", produces = "application/json")
@@ -167,7 +171,8 @@ public class EventResource {
             Authentication authentication, @RequestParam @ObjectId String id) {
         Event event = eventService.getEventById(id);
         return new ResponseEntity<>(participantStartedEventInfoMapper.toResponse(
-                event, eventService.getStartedParticipantInfoByEventAndAuthentication(event, authentication)),
+                event, eventService
+                        .getParticipantInfoByConditionChecking(event, performingEventConditionChecker, authentication)),
                 HttpStatus.OK);
     }
 
@@ -244,8 +249,10 @@ public class EventResource {
         return new ResponseEntity<>(
                 participantCompletedEventInfoMapper
                         .toResponse(event,
-                                eventService
-                                        .getCompletedParticipantInfoByEventAndAuthentication(event, authentication)),
+                                eventService.getParticipantInfoByConditionChecking(
+                                        event,
+                                        participantCompletingEventConditionChecker,
+                                        authentication)),
                 HttpStatus.OK);
     }
 }

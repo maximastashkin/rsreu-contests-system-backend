@@ -5,9 +5,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.event.Event;
-import ru.rsreu.contests_system.api.organization.event.exception.*;
+import ru.rsreu.contests_system.api.organization.event.exception.ActionWithNonStartedEventException;
+import ru.rsreu.contests_system.api.organization.event.exception.EventExceptionsMessagesUtil;
+import ru.rsreu.contests_system.api.organization.event.exception.EventNotFoundException;
+import ru.rsreu.contests_system.api.organization.event.exception.ParticipantInfoNotFoundException;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
+import ru.rsreu.contests_system.api.organization.event.service.checking.EventCheckerUtil;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantEventConditionChecker;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.user.User;
@@ -25,8 +30,8 @@ public record EventService(
         UserService userService,
         EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
         EventDateUtil eventDateUtil,
-        EventCompletingTasksHolder tasksHolder) {
-
+        EventCompletingTasksHolder tasksHolder,
+        EventCheckerUtil eventCheckerUtil) {
     @PostConstruct
     public void initAllNotCompletedParticipantsInfosTasks() {
         organizationRepository.findAllNotCompletedParticipantsInfos().forEach(
@@ -58,8 +63,8 @@ public record EventService(
     }
 
     private void performFollowingToEvent(Event event, User participant) {
-        checkNonActual(event);
-        checkStartedOrCompletedByParticipant(event, participant);
+        eventCheckerUtil.checkNonActual(event);
+        eventCheckerUtil.checkStartedOrCompletedByParticipant(event, participant);
         performAddingParticipantInfoToEvent(event, participant);
     }
 
@@ -68,27 +73,6 @@ public record EventService(
             organizationRepository.addParticipantInfoToEvent(
                     ParticipantInfo.builder()
                             .participant(participant).build(), event);
-        }
-    }
-
-    private void checkStartedOrCompletedByParticipant(Event event, User participant) {
-        if (event.isParticipantStartedEvent(participant) || event.isParticipantCompletedEvent(participant)) {
-            throw new UserFollowingException(
-                    eventExceptionsMessagesUtil.formUserFollowingExceptionMessage(participant));
-        }
-    }
-
-    private void checkNonActual(Event event) {
-        if (!event.isActual()) {
-            throw new ActionWithNonActualEventException(
-                    eventExceptionsMessagesUtil.formActionWithNonActualEventException(event));
-        }
-    }
-
-    private void checkFinished(Event event) {
-        if (event.isActual()) {
-            throw new ActionWithNonFinishedEventException(eventExceptionsMessagesUtil()
-                    .formActionWithNonFinishedEventException(event));
         }
     }
 
@@ -105,8 +89,8 @@ public record EventService(
     }
 
     private void performUnfollowingFromEvent(Event event, User participant) {
-        checkNonActual(event);
-        checkStartedOrCompletedByParticipant(event, participant);
+        eventCheckerUtil.checkNonActual(event);
+        eventCheckerUtil.checkStartedOrCompletedByParticipant(event, participant);
         performRemovingParticipantInfoFromEvent(event, participant);
     }
 
@@ -127,14 +111,6 @@ public record EventService(
     private void performStartingEvent(Event event, User participant) {
         checkNonStarted(event);
         performAddingStartingInfoToParticipantInfo(getParticipantInfoByEventAndParticipant(event, participant), event);
-    }
-
-    public ParticipantInfo getStartedParticipantInfoByEventAndAuthentication(
-            Event event, Authentication authentication) {
-        //TODO Maybe some refactoring those two methods
-        User participant = userService.getUserByAuthentication(authentication);
-        checkParticipantPerformingEventCondition(participant, event);
-        return getParticipantInfoByEventAndParticipant(event, participant);
     }
 
     private ParticipantInfo getParticipantInfoByEventAndParticipant(Event event, User participant) {
@@ -173,35 +149,12 @@ public record EventService(
     }
 
     private void performCompletingEvent(Event event, User participant) {
-        checkNonActual(event);
-        checkNonStartedByParticipant(event, participant);
-        checkCompletedByParticipant(event, participant);
+        eventCheckerUtil.checkNonActual(event);
+        eventCheckerUtil.checkNonStartedByParticipant(event, participant);
+        eventCheckerUtil.checkCompletedByParticipant(event, participant);
         ParticipantInfo participantInfo = getParticipantInfoByEventAndParticipant(event, participant);
         performAddingCompletingDateToParticipantInfo(participantInfo,
                 eventDateUtil.calculateFactEndDateTime(LocalDateTime.now(), participantInfo.getMaxEndDateTime()));
-    }
-
-    private void checkNonStartedByParticipant(Event event, User participant) {
-        if (!event.isParticipantStartedEvent(participant)) {
-            throw new ActionWithNonStartedByParticipantEventException(
-                    eventExceptionsMessagesUtil
-                            .formActionWithNonStartedByParticipantEventExceptionMessage(event, participant));
-        }
-    }
-
-    private void checkCompletedByParticipant(Event event, User participant) {
-        if (event.isParticipantCompletedEvent(participant)) {
-            throw new ActionWithCompletedEventException(
-                    eventExceptionsMessagesUtil.formActionWithCompletedEventExceptionMessage(event, participant));
-        }
-    }
-
-    private void checkNonCompletedByParticipant(Event event, User participant) {
-        if (!event.isParticipantCompletedEvent(participant)) {
-            throw new ActionWithNonCompletedByParticipantEventException(
-                    eventExceptionsMessagesUtil()
-                            .formActionWithNonCompletedByParticipantEventException(event, participant));
-        }
     }
 
     void performAddingCompletingDateToParticipantInfo(ParticipantInfo participantInfo,
@@ -212,9 +165,9 @@ public record EventService(
     }
 
     public void checkParticipantPerformingEventCondition(User participant, Event event) {
-        checkNonActual(event);
-        checkNonStartedByParticipant(event, participant);
-        checkCompletedByParticipant(event, participant);
+        eventCheckerUtil.checkNonActual(event);
+        eventCheckerUtil.checkNonStartedByParticipant(event, participant);
+        eventCheckerUtil.checkCompletedByParticipant(event, participant);
     }
 
     public Event getEventByTaskSolutionId(String taskSolutionId) {
@@ -223,16 +176,15 @@ public record EventService(
                         eventExceptionsMessagesUtil.formEventNotFoundExceptionMessageByTaskSolutionId(taskSolutionId)));
     }
 
-    public ParticipantInfo getCompletedParticipantInfoByEventAndAuthentication(Event event,
-                                                                               Authentication authentication) {
-        //TODO Maybe some refactoring those two methods
-        User participant = userService.getUserByAuthentication(authentication);
-        checkCompletedByParticipantAndFinishedEventCondition(event, participant);
-        return getParticipantInfoByEventAndParticipant(event, participant);
+    public void checkCompletedByParticipantAndFinishedEventCondition(Event event, User participant) {
+        eventCheckerUtil.checkNonCompletedByParticipant(event, participant);
+        eventCheckerUtil.checkFinished(event);
     }
 
-    public void checkCompletedByParticipantAndFinishedEventCondition(Event event, User participant) {
-        checkNonCompletedByParticipant(event, participant);
-        checkFinished(event);
+    public ParticipantInfo getParticipantInfoByConditionChecking(
+            Event event, ParticipantEventConditionChecker checker, Authentication authentication) {
+        User participant = userService.getUserByAuthentication(authentication);
+        checker.checkEventForCondition(event, participant);
+        return getParticipantInfoByEventAndParticipant(event, participant);
     }
 }
