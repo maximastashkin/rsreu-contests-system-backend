@@ -17,6 +17,8 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.task_checking.TaskCheckingRequest;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.TaskSolutionService;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantCompletingEventConditionChecker;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantPerformingEventConditionChecker;
 import ru.rsreu.contests_system.validation.object_id.ObjectId;
 
 import javax.validation.Valid;
@@ -29,6 +31,8 @@ public class TaskSolutionResource {
     private final TaskSolutionService taskSolutionService;
     private final PerformedTaskSolutionInfoMapper performedTaskSolutionInfoMapper;
     private final CompletedTaskSolutionInfoMapper completedTaskSolutionInfoMapper;
+    private final ParticipantPerformingEventConditionChecker performingEventConditionChecker;
+    private final ParticipantCompletingEventConditionChecker completingEventConditionChecker;
 
     @Operation(summary = "${api.orgs.events.tasks.performed.operation}")
     @GetMapping(value = "/performed", produces = "application/json")
@@ -53,7 +57,8 @@ public class TaskSolutionResource {
             Authentication authentication, @RequestParam @ObjectId String id) {
         return new ResponseEntity<>(
                 performedTaskSolutionInfoMapper.toResponse(
-                        taskSolutionService.getPerformingTaskSolutionByAuthenticationAndId(authentication, id)),
+                        taskSolutionService.getTaskSolutionByConditionChecking(
+                                authentication, performingEventConditionChecker, id)),
                 HttpStatus.OK);
     }
 
@@ -110,8 +115,8 @@ public class TaskSolutionResource {
         return new ResponseEntity<>(
                 completedTaskSolutionInfoMapper
                         .toResponse(
-                                taskSolutionService
-                                        .getCompletedTaskSolutionByAuthenticationAndId(authentication, id)),
+                                taskSolutionService.getTaskSolutionByConditionChecking(
+                                        authentication, completingEventConditionChecker, id)),
                 HttpStatus.OK);
     }
 }

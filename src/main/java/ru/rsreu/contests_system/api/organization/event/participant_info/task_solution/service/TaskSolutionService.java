@@ -19,6 +19,8 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.response.ExecutionResponse;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.response.ExecutionTest;
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantEventConditionChecker;
+import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantPerformingEventConditionChecker;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
@@ -36,17 +38,10 @@ public class TaskSolutionService {
     private final OrganizationRepository organizationRepository;
     private final TaskSolutionExceptionMessageUtil taskSolutionExceptionMessageUtil;
     private final CodeExecutorServiceProvider codeExecutorServiceProvider;
+    private final ParticipantPerformingEventConditionChecker performingEventConditionChecker;
 
     @Value("${code_executor_service.seconds_timeout}")
     private Integer codeExecutorServiceTimeout;
-
-    public TaskSolution getPerformingTaskSolutionByAuthenticationAndId(Authentication authentication, String id) {
-        //TODO Maybe some refactoring those two methods
-        User participant = userService.getUserByAuthentication(authentication);
-        Event event = eventService.getEventByTaskSolutionId(id);
-        eventService.checkParticipantPerformingEventCondition(participant, event);
-        return getTaskSolutionByIdAndParticipant(id, participant);
-    }
 
     private TaskSolution getTaskSolutionByIdAndParticipant(String id, User participant) {
         return organizationRepository.findParticipantTaskSolutionById(participant, new ObjectId(id)).orElseThrow(
@@ -57,7 +52,8 @@ public class TaskSolutionService {
 
     public TaskSolution prepareTaskSolutionForChecking(Authentication authentication, String id,
                                                        TaskCheckingRequest request) {
-        TaskSolution taskSolution = getPerformingTaskSolutionByAuthenticationAndId(authentication, id);
+        TaskSolution taskSolution = getTaskSolutionByConditionChecking(
+                authentication, performingEventConditionChecker, id);
         setTaskSolutionCheckingInfoFromRequest(request, taskSolution);
         organizationRepository.setTaskSolutionCheckingInfo(taskSolution);
         return taskSolution;
@@ -134,11 +130,11 @@ public class TaskSolutionService {
         return executionOutput;
     }
 
-    public TaskSolution getCompletedTaskSolutionByAuthenticationAndId(Authentication authentication, String id) {
-        //TODO Maybe some refactoring those two methods
+    public TaskSolution getTaskSolutionByConditionChecking(
+            Authentication authentication, ParticipantEventConditionChecker checker, String id) {
         User participant = userService.getUserByAuthentication(authentication);
         Event event = eventService.getEventByTaskSolutionId(id);
-        eventService.checkCompletedByParticipantAndFinishedEventCondition(event, participant);
+        checker.checkEventForCondition(event, participant);
         return getTaskSolutionByIdAndParticipant(id, participant);
     }
 }
