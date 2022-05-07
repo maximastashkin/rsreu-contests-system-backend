@@ -74,10 +74,12 @@ public class TaskSolutionService {
             ExecutionResponse executionResponse = whenResponse.get(codeExecutorServiceTimeout, TimeUnit.SECONDS);
             if (whenResponse.isDone()) {
                 setTaskSolutionInfoAfterChecking(taskSolution, executionResponse);
-                organizationRepository.setTaskSolutionCheckingResultInfo(taskSolution);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throwRustCodeExecutorServiceNonAvailableException();
+            setTaskSolutionInfoAfterChecking(taskSolution,
+                    ExecutionResponse.getCheckingFailExecutionResponse());
+        } finally {
+            organizationRepository.setTaskSolutionCheckingResultInfo(taskSolution);
         }
     }
 

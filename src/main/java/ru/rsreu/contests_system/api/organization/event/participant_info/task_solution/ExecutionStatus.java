@@ -7,6 +7,7 @@ import java.util.Map;
 public enum ExecutionStatus {
     NO_SOLUTION(null),
     ON_CHECKING(null),
+    CHECKING_FAIL(null),
     OK("OK"),
     ALREADY_TEST("AlreadyTest"),
     NO_SPACE("NoSpace"),

@@ -107,7 +107,8 @@ public class TaskSolutionResource {
             @ApiResponse(responseCode = "406",
                     description = "${api.orgs.events.tasks.completed.response-codes.not-acceptable}",
                     content = @Content),
-            @ApiResponse(responseCode = "409", description = "${api.orgs.events.tasks.completed.response-codes.conflict}",
+            @ApiResponse(responseCode = "409",
+                    description = "${api.orgs.events.tasks.completed.response-codes.conflict}",
                     content = @Content)
     })
     public ResponseEntity<CompletedTaskSolutionInfoResponse> getCompletedTaskInfo(Authentication authentication,
