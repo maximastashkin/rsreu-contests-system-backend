@@ -8,9 +8,12 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import ru.rsreu.contests_system.api.organization.event.Event;
+import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.user.User;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -43,6 +46,10 @@ public class Organization {
     @DBRef
     @Builder.Default
     private Set<User> organizers = new HashSet<>();
+
+    @DBRef
+    @Builder.Default
+    private List<Task> tasks = new ArrayList<>();
 
     @Builder.Default
     private Set<Event> events = new HashSet<>();

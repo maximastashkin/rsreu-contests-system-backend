@@ -168,6 +168,11 @@ public class TestResource {
                             add(userService.getUserByEmail("organizer@mail.ru"));
                         }
                     })
+                    .tasks(new ArrayList<>() {
+                        {
+                            add(taskService.getAll().get(0));
+                        }
+                    })
                     .events(new HashSet<>() {
                         {
                             addAll(List.of(nonActualEvent, startedEvent, actualNonStartedEvent));
