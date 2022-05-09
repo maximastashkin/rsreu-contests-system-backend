@@ -2,6 +2,7 @@ package ru.rsreu.contests_system.api.organization.repository;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
+import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
@@ -38,4 +39,6 @@ public interface OrganizationCustomRepository {
     void setTaskSolutionCheckingResultInfo(TaskSolution taskSolution);
 
     List<ParticipantInfo> findAllNotCompletedParticipantsInfos();
+
+    void addOrganizerToOrganization(Organization organization, User organizer);
 }
