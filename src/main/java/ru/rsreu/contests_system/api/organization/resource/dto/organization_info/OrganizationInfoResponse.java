@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.api.organization.resource.dto.organization.organization_info;
+package ru.rsreu.contests_system.api.organization.resource.dto.organization_info;
 
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
 

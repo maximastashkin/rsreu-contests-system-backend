@@ -33,8 +33,8 @@ public class OrganizationCreatingApplicationService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(rollbackFor = RuntimeException.class)
-    public void approveOrganizationCreatingApplication(String organizationId) {
-        OrganizationCreatingApplication application = getApplicationById(organizationId);
+    public void approveOrganizationCreatingApplication(String applicationId) {
+        OrganizationCreatingApplication application = getApplicationById(applicationId);
         User leader = mapApplicationToUser(application);
         String password = passwordGenerator.generatePassword(); // TODO EMAIL sending
         leader.setPassword(passwordEncoder.encode(password));

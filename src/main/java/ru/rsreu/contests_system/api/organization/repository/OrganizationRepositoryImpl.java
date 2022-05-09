@@ -165,6 +165,23 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
         return getParticipantsInfosByAggregation(newAggregation(pipeline.getOperations()));
     }
 
+    @Override
+    public void addOrganizerToOrganization(Organization organization, User organizer) {
+        mongoTemplate.updateFirst(
+                getOrganizationQuery(organization),
+                getUpdateForAddingOrganizerToOrganization(organizer),
+                Organization.class
+        );
+    }
+
+    public Query getOrganizationQuery(Organization organization) {
+        return Query.query(where("_id").is(organization.getId()));
+    }
+
+    public Update getUpdateForAddingOrganizerToOrganization(User organizer) {
+        return new Update().push("organizers").value(organizer);
+    }
+
     private AggregationPipeline getBaseParticipantInfoAggregationPipelineWithFilter(ArrayOperators.Filter filter) {
         AggregationPipeline pipeline = new AggregationPipeline()
                 .add(project().and(filter).as("participantsInfos"));
