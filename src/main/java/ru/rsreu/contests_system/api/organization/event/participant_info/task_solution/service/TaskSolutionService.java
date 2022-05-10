@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.ExecutionStatus;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.ProgrammingLanguage;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TestInfo;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.RustCodeExecutorServiceNonAvailableException;
@@ -62,7 +61,7 @@ public class TaskSolutionService {
     private void setTaskSolutionCheckingInfoFromRequest(TaskCheckingRequest request, TaskSolution taskSolution) {
         taskSolution.setExecutionStatus(ExecutionStatus.ON_CHECKING);
         taskSolution.setSolution(request.solution());
-        taskSolution.setProgrammingLanguage(ProgrammingLanguage.valueOf(request.language().toUpperCase()));
+        taskSolution.setProgrammingLanguage(request.language());
         taskSolution.getTestsInfos().forEach(TestInfo::setOnCheckingStatus);
     }
 
