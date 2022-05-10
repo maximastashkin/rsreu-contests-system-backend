@@ -15,6 +15,8 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.completed_task_solution_info.CompletedTaskSolutionInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.performed_task_solution_info.PerformedTaskSolutionInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.supported_languages.SupportedLanguagesMapper;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.supported_languages.SupportedLanguagesResponse;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.task_checking.TaskCheckingRequest;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.TaskSolutionService;
 import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantCompletingEventConditionChecker;
@@ -22,6 +24,8 @@ import ru.rsreu.contests_system.api.organization.event.service.checking.Particip
 import ru.rsreu.contests_system.validation.object_id.ObjectId;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @Validated
@@ -33,6 +37,7 @@ public class TaskSolutionResource {
     private final CompletedTaskSolutionInfoMapper completedTaskSolutionInfoMapper;
     private final ParticipantPerformingEventConditionChecker performingEventConditionChecker;
     private final ParticipantCompletingEventConditionChecker completingEventConditionChecker;
+    private final SupportedLanguagesMapper supportedLanguagesMapper;
 
     @Operation(summary = "${api.orgs.events.tasks.performed.operation}")
     @GetMapping(value = "/performed", produces = "application/json")
@@ -119,5 +124,16 @@ public class TaskSolutionResource {
                                 taskSolutionService.getTaskSolutionByConditionChecking(
                                         authentication, completingEventConditionChecker, id)),
                 HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.tasks.supported-languages.operation}")
+    @GetMapping(value = "/supported-languages", produces = "application/json")
+    @ApiResponse(responseCode = "200", description = "${api.orgs.events.tasks.supported-languages.response-codes.ok}")
+    public ResponseEntity<List<SupportedLanguagesResponse>> getSupportedLanguages() {
+        return new ResponseEntity<>(
+                Arrays.stream(taskSolutionService.getAllSupportedLanguage())
+                        .map(supportedLanguagesMapper::toResponse).toList(),
+                HttpStatus.OK
+        );
     }
 }
