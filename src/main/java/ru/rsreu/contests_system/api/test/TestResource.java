@@ -73,7 +73,8 @@ public class TestResource {
         }
         if (taskService.getAll().isEmpty()) {
             Task task = Task.builder()
-                    .text("На вход даются 2 числа a и b. Необходимо вывести сумму этих чисел")
+                    .title("Суммируй!")
+                    .text("На вход даются 2 целых числа a и b. Необходимо вывести сумму этих чисел")
                     .tests(new ArrayList<>() {
                         {
                             addAll(List.of(
@@ -117,6 +118,53 @@ public class TestResource {
                     .timeLimitMs(10000)
                     .build();
             taskService.save(task);
+            task = Task.builder()
+                    .title("Разделяй!")
+                    .text("На вход даются 2 целых числа a и b. Необходимо вывести разность этих чисел (a / b).\nВ случае невозможности выполнения арифметичской операции вывести \"Ошибка!\"\nРезультат необходимо округлять до 2 знаков, если результат - не целое.")
+                    .tests(new ArrayList<>() {
+                        {
+                            add(TaskTest.builder()
+                                    .input("10 2")
+                                    .output("5")
+                                    .isPublic(true)
+                                    .weight(10)
+                                    .build());
+                            add(TaskTest.builder()
+                                    .input("1 3")
+                                    .output("0.33")
+                                    .isPublic(true)
+                                    .weight(10)
+                                    .build());
+                            add(TaskTest.builder()
+                                    .input("5 0")
+                                    .output("Ошибка!")
+                                    .isPublic(true)
+                                    .weight(15)
+                                    .build());
+                            add(TaskTest.builder()
+                                    .input("1 2")
+                                    .output("0.5")
+                                    .isPublic(false)
+                                    .weight(10)
+                                    .build());
+                            add(TaskTest.builder()
+                                    .input("35 7")
+                                    .output("7")
+                                    .isPublic(false)
+                                    .weight(10)
+                                    .build());
+                            add(TaskTest.builder()
+                                    .input("56 98")
+                                    .output("0.57")
+                                    .isPublic(false)
+                                    .weight(10)
+                                    .build());
+                        }
+                    })
+                    .memoryLimitKb(10000)
+                    .timeLimitMs(10000)
+                    .build();
+            taskService.save(task);
         }
         if (organizationService.getAll(Integer.MAX_VALUE, 0).isEmpty()) {
             Event nonActualEvent = Event.builder()
@@ -129,6 +177,7 @@ public class TestResource {
                     .tasks(new HashSet<>() {
                         {
                             add(taskService.getAll().get(0));
+                            add(taskService.getAll().get(1));
                         }
                     })
                     .build();
@@ -142,6 +191,7 @@ public class TestResource {
                     .tasks(new HashSet<>() {
                         {
                             add(taskService.getAll().get(0));
+                            add(taskService.getAll().get(1));
                         }
                     })
                     .build();
@@ -155,6 +205,7 @@ public class TestResource {
                     .tasks(new HashSet<>() {
                         {
                             add(taskService.getAll().get(0));
+                            add(taskService.getAll().get(1));
                         }
                     })
                     .build();
@@ -171,6 +222,7 @@ public class TestResource {
                     .tasks(new ArrayList<>() {
                         {
                             add(taskService.getAll().get(0));
+                            add(taskService.getAll().get(1));
                         }
                     })
                     .events(new HashSet<>() {

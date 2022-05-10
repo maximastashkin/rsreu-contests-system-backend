@@ -16,6 +16,8 @@ public class Task {
     @MongoId
     private ObjectId id;
 
+    private String title;
+
     private String text;
 
     private long memoryLimitKb;

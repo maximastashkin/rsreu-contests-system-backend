@@ -7,6 +7,7 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import java.util.List;
 
 public record PerformedTaskSolutionInfoResponse(
+        String taskTitle,
         String taskText,
         long memoryLimit,
         long timeLimit,

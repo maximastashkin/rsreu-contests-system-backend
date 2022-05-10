@@ -9,6 +9,7 @@ public record PerformedTaskSolutionInfoMapper(
         ParticipantTestInfoMapper participantTestInfoMapper) {
     public PerformedTaskSolutionInfoResponse toResponse(TaskSolution taskSolution) {
         return new PerformedTaskSolutionInfoResponse(
+                taskSolution.getTask().getTitle(),
                 taskSolution.getTask().getText(),
                 taskSolution.getTask().getMemoryLimitKb(),
                 taskSolution.getTask().getTimeLimitMs(),
