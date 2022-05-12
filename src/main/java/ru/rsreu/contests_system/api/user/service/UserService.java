@@ -9,6 +9,7 @@ import ru.rsreu.contests_system.api.user.exception.AdminBlockingAttemptException
 import ru.rsreu.contests_system.api.user.exception.NotUniqueEmailException;
 import ru.rsreu.contests_system.api.user.exception.UserNotFoundException;
 import ru.rsreu.contests_system.api.user.repository.UserRepository;
+import ru.rsreu.contests_system.api.user.resource.dto.change_info.ChangeUserInfoRequest;
 import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 
 import java.util.List;
@@ -72,7 +73,8 @@ public record UserService(
 
     public void confirmUserByToken(String confirmationToken) {
         User user = userRepository.findByConfirmationToken(confirmationToken).orElseThrow(
-                () -> new UserNotFoundException(String.format("User for confirmation token:%s not found", confirmationToken))
+                () -> new UserNotFoundException(
+                        String.format("User for confirmation token:%s not found", confirmationToken))
         );
         replaceUserAuthority(user, Authority.INACTIVE, Authority.ACTIVE);
         userRepository.unsetConfirmationToken(confirmationToken);
@@ -80,5 +82,14 @@ public record UserService(
 
     public User getUserByAuthentication(Authentication authentication) {
         return getUserByEmail(authenticationUserDetailMapper.toUserDetails(authentication).getUsername());
+    }
+
+    public void changeUserInfo(Authentication authentication, ChangeUserInfoRequest changeUserInfoRequest) {
+        User user = getUserByAuthentication(authentication);
+        user.setFirstName(changeUserInfoRequest.firstName());
+        user.setLastName(changeUserInfoRequest.lastName());
+        user.setMiddleName(changeUserInfoRequest.middleName());
+        user.setEducationPlace(changeUserInfoRequest.educationPlace());
+        save(user);
     }
 }
