@@ -39,7 +39,7 @@ public class OrganizationResource {
     private final OrganizerAddingMapper organizerAddingMapper;
 
     @Operation(summary = "${api.orgs.info.operation}")
-    @GetMapping(produces = "application/json")
+    @GetMapping(value = "/info",produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "${api.orgs.response-codes.ok}"),
             @ApiResponse(responseCode = "400", description = "${api.orgs.response-codes.bad-request}",
