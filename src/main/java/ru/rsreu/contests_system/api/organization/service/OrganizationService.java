@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.rsreu.contests_system.api.organization.Organization;
-import ru.rsreu.contests_system.api.organization.exception.OrganizationExceptionMessageUtil;
+import ru.rsreu.contests_system.api.organization.exception.OrganizationExceptionsMessagesUtil;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.organization_creating_application.exception.NotUniqueOrganizationInfo;
@@ -25,7 +25,7 @@ import java.util.List;
 public class OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final UserService userService;
-    private final OrganizationExceptionMessageUtil organizationExceptionMessageUtil;
+    private final OrganizationExceptionsMessagesUtil organizationExceptionsMessagesUtil;
     private final PasswordGenerator passwordGenerator;
 
     public void save(Organization organization) {
@@ -65,7 +65,7 @@ public class OrganizationService {
 
     public Organization getOrganizationById(String id) {
         return organizationRepository.findOrganizationById(new ObjectId(id)).orElseThrow(
-                () -> new OrganizationNotFoundException(organizationExceptionMessageUtil
+                () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
                         .formOrganizationNotFoundException(id))
         );
     }
@@ -87,7 +87,7 @@ public class OrganizationService {
 
     private Organization getOrganizationByLeader(User organizationLeader) {
         return organizationRepository.findOrganizationByOrganizationLeader(organizationLeader).orElseThrow(
-                () -> new OrganizationNotFoundException(organizationExceptionMessageUtil
+                () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
                         .formOrganizationNotFoundException(organizationLeader))
         );
     }

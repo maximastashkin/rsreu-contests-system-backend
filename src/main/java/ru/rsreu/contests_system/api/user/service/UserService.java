@@ -7,6 +7,7 @@ import ru.rsreu.contests_system.api.user.Authority;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.exception.AdminBlockingAttemptException;
 import ru.rsreu.contests_system.api.user.exception.NotUniqueEmailException;
+import ru.rsreu.contests_system.api.user.exception.UserExceptionsMessagesUtil;
 import ru.rsreu.contests_system.api.user.exception.UserNotFoundException;
 import ru.rsreu.contests_system.api.user.repository.UserRepository;
 import ru.rsreu.contests_system.api.user.resource.dto.change_info.ChangeUserInfoRequest;
@@ -18,12 +19,13 @@ import java.util.NoSuchElementException;
 @Service
 public record UserService(
         UserRepository userRepository,
-        AuthenticationUserDetailMapper authenticationUserDetailMapper) {
+        AuthenticationUserDetailMapper authenticationUserDetailMapper,
+        UserExceptionsMessagesUtil userExceptionsMessagesUtil) {
     public User save(User user) {
         try {
             return userRepository.save(user);
         } catch (RuntimeException exception) {
-            throw new NotUniqueEmailException(String.format("Email:%s not unique!", user.getEmail()));
+            throw new NotUniqueEmailException(userExceptionsMessagesUtil.formNotUniqueEmailExceptionMessage(user));
         }
     }
 
@@ -37,7 +39,7 @@ public record UserService(
 
     public User getUserByEmail(String email) throws NoSuchElementException {
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new UserNotFoundException(String.format("User with email:%s didn't found", email)));
+                () -> new UserNotFoundException(userExceptionsMessagesUtil.formUserNotFoundExceptionByEmailMessage(email)));
     }
 
     public void addRefreshToken(String email, String refreshToken) {
@@ -57,7 +59,7 @@ public record UserService(
         if (!user.getAuthorities().contains(Authority.ADMIN)) {
             replaceUserAuthority(user, Authority.UNBLOCKED, Authority.BLOCKED);
         } else {
-            throw new AdminBlockingAttemptException("Admin blocking is impossible");
+            throw new AdminBlockingAttemptException(userExceptionsMessagesUtil.formAdminBlockingAttemptExceptionMessage());
         }
     }
 
@@ -74,7 +76,7 @@ public record UserService(
     public void confirmUserByToken(String confirmationToken) {
         User user = userRepository.findByConfirmationToken(confirmationToken).orElseThrow(
                 () -> new UserNotFoundException(
-                        String.format("User for confirmation token:%s not found", confirmationToken))
+                        userExceptionsMessagesUtil.formUserNotFoundByAuthenticationTokenException(confirmationToken))
         );
         replaceUserAuthority(user, Authority.INACTIVE, Authority.ACTIVE);
         userRepository.unsetConfirmationToken(confirmationToken);

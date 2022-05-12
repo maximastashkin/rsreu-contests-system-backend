@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.user.User;
 
 @Component
-public class OrganizationExceptionMessageUtil {
+public class OrganizationExceptionsMessagesUtil {
     public String formOrganizationNotFoundException(String organizationId) {
         return String.format("Organization with id: %s didn't found", organizationId);
     }
