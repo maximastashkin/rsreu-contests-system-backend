@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.rsreu.contests_system.api.user.resource.dto.change_info.ChangeUserInfoRequest;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailMapper;
 import ru.rsreu.contests_system.api.user.resource.dto.check_mail.CheckMailResponse;
 import ru.rsreu.contests_system.api.user.resource.dto.signup.UserSignUpMapper;
@@ -53,6 +54,22 @@ public class UserResource {
                 userService.getUserByEmail(
                         authenticationUserDetailMapper.toUserDetails(authentication).getUsername())),
                 HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.users.change-info.operation}")
+    @PostMapping(value = "/info", consumes = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.users.change-info.responses-codes.ok}",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "${api.users.change-info.responses-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "${api.users.change-info.responses-codes.not-found}",
+                    content = @Content)
+    })
+    public ResponseEntity<?> updateUserInfo(Authentication authentication,
+                                            @RequestBody @Valid ChangeUserInfoRequest changeUserInfoRequest) {
+        userService.changeUserInfo(authentication, changeUserInfoRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(summary = "${api.users.all.operation}")
