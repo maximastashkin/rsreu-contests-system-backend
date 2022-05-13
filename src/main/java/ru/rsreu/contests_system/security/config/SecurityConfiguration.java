@@ -30,7 +30,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/orgs/all/*/*",
             "/**/events/all-actual/*/*",
             "/**/test/**",
-            "/**/supported-languages"
+            "/**/supported-languages",
+            "/**/types"
     };
 
     private static final String[] AUTH_LIST = {

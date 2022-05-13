@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.rsreu.contests_system.api.organization.event.Event;
+import ru.rsreu.contests_system.api.organization.event.EventType;
 import ru.rsreu.contests_system.api.organization.event.exception.ActionWithNonStartedEventException;
 import ru.rsreu.contests_system.api.organization.event.exception.EventExceptionsMessagesUtil;
 import ru.rsreu.contests_system.api.organization.event.exception.EventNotFoundException;
@@ -164,21 +165,10 @@ public record EventService(
         organizationRepository.addFactEndDateTimeToParticipantInfo(participantInfo);
     }
 
-    public void checkParticipantPerformingEventCondition(User participant, Event event) {
-        eventCheckerUtil.checkNonActual(event);
-        eventCheckerUtil.checkNonStartedByParticipant(event, participant);
-        eventCheckerUtil.checkCompletedByParticipant(event, participant);
-    }
-
     public Event getEventByTaskSolutionId(String taskSolutionId) {
         return organizationRepository.findEventByTaskSolutionId(new ObjectId(taskSolutionId))
                 .orElseThrow(() -> new EventNotFoundException(
                         eventExceptionsMessagesUtil.formEventNotFoundExceptionMessageByTaskSolutionId(taskSolutionId)));
-    }
-
-    public void checkCompletedByParticipantAndFinishedEventCondition(Event event, User participant) {
-        eventCheckerUtil.checkNonCompletedByParticipant(event, participant);
-        eventCheckerUtil.checkFinished(event);
     }
 
     public ParticipantInfo getParticipantInfoByConditionChecking(
@@ -186,5 +176,9 @@ public record EventService(
         User participant = userService.getUserByAuthentication(authentication);
         checker.checkEventForCondition(event, participant);
         return getParticipantInfoByEventAndParticipant(event, participant);
+    }
+
+    public EventType[] getAllEventTypes() {
+        return EventType.values();
     }
 }

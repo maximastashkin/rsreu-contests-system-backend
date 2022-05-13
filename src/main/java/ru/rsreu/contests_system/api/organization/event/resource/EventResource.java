@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.event_types.EventTypesMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.event_types.EventTypesResponse;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_completed_event_info.ParticipantCompletedEventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_completed_event_info.ParticipantCompletedEventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_started_event_info.ParticipantStartedEventInfoMapper;
@@ -26,6 +28,7 @@ import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.validation.object_id.ObjectId;
 
 import javax.validation.constraints.Min;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +44,7 @@ public class EventResource {
     private final ParticipantCompletedEventInfoMapper participantCompletedEventInfoMapper;
     private final ParticipantPerformingEventConditionChecker performingEventConditionChecker;
     private final ParticipantCompletingEventConditionChecker participantCompletingEventConditionChecker;
+    private final EventTypesMapper eventTypesMapper;
 
     @Operation(summary = "${api.orgs.events.all-actual.operation}")
     @GetMapping(value = "/all-actual/{pageSize}/{pageNumber}", produces = "application/json")
@@ -253,6 +257,16 @@ public class EventResource {
                                         event,
                                         participantCompletingEventConditionChecker,
                                         authentication)),
+                HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.types.operation}")
+    @GetMapping(value = "/types", produces = "application/json")
+    @ApiResponse(responseCode = "200", description = "${api.orgs.events.types.response-codes.ok}")
+    public ResponseEntity<List<EventTypesResponse>> getAllEventTypes() {
+        return new ResponseEntity<>(Arrays
+                .stream(eventService.getAllEventTypes())
+                .map(eventTypesMapper::toResponse).toList(),
                 HttpStatus.OK);
     }
 }
