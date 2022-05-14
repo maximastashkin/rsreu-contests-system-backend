@@ -11,12 +11,13 @@ import ru.rsreu.contests_system.api.organization.event.exception.EventExceptions
 import ru.rsreu.contests_system.api.organization.event.exception.EventNotFoundException;
 import ru.rsreu.contests_system.api.organization.event.exception.ParticipantInfoNotFoundException;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
+import ru.rsreu.contests_system.api.organization.event.participant_info.repository.ParticipantInfoRepository;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
+import ru.rsreu.contests_system.api.organization.event.repository.EventRepository;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_creating.EventWithCreator;
 import ru.rsreu.contests_system.api.organization.event.service.checking.EventCheckerUtil;
 import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantEventConditionChecker;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
-import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.user.User;
@@ -30,8 +31,9 @@ import java.util.stream.Collectors;
 
 @Service
 public record EventService(
-        OrganizationRepository organizationRepository,
         OrganizationService organizationService,
+        EventRepository eventRepository,
+        ParticipantInfoRepository participantInfoRepository,
         UserService userService,
         EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
         EventDateUtil eventDateUtil,
@@ -39,23 +41,23 @@ public record EventService(
         EventCheckerUtil eventCheckerUtil) {
     @PostConstruct
     public void initAllNotCompletedParticipantsInfosTasks() {
-        organizationRepository.findAllNotCompletedParticipantsInfos().forEach(
+        participantInfoRepository.findAllNotCompletedParticipantsInfos().forEach(
                 participantInfo ->
                         tasksHolder.addTask(new CompleteEventRunnableTask(this, participantInfo)));
     }
 
     public List<Event> getAllActualEvents(int pageSize, int pageNumber) {
-        return organizationRepository.findAllActualEvents(PageRequest.of(pageNumber, pageSize));
+        return eventRepository.findAllActualEvents(PageRequest.of(pageNumber, pageSize));
     }
 
     public List<Event> getAllUserActualEvents(Authentication authentication, int pageSize, int pageNumber) {
-        return organizationRepository.findUserAllActualEvents(
+        return eventRepository.findUserAllActualEvents(
                 userService.getUserByAuthentication(authentication),
                 PageRequest.of(pageNumber, pageSize));
     }
 
     public List<Event> getAllUserCompletedEvents(Authentication authentication, int pageSize, int pageNumber) {
-        return organizationRepository.findUserAllCompletedEvents(
+        return eventRepository.findUserAllCompletedEvents(
                 userService.getUserByAuthentication(authentication),
                 PageRequest.of(pageNumber, pageSize)
         );
@@ -75,14 +77,14 @@ public record EventService(
 
     private void performAddingParticipantInfoToEvent(Event event, User participant) {
         if (!event.isParticipantFollowedOnEvent(participant)) {
-            organizationRepository.addParticipantInfoToEvent(
+            eventRepository.addParticipantInfoToEvent(
                     ParticipantInfo.builder()
                             .participant(participant).build(), event);
         }
     }
 
     public Event getEventById(String eventObjectId) {
-        return organizationRepository.findEventById(new ObjectId(eventObjectId)).orElseThrow(
+        return eventRepository.findEventById(new ObjectId(eventObjectId)).orElseThrow(
                 () -> new EventNotFoundException(
                         eventExceptionsMessagesUtil.formEventNotFoundExceptionMessageByIdMessage(eventObjectId)));
     }
@@ -101,7 +103,7 @@ public record EventService(
 
     private void performRemovingParticipantInfoFromEvent(Event event, User participant) {
         if (event.isParticipantFollowedOnEvent(participant)) {
-            organizationRepository.removeParticipantInfoFromEvent(
+            eventRepository.removeParticipantInfoFromEvent(
                     ParticipantInfo.getTaskSolutionForDeletingByParticipant(participant), event);
         }
     }
@@ -119,7 +121,7 @@ public record EventService(
     }
 
     private ParticipantInfo getParticipantInfoByEventAndParticipant(Event event, User participant) {
-        return organizationRepository
+        return participantInfoRepository
                 .findParticipantInfoByEventAndParticipant(event, participant)
                 .orElseThrow(() ->
                         new ParticipantInfoNotFoundException(
@@ -133,7 +135,7 @@ public record EventService(
         participantInfo.setMaxEndDateTime(eventDateUtil.calculateMaxEndDateTime(
                 participantInfo.getStartDateTime(), event.getEndDateTime(), event.getTimeLimit()));
         tasksHolder.addTask(new CompleteEventRunnableTask(this, participantInfo));
-        organizationRepository.addStartingInfoToParticipantInfo(participantInfo);
+        participantInfoRepository.addStartingInfoToParticipantInfo(participantInfo);
     }
 
     private Set<TaskSolution> getTaskSolutionsFromTasks(Set<Task> tasks) {
@@ -159,11 +161,11 @@ public record EventService(
                                                       LocalDateTime factEndDateTime) {
         tasksHolder.cancelTaskByParticipantInfo(participantInfo);
         participantInfo.setFactEndDateTime(factEndDateTime);
-        organizationRepository.addFactEndDateTimeToParticipantInfo(participantInfo);
+        participantInfoRepository.addFactEndDateTimeToParticipantInfo(participantInfo);
     }
 
     public Event getEventByTaskSolutionId(String taskSolutionId) {
-        return organizationRepository.findEventByTaskSolutionId(new ObjectId(taskSolutionId))
+        return eventRepository.findEventByTaskSolutionId(new ObjectId(taskSolutionId))
                 .orElseThrow(() -> new EventNotFoundException(
                         eventExceptionsMessagesUtil
                                 .formEventNotFoundExceptionMessageByTaskSolutionIdMessage(taskSolutionId)));
@@ -181,7 +183,7 @@ public record EventService(
     }
 
     public boolean isEventNameUnique(String eventName) {
-        return organizationRepository.countAllByEventName(eventName) == 0;
+        return organizationService.countOrganizationsByEventName(eventName) == 0;
     }
 
     public void createEvent(EventWithCreator eventWithCreator) {
@@ -190,7 +192,7 @@ public record EventService(
         Organization organization = getOrganizationByEventLeader(event.getEventLeader());
         eventCheckerUtil.checkValidEventLeader(organization, event.getEventLeader(), creator);
         eventCheckerUtil.checkValidEventType(creator, event.getEventType(), organization);
-        organizationRepository.addEventToOrganization(organization, event);
+        organizationService.addEventToOrganization(organization, event);
     }
 
     private Organization getOrganizationByEventLeader(User eventLeader) {

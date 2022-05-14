@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.rsreu.contests_system.api.organization.Organization;
+import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationExceptionsMessagesUtil;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
@@ -97,5 +98,13 @@ public class OrganizationService {
                 () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
                         .formOrganizationNotFoundByOrganizerException(organizer))
         );
+    }
+
+    public long countOrganizationsByEventName(String eventName) {
+        return organizationRepository.countAllByEventName(eventName);
+    }
+
+    public void addEventToOrganization(Organization organization, Event event) {
+        organizationRepository.addEventToOrganization(organization, event);
     }
 }

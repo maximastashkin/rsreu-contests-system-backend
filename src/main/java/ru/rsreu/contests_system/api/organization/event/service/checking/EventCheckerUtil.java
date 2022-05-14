@@ -96,8 +96,4 @@ public record EventCheckerUtil(EventExceptionsMessagesUtil eventExceptionsMessag
                     eventExceptionsMessagesUtil().formNotAvailableForOrganizerEventType(eventType));
         }
     }
-
-    public void checkUniqueEventName(String eventName) {
-
-    }
 }

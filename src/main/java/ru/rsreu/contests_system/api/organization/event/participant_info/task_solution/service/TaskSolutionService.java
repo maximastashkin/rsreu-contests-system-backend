@@ -14,6 +14,7 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.RustCodeExecutorServiceNonAvailableException;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.TaskSolutionExceptionsMessagesUtil;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.exception.TaskSolutionForParticipantNotFoundException;
+import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.repository.TaskSolutionRepository;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.resource.dto.task_checking.TaskCheckingRequest;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.CodeExecutorServiceProvider;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.service.code_execution.model.response.ExecutionResponse;
@@ -21,7 +22,6 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.task_sol
 import ru.rsreu.contests_system.api.organization.event.service.EventService;
 import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantEventConditionChecker;
 import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantPerformingEventConditionChecker;
-import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
 
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeoutException;
 public class TaskSolutionService {
     private final UserService userService;
     private final EventService eventService;
-    private final OrganizationRepository organizationRepository;
+    private final TaskSolutionRepository taskSolutionRepository;
     private final TaskSolutionExceptionsMessagesUtil taskSolutionExceptionsMessagesUtil;
     private final CodeExecutorServiceProvider codeExecutorServiceProvider;
     private final ParticipantPerformingEventConditionChecker performingEventConditionChecker;
@@ -44,7 +44,7 @@ public class TaskSolutionService {
     private Integer codeExecutorServiceTimeout;
 
     private TaskSolution getTaskSolutionByIdAndParticipant(String id, User participant) {
-        return organizationRepository.findParticipantTaskSolutionById(participant, new ObjectId(id)).orElseThrow(
+        return taskSolutionRepository.findParticipantTaskSolutionById(participant, new ObjectId(id)).orElseThrow(
                 () -> new TaskSolutionForParticipantNotFoundException(
                         taskSolutionExceptionsMessagesUtil.
                                 formTaskSolutionForParticipantNotFoundException(participant, id)));
@@ -55,7 +55,7 @@ public class TaskSolutionService {
         TaskSolution taskSolution = getTaskSolutionByConditionChecking(
                 authentication, performingEventConditionChecker, id);
         setTaskSolutionCheckingInfoFromRequest(request, taskSolution);
-        organizationRepository.setTaskSolutionCheckingInfo(taskSolution);
+        taskSolutionRepository.setTaskSolutionCheckingInfo(taskSolution);
         return taskSolution;
     }
 
@@ -79,7 +79,7 @@ public class TaskSolutionService {
             setTaskSolutionInfoAfterChecking(taskSolution,
                     ExecutionResponse.getCheckingFailExecutionResponse());
         } finally {
-            organizationRepository.setTaskSolutionCheckingResultInfo(taskSolution);
+            taskSolutionRepository.setTaskSolutionCheckingResultInfo(taskSolution);
         }
     }
 
