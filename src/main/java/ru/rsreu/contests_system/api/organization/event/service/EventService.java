@@ -9,43 +9,31 @@ import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.EventType;
 import ru.rsreu.contests_system.api.organization.event.exception.EventExceptionsMessagesUtil;
 import ru.rsreu.contests_system.api.organization.event.exception.EventNotFoundException;
-import ru.rsreu.contests_system.api.organization.event.exception.ParticipantInfoNotFoundException;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
-import ru.rsreu.contests_system.api.organization.event.participant_info.repository.ParticipantInfoRepository;
-import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
+import ru.rsreu.contests_system.api.organization.event.participant_info.service.EventCompletingTasksHolder;
+import ru.rsreu.contests_system.api.organization.event.participant_info.service.ParticipantInfoService;
 import ru.rsreu.contests_system.api.organization.event.repository.EventRepository;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_creating.EventWithCreator;
 import ru.rsreu.contests_system.api.organization.event.service.checking.EventCheckerUtil;
 import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantEventConditionChecker;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
-import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public record EventService(
         OrganizationService organizationService,
         EventRepository eventRepository,
-        ParticipantInfoRepository participantInfoRepository,
+        ParticipantInfoService participantInfoService,
         UserService userService,
         EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
         EventDateUtil eventDateUtil,
         EventCompletingTasksHolder tasksHolder,
         EventCheckerUtil eventCheckerUtil) {
-    @PostConstruct
-    public void initAllNotCompletedParticipantsInfosTasks() {
-        participantInfoRepository.findAllNotCompletedParticipantsInfos().forEach(
-                participantInfo ->
-                        tasksHolder.addTask(new CompleteEventRunnableTask(this, participantInfo)));
-    }
-
     public List<Event> getAllActualEvents(int pageSize, int pageNumber) {
         return eventRepository.findAllActualEvents(PageRequest.of(pageNumber, pageSize));
     }
@@ -117,29 +105,9 @@ public record EventService(
 
     private void performStartingEvent(Event event, User participant) {
         eventCheckerUtil.checkNonStarted(event);
-        performAddingStartingInfoToParticipantInfo(getParticipantInfoByEventAndParticipant(event, participant), event);
-    }
-
-    private ParticipantInfo getParticipantInfoByEventAndParticipant(Event event, User participant) {
-        return participantInfoRepository
-                .findParticipantInfoByEventAndParticipant(event, participant)
-                .orElseThrow(() ->
-                        new ParticipantInfoNotFoundException(
-                                eventExceptionsMessagesUtil.formParticipantInfoNotFoundExceptionMessage(participant)));
-    }
-
-    private void performAddingStartingInfoToParticipantInfo(ParticipantInfo participantInfo, Event event) {
-        Set<TaskSolution> tasksSolutions = getTaskSolutionsFromTasks(event.getTasks());
-        participantInfo.setTasksSolutions(tasksSolutions);
-        participantInfo.setStartDateTime(LocalDateTime.now());
-        participantInfo.setMaxEndDateTime(eventDateUtil.calculateMaxEndDateTime(
-                participantInfo.getStartDateTime(), event.getEndDateTime(), event.getTimeLimit()));
-        tasksHolder.addTask(new CompleteEventRunnableTask(this, participantInfo));
-        participantInfoRepository.addStartingInfoToParticipantInfo(participantInfo);
-    }
-
-    private Set<TaskSolution> getTaskSolutionsFromTasks(Set<Task> tasks) {
-        return tasks.stream().map(TaskSolution::getTaskSolutionByTask).collect(Collectors.toSet());
+        participantInfoService
+                .performAddingStartingInfoToParticipantInfo(
+                        participantInfoService.getParticipantInfoByEventAndParticipant(event, participant), event);
     }
 
     public void completeEvent(Authentication authentication, String eventId) {
@@ -152,16 +120,10 @@ public record EventService(
         eventCheckerUtil.checkNonActual(event);
         eventCheckerUtil.checkNonStartedByParticipant(event, participant);
         eventCheckerUtil.checkCompletedByParticipant(event, participant);
-        ParticipantInfo participantInfo = getParticipantInfoByEventAndParticipant(event, participant);
-        performAddingCompletingDateToParticipantInfo(participantInfo,
+        ParticipantInfo participantInfo = participantInfoService.
+                getParticipantInfoByEventAndParticipant(event, participant);
+        participantInfoService.performAddingCompletingDateToParticipantInfo(participantInfo,
                 eventDateUtil.calculateFactEndDateTime(LocalDateTime.now(), participantInfo.getMaxEndDateTime()));
-    }
-
-    void performAddingCompletingDateToParticipantInfo(ParticipantInfo participantInfo,
-                                                      LocalDateTime factEndDateTime) {
-        tasksHolder.cancelTaskByParticipantInfo(participantInfo);
-        participantInfo.setFactEndDateTime(factEndDateTime);
-        participantInfoRepository.addFactEndDateTimeToParticipantInfo(participantInfo);
     }
 
     public Event getEventByTaskSolutionId(String taskSolutionId) {
@@ -175,7 +137,7 @@ public record EventService(
             Event event, ParticipantEventConditionChecker checker, Authentication authentication) {
         User participant = userService.getUserByAuthentication(authentication);
         checker.checkEventForCondition(event, participant);
-        return getParticipantInfoByEventAndParticipant(event, participant);
+        return participantInfoService.getParticipantInfoByEventAndParticipant(event, participant);
     }
 
     public EventType[] getAllEventTypes() {

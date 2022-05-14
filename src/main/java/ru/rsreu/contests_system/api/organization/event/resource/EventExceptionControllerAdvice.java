@@ -27,12 +27,6 @@ public class EventExceptionControllerAdvice {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.GONE);
     }
 
-    @ExceptionHandler(ParticipantInfoNotFoundException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<?> handleParticipantInfoNotFoundException(ParticipantInfoNotFoundException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(ActionWithNonStartedEventException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public ResponseEntity<?> handleActionWithNonStartedEventException(ActionWithNonStartedEventException exception) {

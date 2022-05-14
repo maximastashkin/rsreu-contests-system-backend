@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Component
 public class EventDateUtil {
-    LocalDateTime calculateMaxEndDateTime(
+    public LocalDateTime calculateMaxEndDateTime(
             LocalDateTime participantStartDateTime,
             LocalDateTime eventEndDateTime,
             long timeLimit) {

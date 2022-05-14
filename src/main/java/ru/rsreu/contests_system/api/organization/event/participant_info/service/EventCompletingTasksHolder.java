@@ -1,4 +1,4 @@
-package ru.rsreu.contests_system.api.organization.event.service;
+package ru.rsreu.contests_system.api.organization.event.participant_info.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
