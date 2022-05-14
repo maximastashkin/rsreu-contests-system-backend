@@ -16,6 +16,7 @@ import ru.rsreu.contests_system.util.RepositoryUtil;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static org.springframework.data.mongodb.core.aggregation.ArrayOperators.Filter.filter;
+import static org.springframework.data.mongodb.core.aggregation.BooleanOperators.And.and;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @SuppressWarnings("ClassCanBeRecord")
@@ -71,9 +72,11 @@ public class ParticipantInfoRepositoryUtil {
         return pipeline;
     }
 
-    public ArrayOperators.Filter getFilterForAllNotCompletedParticipantsInfos() {
+    public ArrayOperators.Filter getFilterForAllStartedNotCompletedParticipantsInfos() {
         return filter("participantsInfos")
                 .as("info")
-                .by(repositoryUtil.getNotOperationForFilterCondForFieldExistChecking("info.factEndDateTime"));
+                .by(and(
+                        repositoryUtil.getExistsAggregationExpression("info.factEndDateTime", false),
+                        repositoryUtil.getExistsAggregationExpression("info.startDateTime", true)));
     }
 }

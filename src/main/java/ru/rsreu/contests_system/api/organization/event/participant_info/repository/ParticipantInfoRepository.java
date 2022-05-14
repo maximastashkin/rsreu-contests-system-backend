@@ -14,5 +14,5 @@ public interface ParticipantInfoRepository {
 
     void addFactEndDateTimeToParticipantInfo(ParticipantInfo participantInfo);
 
-    List<ParticipantInfo> findAllNotCompletedParticipantsInfos();
+    List<ParticipantInfo> findAllStartedNotCompletedParticipantsInfos();
 }

@@ -2,10 +2,7 @@ package ru.rsreu.contests_system.util;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationPipeline;
-import org.springframework.data.mongodb.core.aggregation.BooleanOperators;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.aggregation.ConditionalOperators.IfNull.ifNull;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Component
@@ -47,8 +45,7 @@ public class RepositoryUtil {
         return where("_id").is(id);
     }
 
-    @SuppressWarnings("SameParameterValue")
-    public BooleanOperators.Not getNotOperationForFilterCondForFieldExistChecking(String field) {
-        return BooleanOperators.Not.not(field);
+    public AggregationExpression getExistsAggregationExpression(String field, boolean exists) {
+        return ifNull(field).then(!exists);
     }
 }

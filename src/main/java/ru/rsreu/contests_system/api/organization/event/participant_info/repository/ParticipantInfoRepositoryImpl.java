@@ -48,11 +48,11 @@ public class ParticipantInfoRepositoryImpl implements ParticipantInfoRepository 
     }
 
     @Override
-    public List<ParticipantInfo> findAllNotCompletedParticipantsInfos() {
+    public List<ParticipantInfo> findAllStartedNotCompletedParticipantsInfos() {
         AggregationPipeline pipeline = participantInfoRepositoryUtil.getUnwindEventsPipeline();
         repositoryUtil.addOperationsFromPipeline(
                 participantInfoRepositoryUtil.getBaseParticipantInfoAggregationPipelineWithFilter(
-                        participantInfoRepositoryUtil.getFilterForAllNotCompletedParticipantsInfos()),
+                        participantInfoRepositoryUtil.getFilterForAllStartedNotCompletedParticipantsInfos()),
                 pipeline);
         return getParticipantsInfosByAggregation(newAggregation(pipeline.getOperations()));
     }

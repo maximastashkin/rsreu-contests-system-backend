@@ -28,7 +28,7 @@ public class ParticipantInfoService {
 
     @PostConstruct
     private void initAllNotCompletedParticipantsInfosTasks() {
-        participantInfoRepository.findAllNotCompletedParticipantsInfos().forEach(
+        participantInfoRepository.findAllStartedNotCompletedParticipantsInfos().forEach(
                 participantInfo ->
                         tasksHolder.addTask(new CompleteEventRunnableTask(this, participantInfo)));
     }
