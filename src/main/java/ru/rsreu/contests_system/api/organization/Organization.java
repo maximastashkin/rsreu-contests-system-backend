@@ -53,4 +53,12 @@ public class Organization {
 
     @Builder.Default
     private Set<Event> events = new HashSet<>();
+
+    public boolean isLeader(User candidate) {
+        return organizationLeader.equals(candidate);
+    }
+
+    public boolean isUserInOrganization(User user) {
+        return isLeader(user) || organizers.contains(user);
+    }
 }

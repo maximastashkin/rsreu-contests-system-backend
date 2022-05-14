@@ -1,19 +1,19 @@
-package ru.rsreu.contests_system.validation.null_or_not_blank;
+package ru.rsreu.contests_system.validation.object_id;
 
 import org.springframework.beans.factory.annotation.Value;
+import ru.rsreu.contests_system.validation.null_or_not_blank.NullOrNotBlank;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-
-@Target({ElementType.FIELD, ElementType.PARAMETER, ANNOTATION_TYPE})
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = NullOrNotBlankValidator.class)
-public @interface NullOrNotBlank {
-    @Value("${validation.not-null-or-blank.message}")
+@Constraint(validatedBy = NotRequiredObjectIdValidator.class)
+@NullOrNotBlank
+public @interface NotRequiredObjectId {
+    @Value("${validation.not_required_object_id.message}")
     String defaultMessage = "";
     String message() default defaultMessage;
     Class<?>[] groups() default { };

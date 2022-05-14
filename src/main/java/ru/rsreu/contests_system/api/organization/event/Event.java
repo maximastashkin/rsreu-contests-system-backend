@@ -37,7 +37,6 @@ public class Event {
     private long timeLimit;
 
     @DBRef
-    @Indexed(unique = true)
     private User eventLeader;
 
     @DBRef

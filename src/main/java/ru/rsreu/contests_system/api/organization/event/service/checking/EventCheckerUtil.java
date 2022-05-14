@@ -1,7 +1,9 @@
 package ru.rsreu.contests_system.api.organization.event.service.checking;
 
 import org.springframework.stereotype.Component;
+import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
+import ru.rsreu.contests_system.api.organization.event.EventType;
 import ru.rsreu.contests_system.api.organization.event.exception.*;
 import ru.rsreu.contests_system.api.user.User;
 
@@ -24,7 +26,7 @@ public record EventCheckerUtil(EventExceptionsMessagesUtil eventExceptionsMessag
     public void checkFinished(Event event) {
         if (event.isActual()) {
             throw new ActionWithNonFinishedEventException(eventExceptionsMessagesUtil()
-                    .formActionWithNonFinishedEventException(event));
+                    .formActionWithNonFinishedEventExceptionMessage(event));
         }
     }
 
@@ -47,7 +49,51 @@ public record EventCheckerUtil(EventExceptionsMessagesUtil eventExceptionsMessag
         if (!event.isParticipantCompletedEvent(participant)) {
             throw new ActionWithNonCompletedByParticipantEventException(
                     eventExceptionsMessagesUtil()
-                            .formActionWithNonCompletedByParticipantEventException(event, participant));
+                            .formActionWithNonCompletedByParticipantEventExceptionMessage(event, participant));
+        }
+    }
+
+    public void checkNonStarted(Event event) {
+        if (!event.isStarted()) {
+            throw new ActionWithNonStartedEventException(
+                    eventExceptionsMessagesUtil.formActionWithNonStartedEventExceptionMessage(event));
+        }
+    }
+
+    public void checkLeaderAndCreatorInSameOrganization(Organization organization, User eventLeader, User eventCreator) {
+        if (!(organization.isUserInOrganization(eventCreator) && organization.isUserInOrganization(eventLeader))) {
+            throw new EventLeaderAndCreatorNotInSameOrganizationException(
+                    eventExceptionsMessagesUtil.formEventLeaderAndCreatorNotInSameOrganizationExceptionMessage(
+                            eventLeader, eventCreator
+                    )
+            );
+        }
+    }
+
+    public void checkValidEventLeader(Organization organization, User eventLeader, User eventCreator) {
+        checkLeaderAndCreatorInSameOrganization(organization, eventLeader, eventCreator);
+        checkOrganizerNotMadeOrganizationLeaderEventLeader(organization, eventLeader, eventCreator);
+    }
+
+    private void checkOrganizerNotMadeOrganizationLeaderEventLeader(Organization organization, User eventLeader, User eventCreator) {
+        if (organization.isLeader(eventLeader) && !eventLeader.equals(eventCreator)) {
+            throw new AppointmentOrganizationLeaderEventLeaderException(
+                    eventExceptionsMessagesUtil.formAppointmentOrganizationLeaderEventLeaderExceptionMessage(
+                            eventLeader, eventCreator)
+            );
+        }
+    }
+
+    public void checkValidEventType(User creator, EventType eventType, Organization organization) {
+        if (!organization.isLeader(creator)) {
+            checkValidEventTypeForOrganizer(eventType);
+        }
+    }
+
+    private void checkValidEventTypeForOrganizer(EventType eventType) {
+        if (!EventType.getAvailableForOrganizersTypes().contains(eventType)) {
+            throw new NotAvailableForOrganizerEventType(
+                    eventExceptionsMessagesUtil().formNotAvailableForOrganizerEventType(eventType));
         }
     }
 }

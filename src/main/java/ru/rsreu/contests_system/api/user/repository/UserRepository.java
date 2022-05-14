@@ -14,4 +14,6 @@ public interface UserRepository extends MongoRepository<User, ObjectId>, UserCus
     Page<User> findAll(Pageable pageable);
 
     Optional<User> findByConfirmationToken(String confirmationToken);
+
+    Optional<User> findById(ObjectId objectId);
 }

@@ -41,4 +41,8 @@ public interface OrganizationCustomRepository {
     List<ParticipantInfo> findAllNotCompletedParticipantsInfos();
 
     void addOrganizerToOrganization(Organization organization, User organizer);
+
+    Optional<Organization> findOrganizationByOrganizer(User organizer);
+
+    void addEventToOrganization(Organization organization, Event event);
 }
