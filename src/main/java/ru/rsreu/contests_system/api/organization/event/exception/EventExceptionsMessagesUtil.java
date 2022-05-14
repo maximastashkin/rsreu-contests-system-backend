@@ -2,6 +2,7 @@ package ru.rsreu.contests_system.api.organization.event.exception;
 
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.organization.event.Event;
+import ru.rsreu.contests_system.api.organization.event.EventType;
 import ru.rsreu.contests_system.api.user.User;
 
 @Component
@@ -16,12 +17,12 @@ public class EventExceptionsMessagesUtil {
         return String.format("User with email:%s already start or completed this event", participant.getEmail());
     }
 
-    public String formParticipantInfoNotFoundException(User participant) {
+    public String formParticipantInfoNotFoundExceptionMessage(User participant) {
         return String.format("Critical error. Server didn't create ParticipantInfo for user with email:%s",
                 participant.getEmail());
     }
 
-    public String formActionWithNonStartedEventException(Event event) {
+    public String formActionWithNonStartedEventExceptionMessage(Event event) {
         return String.format("Event with id:%s non started yet. Following have done", event.getId().toString());
     }
 
@@ -35,21 +36,43 @@ public class EventExceptionsMessagesUtil {
                 participant.getEmail(), event.getId());
     }
 
-    public String formEventNotFoundExceptionMessageById(String eventObjectId) {
+    public String formEventNotFoundExceptionMessageByIdMessage(String eventObjectId) {
         return String.format("Event with id:%s didn't find", eventObjectId);
     }
 
-    public String formEventNotFoundExceptionMessageByTaskSolutionId(String taskSolutionId) {
+    public String formEventNotFoundExceptionMessageByTaskSolutionIdMessage(String taskSolutionId) {
         return String.format("Event with TaskSolution with id:%s didn't found. In fact that TaskSolution doesn't exist",
                 taskSolutionId);
     }
 
-    public String formActionWithNonFinishedEventException(Event event) {
+    public String formActionWithNonFinishedEventExceptionMessage(Event event) {
         return String.format("Event with id:%s haven't finished yet", event.getId().toString());
     }
 
-    public String formActionWithNonCompletedByParticipantEventException(Event event, User participant) {
+    public String formActionWithNonCompletedByParticipantEventExceptionMessage(Event event, User participant) {
         return String.format("User with email:%s hasn't completed event with id:%s",
                 participant.getEmail(), event.getId().toString());
+    }
+
+    public String formEventWrongDatesOrderExceptionMessage() {
+        return "Wrong dates order!";
+    }
+
+    public String formNotAvailableForOrganizerEventType(EventType eventType) {
+        return eventType.toString() + " not available for creating by organizers";
+    }
+
+    public String formEventLeaderAndCreatorNotInSameOrganizationExceptionMessage(User leader, User creator) {
+        return String.format("Event leader with id:%s and event creator with id:%s isn't in same organization",
+                leader.getId().toString(), creator.getId().toString());
+    }
+
+    public String formAppointmentOrganizationLeaderEventLeaderExceptionMessage(User leader, User creator) {
+        return String.format("Attempt to appointment organization leader (id:%s) as event leader by organizer (id:%s)",
+                leader.getId().toString(), creator.getId().toString());
+    }
+
+    public String formNotUniqueEventNameException(String eventName) {
+        return String.format("Event with name '%s' already exists", eventName);
     }
 }

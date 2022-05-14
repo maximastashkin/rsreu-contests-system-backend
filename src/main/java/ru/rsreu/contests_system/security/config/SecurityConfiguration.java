@@ -60,6 +60,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/**/organizers/**"
     };
 
+    private static final String[] ORGANIZATION_LEADER_AND_ORGANIZER_LIST = {
+            "/**/events/"
+    };
+
     private static final String[] ADMIN_LIST = {
             "/**/users/all/**",
             "/**/users/block",
@@ -94,6 +98,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                 .antMatchers(ORGANIZATION_LEADER_LIST).access(
                                         authorityAccessAttributeProvider.formActiveUnblockedAttribute(
                                                 Authority.ORGANIZATION_LEADER))
+                                .antMatchers(ORGANIZATION_LEADER_AND_ORGANIZER_LIST).access(
+                                        authorityAccessAttributeProvider.formActiveUnblockedAttribute(
+                                                Authority.ORGANIZATION_LEADER, Authority.ORGANIZER
+                                        )
+                                )
                                 .antMatchers(ADMIN_LIST).access(
                                         authorityAccessAttributeProvider.formActiveUnblockedAttribute(
                                                 Authority.ADMIN))

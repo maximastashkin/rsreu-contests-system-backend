@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.Event;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.event_creating.EventCreatingMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.event_creating.EventCreatingRequest;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_types.EventTypesMapper;
@@ -27,6 +29,7 @@ import ru.rsreu.contests_system.api.organization.util.UserCandidateByAuthenticat
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.validation.object_id.ObjectId;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +48,7 @@ public class EventResource {
     private final ParticipantPerformingEventConditionChecker performingEventConditionChecker;
     private final ParticipantCompletingEventConditionChecker participantCompletingEventConditionChecker;
     private final EventTypesMapper eventTypesMapper;
+    private final EventCreatingMapper eventCreatingMapper;
 
     @Operation(summary = "${api.orgs.events.all-actual.operation}")
     @GetMapping(value = "/all-actual/{pageSize}/{pageNumber}", produces = "application/json")
@@ -268,5 +272,27 @@ public class EventResource {
                 .stream(eventService.getAllEventTypes())
                 .map(eventTypesMapper::toResponse).toList(),
                 HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.create.operation}", description = "${api.orgs.events.create.description}")
+    @PostMapping(consumes = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "${api.orgs.events.create.response-codes.created}",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "${api.orgs.events.create.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "${api.orgs.events.create.response-codes.forbidden}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "${api.orgs.events.create.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406", description = "${api.orgs.events.create.response-codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.create.response-codes.conflict}",
+                    content = @Content)
+    })
+    public ResponseEntity<?> createEvent(Authentication authentication,
+                                         @RequestBody @Valid EventCreatingRequest eventCreatingRequest) {
+        eventService.createEvent(eventCreatingMapper.toEventWithCreator(eventCreatingRequest, authentication));
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

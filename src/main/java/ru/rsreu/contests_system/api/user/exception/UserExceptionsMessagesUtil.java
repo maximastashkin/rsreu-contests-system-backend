@@ -1,5 +1,6 @@
 package ru.rsreu.contests_system.api.user.exception;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 import ru.rsreu.contests_system.api.user.User;
 
@@ -10,7 +11,11 @@ public class UserExceptionsMessagesUtil {
     }
 
     public String formUserNotFoundExceptionByEmailMessage(String email) {
-        return String.format("User with email:%s didn't found", email);
+        return String.format("User with email:%s didn't find", email);
+    }
+
+    public String formUserNotFoundExceptionByIdMessage(ObjectId objectId) {
+        return String.format("User with id:%s didn't find", objectId.toString());
     }
 
     public String formAdminBlockingAttemptExceptionMessage() {

@@ -52,21 +52,21 @@ public class OrganizationService {
     }
 
     public boolean isNameUnique(String name) {
-        return organizationRepository.findByName(name).isEmpty();
+        return organizationRepository.findOrganizationByName(name).isEmpty();
     }
 
     public boolean isEmailUnique(String email) {
-        return organizationRepository.findByOrganizationEmail(email).isEmpty();
+        return organizationRepository.findOrganizationByOrganizationEmail(email).isEmpty();
     }
 
     public boolean isPhoneUnique(String phone) {
-        return organizationRepository.findByOrganizationPhone(phone).isEmpty();
+        return organizationRepository.findOrganizationByOrganizationPhone(phone).isEmpty();
     }
 
     public Organization getOrganizationById(String id) {
-        return organizationRepository.findOrganizationById(new ObjectId(id)).orElseThrow(
+        return organizationRepository.findOrganizationOrganizationById(new ObjectId(id)).orElseThrow(
                 () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
-                        .formOrganizationNotFoundException(id))
+                        .formOrganizationNotFoundByLeaderException(id))
         );
     }
 
@@ -85,10 +85,17 @@ public class OrganizationService {
         organizationRepository.addOrganizerToOrganization(organization, organizer);
     }
 
-    private Organization getOrganizationByLeader(User organizationLeader) {
+    public Organization getOrganizationByLeader(User organizationLeader) {
         return organizationRepository.findOrganizationByOrganizationLeader(organizationLeader).orElseThrow(
                 () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
-                        .formOrganizationNotFoundException(organizationLeader))
+                        .formOrganizationNotFoundByLeaderException(organizationLeader))
+        );
+    }
+
+    public Organization getOrganizationByOrganizer(User organizer) {
+        return organizationRepository.findOrganizationByOrganizer(organizer).orElseThrow(
+                () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
+                        .formOrganizationNotFoundByOrganizerException(organizer))
         );
     }
 }

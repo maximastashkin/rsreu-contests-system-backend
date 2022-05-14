@@ -4,17 +4,20 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.EventType;
-import ru.rsreu.contests_system.api.organization.event.exception.ActionWithNonStartedEventException;
 import ru.rsreu.contests_system.api.organization.event.exception.EventExceptionsMessagesUtil;
 import ru.rsreu.contests_system.api.organization.event.exception.EventNotFoundException;
 import ru.rsreu.contests_system.api.organization.event.exception.ParticipantInfoNotFoundException;
 import ru.rsreu.contests_system.api.organization.event.participant_info.ParticipantInfo;
 import ru.rsreu.contests_system.api.organization.event.participant_info.task_solution.TaskSolution;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.event_creating.EventWithCreator;
 import ru.rsreu.contests_system.api.organization.event.service.checking.EventCheckerUtil;
 import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantEventConditionChecker;
+import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
 import ru.rsreu.contests_system.api.organization.repository.OrganizationRepository;
+import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 import ru.rsreu.contests_system.api.task.Task;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public record EventService(
         OrganizationRepository organizationRepository,
+        OrganizationService organizationService,
         UserService userService,
         EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
         EventDateUtil eventDateUtil,
@@ -80,7 +84,7 @@ public record EventService(
     public Event getEventById(String eventObjectId) {
         return organizationRepository.findEventById(new ObjectId(eventObjectId)).orElseThrow(
                 () -> new EventNotFoundException(
-                        eventExceptionsMessagesUtil.formEventNotFoundExceptionMessageById(eventObjectId)));
+                        eventExceptionsMessagesUtil.formEventNotFoundExceptionMessageByIdMessage(eventObjectId)));
     }
 
     public void unfollowFromEvent(Authentication authentication, String eventId) {
@@ -110,7 +114,7 @@ public record EventService(
     }
 
     private void performStartingEvent(Event event, User participant) {
-        checkNonStarted(event);
+        eventCheckerUtil.checkNonStarted(event);
         performAddingStartingInfoToParticipantInfo(getParticipantInfoByEventAndParticipant(event, participant), event);
     }
 
@@ -119,14 +123,7 @@ public record EventService(
                 .findParticipantInfoByEventAndParticipant(event, participant)
                 .orElseThrow(() ->
                         new ParticipantInfoNotFoundException(
-                                eventExceptionsMessagesUtil.formParticipantInfoNotFoundException(participant)));
-    }
-
-    private void checkNonStarted(Event event) {
-        if (!event.isStarted()) {
-            throw new ActionWithNonStartedEventException(
-                    eventExceptionsMessagesUtil.formActionWithNonStartedEventException(event));
-        }
+                                eventExceptionsMessagesUtil.formParticipantInfoNotFoundExceptionMessage(participant)));
     }
 
     private void performAddingStartingInfoToParticipantInfo(ParticipantInfo participantInfo, Event event) {
@@ -168,7 +165,8 @@ public record EventService(
     public Event getEventByTaskSolutionId(String taskSolutionId) {
         return organizationRepository.findEventByTaskSolutionId(new ObjectId(taskSolutionId))
                 .orElseThrow(() -> new EventNotFoundException(
-                        eventExceptionsMessagesUtil.formEventNotFoundExceptionMessageByTaskSolutionId(taskSolutionId)));
+                        eventExceptionsMessagesUtil
+                                .formEventNotFoundExceptionMessageByTaskSolutionIdMessage(taskSolutionId)));
     }
 
     public ParticipantInfo getParticipantInfoByConditionChecking(
@@ -180,5 +178,26 @@ public record EventService(
 
     public EventType[] getAllEventTypes() {
         return EventType.values();
+    }
+
+    public boolean isEventNameUnique(String eventName) {
+        return organizationRepository.countAllByEventName(eventName) == 0;
+    }
+
+    public void createEvent(EventWithCreator eventWithCreator) {
+        Event event = eventWithCreator.event();
+        User creator = eventWithCreator.creator();
+        Organization organization = getOrganizationByEventLeader(event.getEventLeader());
+        eventCheckerUtil.checkValidEventLeader(organization, event.getEventLeader(), creator);
+        eventCheckerUtil.checkValidEventType(creator, event.getEventType(), organization);
+        organizationRepository.addEventToOrganization(organization, event);
+    }
+
+    private Organization getOrganizationByEventLeader(User eventLeader) {
+        try {
+            return organizationService.getOrganizationByLeader(eventLeader);
+        } catch (OrganizationNotFoundException exception) {
+            return organizationService.getOrganizationByOrganizer(eventLeader);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package ru.rsreu.contests_system.api.user.service;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,6 @@ import ru.rsreu.contests_system.api.user.resource.dto.change_info.ChangeUserInfo
 import ru.rsreu.contests_system.security.user.AuthenticationUserDetailMapper;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public record UserService(
@@ -37,9 +37,17 @@ public record UserService(
         return userRepository.findAll(PageRequest.of(pageNumber, pageSize)).stream().toList();
     }
 
-    public User getUserByEmail(String email) throws NoSuchElementException {
+    public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new UserNotFoundException(userExceptionsMessagesUtil.formUserNotFoundExceptionByEmailMessage(email)));
+                () -> new UserNotFoundException(userExceptionsMessagesUtil
+                        .formUserNotFoundExceptionByEmailMessage(email)));
+    }
+
+    public User getUserById(String id) {
+        ObjectId objectId = new ObjectId(id);
+        return userRepository.findById(objectId).orElseThrow(
+                () -> new UserNotFoundException(userExceptionsMessagesUtil
+                        .formUserNotFoundExceptionByIdMessage(objectId)));
     }
 
     public void addRefreshToken(String email, String refreshToken) {

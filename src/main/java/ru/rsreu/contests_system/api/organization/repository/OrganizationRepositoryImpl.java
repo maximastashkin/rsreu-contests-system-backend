@@ -71,7 +71,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     public Optional<Event> findEventById(ObjectId eventId) {
         List<Event> mappedResults = getEventsByAggregation(
                 Aggregation.newAggregation(getEventByIdAggregationPipeline(eventId).getOperations()));
-        return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+        return getOptionalByQueryResults(mappedResults);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
         List<ParticipantInfo> mappedResults = getParticipantsInfosByAggregation(
                 Aggregation.newAggregation(
                         getParticipantInfoByEventAndParticipantPipeline(event, participant).getOperations()));
-        return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+        return getOptionalByQueryResults(mappedResults);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     public Optional<Event> findEventByTaskSolutionId(ObjectId taskSolutionId) {
         List<Event> mappedResults = getEventsByAggregation(
                 Aggregation.newAggregation(getEventByTaskSolutionIdPipeline(taskSolutionId).getOperations()));
-        return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+        return getOptionalByQueryResults(mappedResults);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
         List<TaskSolution> mappedResults = getTasksSolutionsByAggregation(
                 newAggregation(
                         getTasksSolutionsByParticipantAndIdPipeline(participant, taskSolutionId).getOperations()));
-        return mappedResults.isEmpty() ? Optional.empty() : Optional.of(mappedResults.get(0));
+        return getOptionalByQueryResults(mappedResults);
     }
 
     @Override
@@ -172,6 +172,30 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
                 getUpdateForAddingOrganizerToOrganization(organizer),
                 Organization.class
         );
+    }
+
+    @Override
+    public Optional<Organization> findOrganizationByOrganizer(User organizer) {
+        List<Organization> results = mongoTemplate
+                .find(getOrganizationByOrganizerQuery(organizer), Organization.class);
+        return getOptionalByQueryResults(results);
+    }
+
+    private Query getOrganizationByOrganizerQuery(User organizer) {
+        return Query.query(where("organizers.$id").is(organizer.getId()));
+    }
+
+    @Override
+    public void addEventToOrganization(Organization organization, Event event) {
+        mongoTemplate.updateFirst(
+                getOrganizationQuery(organization),
+                getUpdateForAddingEvent(event),
+                Organization.class
+        );
+    }
+
+    private Update getUpdateForAddingEvent(Event event) {
+        return new Update().push("events").value(event);
     }
 
     public Query getOrganizationQuery(Organization organization) {
@@ -365,5 +389,9 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
     private List<TaskSolution> getTasksSolutionsByAggregation(Aggregation aggregation) {
         return mongoTemplate.aggregate(
                 aggregation, "organizations", TaskSolution.class).getMappedResults();
+    }
+
+    private <T> Optional<T> getOptionalByQueryResults(List<T> results) {
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 }

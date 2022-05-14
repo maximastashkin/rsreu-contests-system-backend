@@ -65,4 +65,36 @@ public class EventExceptionControllerAdvice {
     public ResponseEntity<?> handleActionWithNonFinishedEventException(ActionWithNonFinishedEventException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(EventWrongDatesOrderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> handleEventWrongDatesOrderException(EventWrongDatesOrderException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotAvailableForOrganizerEventType.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<?> handleNotAvailableForOrganizerEventType(NotAvailableForOrganizerEventType exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(EventLeaderAndCreatorNotInSameOrganizationException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ResponseEntity<?> handleEventLeaderAndCreatorNotInSameOrganizationException(
+            EventLeaderAndCreatorNotInSameOrganizationException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(AppointmentOrganizationLeaderAsEventLeaderException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<?> handleAppointmentOrganizationLeaderEventLeaderException(
+            AppointmentOrganizationLeaderAsEventLeaderException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(NotUniqueEventNameException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> handleNotUniqueEventNameException(NotUniqueEventNameException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
