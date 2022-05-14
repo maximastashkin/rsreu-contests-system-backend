@@ -72,12 +72,12 @@ public record EventCheckerUtil(EventExceptionsMessagesUtil eventExceptionsMessag
 
     public void checkValidEventLeader(Organization organization, User eventLeader, User eventCreator) {
         checkLeaderAndCreatorInSameOrganization(organization, eventLeader, eventCreator);
-        checkOrganizerNotMadeOrganizationLeaderEventLeader(organization, eventLeader, eventCreator);
+        checkOrganizerNotMadeOrganizationLeaderAsEventLeader(organization, eventLeader, eventCreator);
     }
 
-    private void checkOrganizerNotMadeOrganizationLeaderEventLeader(Organization organization, User eventLeader, User eventCreator) {
+    private void checkOrganizerNotMadeOrganizationLeaderAsEventLeader(Organization organization, User eventLeader, User eventCreator) {
         if (organization.isLeader(eventLeader) && !eventLeader.equals(eventCreator)) {
-            throw new AppointmentOrganizationLeaderEventLeaderException(
+            throw new AppointmentOrganizationLeaderAsEventLeaderException(
                     eventExceptionsMessagesUtil.formAppointmentOrganizationLeaderEventLeaderExceptionMessage(
                             eventLeader, eventCreator)
             );
@@ -95,5 +95,9 @@ public record EventCheckerUtil(EventExceptionsMessagesUtil eventExceptionsMessag
             throw new NotAvailableForOrganizerEventType(
                     eventExceptionsMessagesUtil().formNotAvailableForOrganizerEventType(eventType));
         }
+    }
+
+    public void checkUniqueEventName(String eventName) {
+
     }
 }

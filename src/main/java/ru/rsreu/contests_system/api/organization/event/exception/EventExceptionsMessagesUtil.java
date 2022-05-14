@@ -68,7 +68,11 @@ public class EventExceptionsMessagesUtil {
     }
 
     public String formAppointmentOrganizationLeaderEventLeaderExceptionMessage(User leader, User creator) {
-        return String.format("Attempt to appointment organization leader (id:%s) event leader by organizer (id:%s)",
+        return String.format("Attempt to appointment organization leader (id:%s) as event leader by organizer (id:%s)",
                 leader.getId().toString(), creator.getId().toString());
+    }
+
+    public String formNotUniqueEventNameException(String eventName) {
+        return String.format("Event with name '%s' already exists", eventName);
     }
 }

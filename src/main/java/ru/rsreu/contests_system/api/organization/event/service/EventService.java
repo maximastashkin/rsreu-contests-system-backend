@@ -180,6 +180,10 @@ public record EventService(
         return EventType.values();
     }
 
+    public boolean isEventNameUnique(String eventName) {
+        return organizationRepository.countAllByEventName(eventName) == 0;
+    }
+
     public void createEvent(EventWithCreator eventWithCreator) {
         Event event = eventWithCreator.event();
         User creator = eventWithCreator.creator();

@@ -85,10 +85,16 @@ public class EventExceptionControllerAdvice {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
     }
 
-    @ExceptionHandler(AppointmentOrganizationLeaderEventLeaderException.class)
+    @ExceptionHandler(AppointmentOrganizationLeaderAsEventLeaderException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<?> handleAppointmentOrganizationLeaderEventLeaderException(
-            AppointmentOrganizationLeaderEventLeaderException exception) {
+            AppointmentOrganizationLeaderAsEventLeaderException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(NotUniqueEventNameException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> handleNotUniqueEventNameException(NotUniqueEventNameException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

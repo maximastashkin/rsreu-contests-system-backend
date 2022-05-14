@@ -274,9 +274,24 @@ public class EventResource {
                 HttpStatus.OK);
     }
 
-    @PostMapping
+    @Operation(summary = "${api.orgs.events.create.operation}", description = "${api.orgs.events.create.description}")
+    @PostMapping(consumes = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "${api.orgs.events.create.response-codes.created}",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "${api.orgs.events.create.response-codes.bad-request}",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "${api.orgs.events.create.response-codes.forbidden}",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "${api.orgs.events.create.response-codes.not-found}",
+                    content = @Content),
+            @ApiResponse(responseCode = "406", description = "${api.orgs.events.create.response-codes.not-acceptable}",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "${api.orgs.events.create.response-codes.conflict}",
+                    content = @Content)
+    })
     public ResponseEntity<?> createEvent(Authentication authentication,
-                                         @RequestBody @Valid EventCreatingRequest  eventCreatingRequest) {
+                                         @RequestBody @Valid EventCreatingRequest eventCreatingRequest) {
         eventService.createEvent(eventCreatingMapper.toEventWithCreator(eventCreatingRequest, authentication));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
