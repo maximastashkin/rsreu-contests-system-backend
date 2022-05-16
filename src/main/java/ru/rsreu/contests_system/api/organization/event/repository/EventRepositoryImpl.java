@@ -78,6 +78,15 @@ public class EventRepositoryImpl implements EventRepository {
         return repositoryUtil.getOptionalByQueryResults(mappedResults);
     }
 
+    @Override
+    public void setEventLeader(Event event, User leader) {
+        mongoTemplate.updateFirst(
+                eventRepositoryUtil.getOrganizationByEventQuery(event),
+                eventRepositoryUtil.getUpdateForEventLeaderSetting(event, leader),
+                Organization.class
+        );
+    }
+
     private List<Event> getEventsByAggregation(Aggregation aggregation) {
         return mongoTemplate.aggregate(aggregation, "organizations", Event.class).getMappedResults();
     }

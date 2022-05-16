@@ -9,17 +9,12 @@ import ru.rsreu.contests_system.api.user.User;
 public class EventExceptionsMessagesUtil {
     public String formActionWithNonActualEventException(Event event) {
         return String.format(
-                "Unable to perform participant action with event with id:%s, because it's non-actual",
+                "Unable to perform action with event with id:%s, because it's non-actual",
                 event.getId());
     }
 
     public String formUserFollowingExceptionMessage(User participant) {
         return String.format("User with email:%s already start or completed this event", participant.getEmail());
-    }
-
-    public String formParticipantInfoNotFoundExceptionMessage(User participant) {
-        return String.format("Critical error. Server didn't create ParticipantInfo for user with email:%s",
-                participant.getEmail());
     }
 
     public String formActionWithNonStartedEventExceptionMessage(Event event) {

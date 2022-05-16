@@ -99,4 +99,10 @@ public class EventRepositoryUtil {
     private MatchOperation getEventByTaskSolutionIdMatchOperation(ObjectId taskSolutionId) {
         return match(where("participantsInfos.tasksSolutions._id").is(taskSolutionId));
     }
+
+    public Update getUpdateForEventLeaderSetting(Event event, User leader) {
+        return new Update()
+                .set("events.$[i].eventLeader", leader)
+                .filterArray(repositoryUtil.getCriteriaForFilterArrayById(event.getId(), "i"));
+    }
 }

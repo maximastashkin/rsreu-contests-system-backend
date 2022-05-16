@@ -67,7 +67,8 @@ public record UserService(
         if (!user.getAuthorities().contains(Authority.ADMIN)) {
             replaceUserAuthority(user, Authority.UNBLOCKED, Authority.BLOCKED);
         } else {
-            throw new AdminBlockingAttemptException(userExceptionsMessagesUtil.formAdminBlockingAttemptExceptionMessage());
+            throw new AdminBlockingAttemptException(userExceptionsMessagesUtil
+                    .formAdminBlockingAttemptExceptionMessage());
         }
     }
 
@@ -101,5 +102,12 @@ public record UserService(
         user.setMiddleName(changeUserInfoRequest.middleName());
         user.setEducationPlace(changeUserInfoRequest.educationPlace());
         save(user);
+    }
+
+    public User getEventLeader(String eventLeaderId, User initiator) {
+        if (eventLeaderId != null) {
+            return getUserById(eventLeaderId);
+        }
+        return initiator;
     }
 }

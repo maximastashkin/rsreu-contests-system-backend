@@ -14,9 +14,11 @@ import ru.rsreu.contests_system.api.organization.event.participant_info.service.
 import ru.rsreu.contests_system.api.organization.event.participant_info.service.ParticipantInfoService;
 import ru.rsreu.contests_system.api.organization.event.repository.EventRepository;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_creating.EventWithCreator;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.leader_changing.EventLeaderChangingRequest;
 import ru.rsreu.contests_system.api.organization.event.service.checking.EventCheckerUtil;
 import ru.rsreu.contests_system.api.organization.event.service.checking.ParticipantEventConditionChecker;
 import ru.rsreu.contests_system.api.organization.exception.OrganizationNotFoundException;
+import ru.rsreu.contests_system.api.organization.service.OrganizationCheckerUtil;
 import ru.rsreu.contests_system.api.organization.service.OrganizationService;
 import ru.rsreu.contests_system.api.user.User;
 import ru.rsreu.contests_system.api.user.service.UserService;
@@ -33,7 +35,8 @@ public record EventService(
         EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
         EventDateUtil eventDateUtil,
         EventCompletingTasksHolder tasksHolder,
-        EventCheckerUtil eventCheckerUtil) {
+        EventCheckerUtil eventCheckerUtil,
+        OrganizationCheckerUtil organizationCheckerUtil) {
     public List<Event> getAllActualEvents(int pageSize, int pageNumber) {
         return eventRepository.findAllActualEvents(PageRequest.of(pageNumber, pageSize));
     }
@@ -163,5 +166,28 @@ public record EventService(
         } catch (OrganizationNotFoundException exception) {
             return organizationService.getOrganizationByOrganizer(eventLeader);
         }
+    }
+
+    public void changeEventLeader(Authentication authentication,
+                                  EventLeaderChangingRequest eventLeaderChangingRequest) {
+        Event event = getEventById(eventLeaderChangingRequest.eventId());
+        Organization organization = organizationService.getOrganizationByEventContaining(event);
+        User organizationLeader = userService.getUserByAuthentication(authentication);
+        User newEventLeader = userService.getEventLeader(
+                eventLeaderChangingRequest.newEventLeaderId(), organizationLeader);
+        performEventLeaderChanging(event, organization, organizationLeader, newEventLeader);
+    }
+
+    private void checkValidEventLeaderChanging(
+            Event event, Organization organization, User organizationLeader, User newEventLeader) {
+        eventCheckerUtil.checkNonActual(event);
+        organizationCheckerUtil.checkOrganizationLeader(organization, organizationLeader);
+        eventCheckerUtil.checkLeaderAndInitiatorInSameOrganization(organization, organizationLeader, newEventLeader);
+    }
+
+    private void performEventLeaderChanging(
+            Event event, Organization organization, User organizationLeader, User newEventLeader) {
+        checkValidEventLeaderChanging(event, organization, organizationLeader, newEventLeader);
+        eventRepository.setEventLeader(event, newEventLeader);
     }
 }

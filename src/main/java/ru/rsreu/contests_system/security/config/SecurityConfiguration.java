@@ -57,7 +57,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     };
 
     private static final String[] ORGANIZATION_LEADER_LIST = {
-            "/**/organizers/**"
+            "/**/organizers/**",
+            "/**/leader/change"
     };
 
     private static final String[] ORGANIZATION_LEADER_AND_ORGANIZER_LIST = {

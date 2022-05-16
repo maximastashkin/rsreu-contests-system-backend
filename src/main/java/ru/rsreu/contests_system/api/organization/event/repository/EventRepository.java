@@ -23,4 +23,6 @@ public interface EventRepository {
     void removeParticipantInfoFromEvent(ParticipantInfo participantInfo, Event event);
 
     Optional<Event> findEventByTaskSolutionId(ObjectId taskSolutionId);
+
+    void setEventLeader(Event event, User leader);
 }

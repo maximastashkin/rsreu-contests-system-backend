@@ -18,6 +18,7 @@ import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.E
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_types.EventTypesMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_types.EventTypesResponse;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.leader_changing.EventLeaderChangingRequest;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_completed_event_info.ParticipantCompletedEventInfoMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_completed_event_info.ParticipantCompletedEventInfoResponse;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.participant_started_event_info.ParticipantStartedEventInfoMapper;
@@ -294,5 +295,13 @@ public class EventResource {
                                          @RequestBody @Valid EventCreatingRequest eventCreatingRequest) {
         eventService.createEvent(eventCreatingMapper.toEventWithCreator(eventCreatingRequest, authentication));
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/leader/change")
+    public ResponseEntity<?> changeEventLeader(
+            Authentication authentication,
+            @RequestBody @Valid EventLeaderChangingRequest eventLeaderChangingRequest) {
+        eventService.changeEventLeader(authentication, eventLeaderChangingRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
