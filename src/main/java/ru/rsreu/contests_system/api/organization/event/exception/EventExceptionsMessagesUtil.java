@@ -58,7 +58,7 @@ public class EventExceptionsMessagesUtil {
     }
 
     public String formEventLeaderAndCreatorNotInSameOrganizationExceptionMessage(User leader, User creator) {
-        return String.format("Event leader with id:%s and event creator with id:%s isn't in same organization",
+        return String.format("Event leader with id:%s and event creator with id:%s aren't in same organization",
                 leader.getId().toString(), creator.getId().toString());
     }
 
