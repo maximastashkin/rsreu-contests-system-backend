@@ -237,18 +237,18 @@ public class EventResource {
     @Operation(summary = "${api.orgs.events.completed-info.operation}")
     @GetMapping(value = "/complete", produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.orgs.events.completed-info.responses.codes.ok}"),
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.completed-info.response-codes.ok}"),
             @ApiResponse(responseCode = "400",
-                    description = "${api.orgs.events.completed-info.responses.codes.bad-request}",
+                    description = "${api.orgs.events.completed-info.response-codes.bad-request}",
                     content = @Content),
             @ApiResponse(responseCode = "404",
-                    description = "${api.orgs.events.completed-info.responses.codes.not-found}",
+                    description = "${api.orgs.events.completed-info.response-codes.not-found}",
                     content = @Content),
             @ApiResponse(responseCode = "406",
-                    description = "${api.orgs.events.completed-info.responses.codes.not-acceptable}",
+                    description = "${api.orgs.events.completed-info.response-codes.not-acceptable}",
                     content = @Content),
             @ApiResponse(responseCode = "409",
-                    description = "${api.orgs.events.completed-info.responses.codes.conflict}",
+                    description = "${api.orgs.events.completed-info.response-codes.conflict}",
                     content = @Content)
     })
     public ResponseEntity<ParticipantCompletedEventInfoResponse> getCompletedEventInfo(
@@ -297,7 +297,22 @@ public class EventResource {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/leader/change")
+    @Operation(summary = "${api.orgs.events.change-leader.operation}")
+    @PostMapping(value = "/leader/change", consumes = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.change-leader.response-codes.ok}",
+                    content = @Content),
+            @ApiResponse(responseCode = "400",
+                    description = "${api.orgs.events.change-leader.response-codes.bad-request}", content = @Content),
+            @ApiResponse(responseCode = "403",
+                    description = "${api.orgs.events.change-leader.response-codes.forbidden}", content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "${api.orgs.events.change-leader.response-codes.not-found}", content = @Content),
+            @ApiResponse(responseCode = "406",
+                    description = "${api.orgs.events.change-leader.response-codes.not-acceptable}", content = @Content),
+            @ApiResponse(responseCode = "410", description = "${api.orgs.events.change-leader.response-codes.gone}",
+                    content = @Content)
+    })
     public ResponseEntity<?> changeEventLeader(
             Authentication authentication,
             @RequestBody @Valid EventLeaderChangingRequest eventLeaderChangingRequest) {
