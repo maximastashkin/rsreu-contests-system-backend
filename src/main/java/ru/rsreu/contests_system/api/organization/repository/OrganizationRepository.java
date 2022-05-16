@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import ru.rsreu.contests_system.api.organization.Organization;
+import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.user.User;
 
 import java.util.Optional;
@@ -25,4 +26,6 @@ public interface OrganizationRepository extends MongoRepository<Organization, Ob
 
     @Query(value = "{'events.name': /^?0$/i}}", count = true)
     long countAllByEventName(String eventName);
+
+    Optional<Organization> findOrganizationByEventsContaining(Event event);
 }

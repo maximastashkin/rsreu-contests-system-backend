@@ -5,10 +5,12 @@ import ru.rsreu.contests_system.api.organization.Organization;
 import ru.rsreu.contests_system.api.organization.event.Event;
 import ru.rsreu.contests_system.api.organization.event.EventType;
 import ru.rsreu.contests_system.api.organization.event.exception.*;
+import ru.rsreu.contests_system.api.organization.service.OrganizationCheckerUtil;
 import ru.rsreu.contests_system.api.user.User;
 
 @Component
-public record EventCheckerUtil(EventExceptionsMessagesUtil eventExceptionsMessagesUtil) {
+public record EventCheckerUtil(EventExceptionsMessagesUtil eventExceptionsMessagesUtil,
+                               OrganizationCheckerUtil organizationCheckerUtil) {
     public void checkStartedOrCompletedByParticipant(Event event, User participant) {
         if (event.isParticipantStartedEvent(participant) || event.isParticipantCompletedEvent(participant)) {
             throw new UserFollowingException(
@@ -60,22 +62,23 @@ public record EventCheckerUtil(EventExceptionsMessagesUtil eventExceptionsMessag
         }
     }
 
-    public void checkLeaderAndCreatorInSameOrganization(Organization organization, User eventLeader, User eventCreator) {
-        if (!(organization.isUserInOrganization(eventCreator) && organization.isUserInOrganization(eventLeader))) {
+    public void checkLeaderAndInitiatorInSameOrganization(Organization organization, User eventLeader, User initiator) {
+        if (!(organization.isUserInOrganization(initiator) && organization.isUserInOrganization(eventLeader))) {
             throw new EventLeaderAndCreatorNotInSameOrganizationException(
                     eventExceptionsMessagesUtil.formEventLeaderAndCreatorNotInSameOrganizationExceptionMessage(
-                            eventLeader, eventCreator
+                            eventLeader, initiator
                     )
             );
         }
     }
 
     public void checkValidEventLeader(Organization organization, User eventLeader, User eventCreator) {
-        checkLeaderAndCreatorInSameOrganization(organization, eventLeader, eventCreator);
+        checkLeaderAndInitiatorInSameOrganization(organization, eventLeader, eventCreator);
         checkOrganizerNotMadeOrganizationLeaderAsEventLeader(organization, eventLeader, eventCreator);
     }
 
-    private void checkOrganizerNotMadeOrganizationLeaderAsEventLeader(Organization organization, User eventLeader, User eventCreator) {
+    private void checkOrganizerNotMadeOrganizationLeaderAsEventLeader(
+            Organization organization, User eventLeader, User eventCreator) {
         if (organization.isLeader(eventLeader) && !eventLeader.equals(eventCreator)) {
             throw new AppointmentOrganizationLeaderAsEventLeaderException(
                     eventExceptionsMessagesUtil.formAppointmentOrganizationLeaderEventLeaderExceptionMessage(

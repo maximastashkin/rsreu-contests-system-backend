@@ -59,11 +59,11 @@ public class UserResource {
     @Operation(summary = "${api.users.change-info.operation}")
     @PostMapping(value = "/info", consumes = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.users.change-info.responses-codes.ok}",
+            @ApiResponse(responseCode = "200", description = "${api.users.change-info.response-codes.ok}",
                     content = @Content),
-            @ApiResponse(responseCode = "400", description = "${api.users.change-info.responses-codes.bad-request}",
+            @ApiResponse(responseCode = "400", description = "${api.users.change-info.response-codes.bad-request}",
                     content = @Content),
-            @ApiResponse(responseCode = "404", description = "${api.users.change-info.responses-codes.not-found}",
+            @ApiResponse(responseCode = "404", description = "${api.users.change-info.response-codes.not-found}",
                     content = @Content)
     })
     public ResponseEntity<?> updateUserInfo(Authentication authentication,
@@ -140,9 +140,9 @@ public class UserResource {
     @Operation(summary = "${api.users.check-email.operation}")
     @GetMapping(path = "/check-mail", produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.users.check-email.responses-codes.ok}",
+            @ApiResponse(responseCode = "200", description = "${api.users.check-email.response-codes.ok}",
                     content = @Content),
-            @ApiResponse(responseCode = "400", description = "${api.users.check-email.responses-codes.bad-request}",
+            @ApiResponse(responseCode = "400", description = "${api.users.check-email.response-codes.bad-request}",
                     content = @Content)
     })
     public ResponseEntity<CheckMailResponse> checkEmailUnique(@RequestParam @NotBlank @Email String email) {

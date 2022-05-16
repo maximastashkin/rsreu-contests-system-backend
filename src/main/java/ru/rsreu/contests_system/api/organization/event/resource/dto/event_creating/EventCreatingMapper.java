@@ -19,15 +19,8 @@ public record EventCreatingMapper(
                                                Authentication authentication) {
         User creator = userService.getUserByAuthentication(authentication);
         Event event = toEvent(eventCreatingRequest);
-        event.setEventLeader(getEventLeader(eventCreatingRequest, creator));
+        event.setEventLeader(userService.getEventLeader(eventCreatingRequest.eventLeaderId(), creator));
         return new EventWithCreator(event, creator);
-    }
-
-    private User getEventLeader(EventCreatingRequest eventCreatingRequest, User creator) {
-        if (eventCreatingRequest.eventLeaderId() != null) {
-            return userService.getUserById(eventCreatingRequest.eventLeaderId());
-        }
-        return creator;
     }
 
     private Event toEvent(EventCreatingRequest eventCreatingRequest) {

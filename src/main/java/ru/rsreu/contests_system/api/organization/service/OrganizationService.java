@@ -67,7 +67,7 @@ public class OrganizationService {
     public Organization getOrganizationById(String id) {
         return organizationRepository.findOrganizationOrganizationById(new ObjectId(id)).orElseThrow(
                 () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
-                        .formOrganizationNotFoundByLeaderException(id))
+                        .formOrganizationNotFoundByIdExceptionMessage(id))
         );
     }
 
@@ -89,14 +89,14 @@ public class OrganizationService {
     public Organization getOrganizationByLeader(User organizationLeader) {
         return organizationRepository.findOrganizationByOrganizationLeader(organizationLeader).orElseThrow(
                 () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
-                        .formOrganizationNotFoundByLeaderException(organizationLeader))
+                        .formOrganizationNotFoundByLeaderExceptionMessage(organizationLeader))
         );
     }
 
     public Organization getOrganizationByOrganizer(User organizer) {
         return organizationRepository.findOrganizationByOrganizer(organizer).orElseThrow(
                 () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
-                        .formOrganizationNotFoundByOrganizerException(organizer))
+                        .formOrganizationNotFoundByOrganizerExceptionMessage(organizer))
         );
     }
 
@@ -106,5 +106,12 @@ public class OrganizationService {
 
     public void addEventToOrganization(Organization organization, Event event) {
         organizationRepository.addEventToOrganization(organization, event);
+    }
+
+    public Organization getOrganizationByEventContaining(Event event) {
+        return organizationRepository.findOrganizationByEventsContaining(event).orElseThrow(
+                () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
+                        .formOrganizationNotFoundByEventExceptionMessage(event))
+        );
     }
 }
