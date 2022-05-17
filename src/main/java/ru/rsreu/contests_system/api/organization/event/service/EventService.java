@@ -190,4 +190,8 @@ public record EventService(
         checkValidEventLeaderChanging(event, organization, organizationLeader, newEventLeader);
         eventRepository.setEventLeader(event, newEventLeader);
     }
+
+    public boolean checkEventNameUnique(String eventName) {
+        return eventRepository.findEventByName(eventName).isEmpty();
+    }
 }

@@ -26,22 +26,23 @@ public class EventRepositoryImpl implements EventRepository {
     @Override
     public Optional<Event> findEventById(ObjectId eventId) {
         List<Event> mappedResults = getEventsByAggregation(
-                Aggregation.newAggregation(eventRepositoryUtil.getEventByIdAggregationPipeline(eventId)
+                Aggregation.newAggregation(eventRepositoryUtil.getEventByIdPipeline(eventId)
                         .getOperations()));
         return repositoryUtil.getOptionalByQueryResults(mappedResults);
     }
 
     @Override
     public List<Event> findAllActualEvents(Pageable pageable) {
-        AggregationPipeline pipeline = eventRepositoryUtil.getActualEventsAggregationPipeline();
+        AggregationPipeline pipeline = eventRepositoryUtil.getActualEventsPipeline();
         repositoryUtil.addOperationsFromPipeline(repositoryUtil.getPaginationPipeline(pageable), pipeline);
         return getEventsByAggregation(Aggregation.newAggregation(pipeline.getOperations()));
     }
 
     @Override
     public List<Event> findUserAllActualEvents(User user, Pageable pageable) {
-        AggregationPipeline pipeline = eventRepositoryUtil.getActualEventsAggregationPipeline();
-        pipeline.add(eventRepositoryUtil.getParticipantEventsMatchOperation(user)).add(repositoryUtil.getMatchByCompletedOperation(false));
+        AggregationPipeline pipeline = eventRepositoryUtil.getActualEventsPipeline();
+        pipeline.add(eventRepositoryUtil.getParticipantEventsMatchOperation(user))
+                .add(repositoryUtil.getMatchByCompletedOperation(false));
         repositoryUtil.addOperationsFromPipeline(repositoryUtil.getPaginationPipeline(pageable), pipeline);
         return getEventsByAggregation(Aggregation.newAggregation(pipeline.getOperations()));
     }
@@ -49,7 +50,8 @@ public class EventRepositoryImpl implements EventRepository {
     @Override
     public List<Event> findUserAllCompletedEvents(User user, Pageable pageable) {
         AggregationPipeline pipeline = eventRepositoryUtil.getUnwindEventsPipeline();
-        pipeline.add(eventRepositoryUtil.getParticipantEventsMatchOperation(user)).add(repositoryUtil.getMatchByCompletedOperation(true));
+        pipeline.add(eventRepositoryUtil.getParticipantEventsMatchOperation(user))
+                .add(repositoryUtil.getMatchByCompletedOperation(true));
         pipeline.add(eventRepositoryUtil.getEventsSortByStartDateTimeOperation());
         repositoryUtil.addOperationsFromPipeline(repositoryUtil.getPaginationPipeline(pageable), pipeline);
         return getEventsByAggregation(Aggregation.newAggregation(pipeline.getOperations()));
@@ -74,7 +76,8 @@ public class EventRepositoryImpl implements EventRepository {
     @Override
     public Optional<Event> findEventByTaskSolutionId(ObjectId taskSolutionId) {
         List<Event> mappedResults = getEventsByAggregation(
-                Aggregation.newAggregation(eventRepositoryUtil.getEventByTaskSolutionIdPipeline(taskSolutionId).getOperations()));
+                Aggregation.newAggregation(eventRepositoryUtil
+                        .getEventByTaskSolutionIdPipeline(taskSolutionId).getOperations()));
         return repositoryUtil.getOptionalByQueryResults(mappedResults);
     }
 
@@ -85,6 +88,13 @@ public class EventRepositoryImpl implements EventRepository {
                 eventRepositoryUtil.getUpdateForEventLeaderSetting(event, leader),
                 Organization.class
         );
+    }
+
+    @Override
+    public Optional<Event> findEventByName(String name) {
+        List<Event> mappedResults = getEventsByAggregation(
+                Aggregation.newAggregation(eventRepositoryUtil.getEventByNamePipeline(name).getOperations()));
+        return repositoryUtil.getOptionalByQueryResults(mappedResults);
     }
 
     private List<Event> getEventsByAggregation(Aggregation aggregation) {
