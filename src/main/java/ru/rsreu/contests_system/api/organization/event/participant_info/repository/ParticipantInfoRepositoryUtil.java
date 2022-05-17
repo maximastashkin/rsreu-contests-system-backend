@@ -27,7 +27,7 @@ public class ParticipantInfoRepositoryUtil {
     private final EventRepositoryUtil eventRepositoryUtil;
 
     public AggregationPipeline getParticipantInfoByEventAndParticipantPipeline(Event event, User participant) {
-        AggregationPipeline pipeline = eventRepositoryUtil.getEventByIdAggregationPipeline(event.getId());
+        AggregationPipeline pipeline = eventRepositoryUtil.getEventByIdPipeline(event.getId());
         repositoryUtil.addOperationsFromPipeline(getUnwindParticipantsInfosPipeline(), pipeline);
         pipeline.add(getParticipantInfosMatchOperation(participant));
         return pipeline;

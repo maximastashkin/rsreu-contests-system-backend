@@ -25,4 +25,6 @@ public interface EventRepository {
     Optional<Event> findEventByTaskSolutionId(ObjectId taskSolutionId);
 
     void setEventLeader(Event event, User leader);
+
+    Optional<Event> findEventByName(String name);
 }

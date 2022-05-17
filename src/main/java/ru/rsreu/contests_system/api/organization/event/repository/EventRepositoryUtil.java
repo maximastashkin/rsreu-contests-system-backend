@@ -15,7 +15,6 @@ import ru.rsreu.contests_system.util.RepositoryUtil;
 import java.time.LocalDateTime;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.ArrayOperators.Filter.filter;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -65,9 +64,9 @@ public class EventRepositoryUtil {
         return pipeline;
     }
 
-    AggregationPipeline getActualEventsAggregationPipeline() {
+    AggregationPipeline getActualEventsPipeline() {
         return getBaseEventAggregationPipelineWithFilter(
-                        getActualEventsFilter())
+                getActualEventsFilter())
                 .add(getEventsSortByStartDateTimeOperation());
     }
 
@@ -81,7 +80,7 @@ public class EventRepositoryUtil {
         return Query.query(where("events._id").is(event.getId()));
     }
 
-    public AggregationPipeline getEventByIdAggregationPipeline(ObjectId eventId) {
+    public AggregationPipeline getEventByIdPipeline(ObjectId eventId) {
         return getBaseEventAggregationPipelineWithFilter(getEventByIdFilter(eventId));
     }
 
@@ -104,5 +103,13 @@ public class EventRepositoryUtil {
         return new Update()
                 .set("events.$[i].eventLeader", leader)
                 .filterArray(repositoryUtil.getCriteriaForFilterArrayById(event.getId(), "i"));
+    }
+
+    public AggregationPipeline getEventByNamePipeline(String name) {
+        return getBaseEventAggregationPipelineWithFilter(getEventByNameFilter(name));
+    }
+
+    private ArrayOperators.Filter getEventByNameFilter(String name) {
+        return getEventsFilterBase().by(ComparisonOperators.Eq.valueOf("event.name").equalToValue(name));
     }
 }

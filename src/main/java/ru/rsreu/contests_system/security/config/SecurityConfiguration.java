@@ -62,7 +62,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     };
 
     private static final String[] ORGANIZATION_LEADER_AND_ORGANIZER_LIST = {
-            "/**/events/"
+            "/**/events/",
+            "/**/events/check-name/"
     };
 
     private static final String[] ADMIN_LIST = {

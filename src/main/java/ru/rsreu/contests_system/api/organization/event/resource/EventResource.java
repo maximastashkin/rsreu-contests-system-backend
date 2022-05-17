@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.rsreu.contests_system.api.organization.event.Event;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.check_name.CheckEventNameUniqueMapper;
+import ru.rsreu.contests_system.api.organization.event.resource.dto.check_name.CheckEventNameUniqueResponse;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_creating.EventCreatingMapper;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_creating.EventCreatingRequest;
 import ru.rsreu.contests_system.api.organization.event.resource.dto.event_info.EventInfoMapper;
@@ -32,6 +34,7 @@ import ru.rsreu.contests_system.validation.object_id.ObjectId;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +53,7 @@ public class EventResource {
     private final ParticipantCompletingEventConditionChecker participantCompletingEventConditionChecker;
     private final EventTypesMapper eventTypesMapper;
     private final EventCreatingMapper eventCreatingMapper;
+    private final CheckEventNameUniqueMapper checkEventNameUniqueMapper;
 
     @Operation(summary = "${api.orgs.events.all-actual.operation}")
     @GetMapping(value = "/all-actual/{pageSize}/{pageNumber}", produces = "application/json")
@@ -318,5 +322,18 @@ public class EventResource {
             @RequestBody @Valid EventLeaderChangingRequest eventLeaderChangingRequest) {
         eventService.changeEventLeader(authentication, eventLeaderChangingRequest);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "${api.orgs.events.check-name.operation}")
+    @GetMapping(value = "/check-name", produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.orgs.events.check-name.response-codes.ok}")
+    })
+    public ResponseEntity<CheckEventNameUniqueResponse> checkEventNameUnique(
+            @RequestParam @NotBlank String eventName) {
+        return new ResponseEntity<>(
+                checkEventNameUniqueMapper.toResponse(eventService.
+                        checkEventNameUnique(eventName)),
+                HttpStatus.OK);
     }
 }
