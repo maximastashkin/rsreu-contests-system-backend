@@ -25,7 +25,6 @@ public class OrganizationRepositoryImpl implements OrganizationCustomRepository 
         );
     }
 
-    @Override
     public Optional<Organization> findOrganizationByOrganizer(User organizer) {
         List<Organization> results = mongoTemplate
                 .find(organizationRepositoryUtil.getOrganizationByOrganizerQuery(organizer), Organization.class);

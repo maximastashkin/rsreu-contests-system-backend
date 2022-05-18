@@ -24,6 +24,8 @@ public interface OrganizationRepository extends MongoRepository<Organization, Ob
 
     Optional<Organization> findOrganizationByOrganizationLeader(User organizationLeader);
 
+    Optional<Organization> findOrganizationByOrganizersContaining(User organizer);
+
     @Query(value = "{'events.name': /^?0$/i}}", count = true)
     long countAllByEventName(String eventName);
 
