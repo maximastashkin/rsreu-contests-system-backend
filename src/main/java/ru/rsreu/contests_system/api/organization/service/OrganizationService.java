@@ -94,7 +94,7 @@ public class OrganizationService {
     }
 
     public Organization getOrganizationByOrganizer(User organizer) {
-        return organizationRepository.findOrganizationByOrganizer(organizer).orElseThrow(
+        return organizationRepository.findOrganizationByOrganizersContaining(organizer).orElseThrow(
                 () -> new OrganizationNotFoundException(organizationExceptionsMessagesUtil
                         .formOrganizationNotFoundByOrganizerExceptionMessage(organizer))
         );
